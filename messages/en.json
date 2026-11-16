@@ -74,7 +74,11 @@
   "dashboard": {
     "title": "Dashboard",
     "empty": "Your workspace is ready. Buildings and leases arrive in the next milestone.",
-    "orgCreated": "Organization created"
+    "orgCreated": "Organization created",
+    "expiringLeases": "Leases expiring soon",
+    "expiringSubtitle": "Active leases ending within the next 30 days that may require renewal or termination notice.",
+    "daysLeft": "{days} days left",
+    "viewAll": "View all leases"
   },
   "settings": {
     "users": {

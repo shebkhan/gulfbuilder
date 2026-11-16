@@ -1362,6 +1362,16 @@ export type Database = {
       isnt_empty: { Args: { "": string }; Returns: string }
       lease_building_id: { Args: { p_lease: string }; Returns: string }
       lease_capacity: { Args: { p_lease: string }; Returns: number }
+      leases_expiring: {
+        Args: { p_days?: number }
+        Returns: {
+          days_left: number
+          end_date: string
+          lease_id: string
+          lease_no: string
+          tenant_name: string
+        }[]
+      }
       lives_ok: { Args: { "": string }; Returns: string }
       no_plan: { Args: never; Returns: boolean[] }
       num_failed: { Args: never; Returns: number }
