@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* White-label defaults; the root layout overrides these from org_branding (SPEC 10). */
+    --brand-primary: #795919;
+    --brand-container: #c9a15a;
+    --on-brand: #ffffff;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    overscroll-behavior: none;
+    @apply bg-surface-container-low font-body-md text-body-md text-on-surface antialiased;
+  }
+
+  /* Financial figures, dates and areas must align in columns (DESIGN.md typography rules). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}

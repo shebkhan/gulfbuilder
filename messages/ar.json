@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "properties": "العقارات",
+    "tenants": "المستأجرون",
+    "leases": "عقود الإيجار",
+    "finance": "المالية",
+    "payments": "المدفوعات",
+    "cheques": "الشيكات",
+    "deposits": "التأمينات",
+    "expenses": "المصروفات",
+    "maintenance": "الصيانة",
+    "reports": "التقارير",
+    "settings": "الإعدادات"
+  },
+  "common": {
+    "appName": "عقارات الخليج",
+    "appTagline": "الإدارة",
+    "language": "اللغة",
+    "currency": "ر.ق"
+  }
+}

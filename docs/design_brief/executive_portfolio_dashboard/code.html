@@ -1,0 +1,518 @@
+<!DOCTYPE html><html class="h-full bg-surface-container-low" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-error-container": "#93000a", "primary-fixed-dim": "#ebc076", "error": "#ba1a1a", "surface-container-highest": "#e5e2de", "on-primary": "#ffffff", "inverse-primary": "#ebc076", "on-background": "#1c1c1a", "on-secondary-container": "#1e724c", "surface-container-high": "#ebe8e4", "on-surface": "#1c1c1a", "surface-dim": "#dcdad6", "on-error": "#ffffff", "secondary-fixed-dim": "#87d7aa", "on-primary-fixed": "#271900", "tertiary-container": "#8eabbf", "surface-bright": "#fcf9f5", "secondary-container": "#a2f4c5", "surface": "#fcf9f5", "outline": "#807667", "on-secondary-fixed-variant": "#005233", "on-secondary": "#ffffff", "on-surface-variant": "#4e4639", "on-tertiary-fixed": "#001e2c", "on-tertiary-container": "#234050", "secondary": "#156c47", "tertiary": "#456273", "surface-container-low": "#f6f3ef", "surface-container": "#f0edea", "tertiary-fixed": "#c8e7fc", "on-tertiary-fixed-variant": "#2d4a5b", "on-primary-container": "#513800", "on-tertiary": "#ffffff", "primary-container": "#c9a15a", "outline-variant": "#d2c5b4", "secondary-fixed": "#a2f4c5", "inverse-surface": "#31302e", "on-primary-fixed-variant": "#5e4100", "surface-variant": "#e5e2de", "surface-tint": "#795919", "surface-container-lowest": "#ffffff", "error-container": "#ffdad6", "inverse-on-surface": "#f3f0ec", "primary": "#795919", "tertiary-fixed-dim": "#adcbdf", "on-secondary-fixed": "#002112", "primary-fixed": "#ffdea9", "background": "#fcf9f5" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "margin-mobile": "1rem", "margin": "2rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "gutter": "1.25rem", "space-xl": "2.5rem", "space-sm": "0.5rem", "gutter-mobile": "0.75rem" }, "fontFamily": { "metric-num-sm": [ "Manrope" ], "body-sm": [ "Inter" ], "label-md": [ "Inter" ], "headline-md": [ "Manrope" ], "headline-sm": [ "Manrope" ], "headline-lg-mobile": [ "Manrope" ], "display-lg": [ "Manrope" ], "section-kicker": [ "Inter" ], "body-md": [ "Inter" ], "metric-num": [ "Manrope" ], "body-lg": [ "Inter" ], "headline-lg": [ "Manrope" ], "label-sm": [ "Inter" ] }, "fontSize": { "metric-num-sm": [ "20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-sm": [ "12px", { "lineHeight": "18px", "fontWeight": "400" } ], "label-md": [ "13px", { "lineHeight": "18px", "fontWeight": "500" } ], "headline-md": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "headline-sm": [ "18px", { "lineHeight": "26px", "letterSpacing": "0", "fontWeight": "600" } ], "headline-lg-mobile": [ "26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "display-lg": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "300" } ], "section-kicker": [ "11px", { "lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "600" } ], "body-md": [ "14px", { "lineHeight": "22px", "fontWeight": "400" } ], "metric-num": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "500" } ], "body-lg": [ "16px", { "lineHeight": "26px", "fontWeight": "400" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "400" } ], "label-sm": [ "11px", { "lineHeight": "16px", "fontWeight": "500" } ] } } } };</script></head><body class="bg-surface-container-low font-body-md text-body-md text-on-surface p-margin-mobile lg:p-margin antialiased min-h-screen"><div class="bg-surface-container-lowest rounded-[28px] shadow-[0_12px_32px_-8px_rgba(28,28,26,0.04),0_4px_12px_-4px_rgba(28,28,26,0.02)] min-h-[calc(100vh-4rem)] relative overflow-hidden flex flex-col" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 24px 48px -12px, rgba(49, 48, 46, 0.04) 0px 12px 24px -6px, rgba(210, 197, 180, 0.25) 0px 0px 0px 1px;"><aside class="hidden lg:flex fixed top-margin bottom-margin left-margin w-[210px] bg-surface-container-lowest flex-col z-30 justify-between py-6 px-3 rounded-l-[28px]"><div class="flex flex-col gap-6"><div class="flex items-center gap-3 px-3 pb-2"><img alt="Gulf Property Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrAGnEydkEJM4xbBxuoM6_p1YQ6jECPx0i15F6xhqThhOKzaU2Ph-vgNMSwA7Jxx66sYRNoKWfjkLIuD_c9mz8JvpixrTcXC2Ew7CXNYYQr7aNs9OulKIQFCXISm0dIX4haLgQNfEm0cbbz977tV-iHXnSruNh4M-8R9_ow7X86W5hXvqKnvq6yKbBafn4pwsXECcppkI0FAG6sWQji9N4M9vsbYCXIsLBTLYF72TSMD4Q"><div class="flex flex-col"><span class="font-headline-sm text-label-md text-on-surface leading-tight font-semibold tracking-tight">Gulf Property</span><span class="font-section-kicker text-section-kicker text-on-surface-variant uppercase tracking-widest text-[9px]">Management</span></div></div><nav class="flex flex-col gap-0.5" data-active-classes="bg-surface-container text-on-surface font-medium rounded-lg"><a aria-current="page" class="flex items-center gap-3 px-3 py-2 transition-all bg-surface-container text-on-surface font-medium rounded-lg" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">space_dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="portfolio" href="#"><span class="material-symbols-outlined text-[18px]">pie_chart</span><span>Portfolio</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="properties" href="#"><span class="material-symbols-outlined text-[18px]">domain</span><span>Properties</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="finance" href="#"><span class="material-symbols-outlined text-[18px]">account_balance_wallet</span><span>Finance</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="opportunities" href="#"><span class="material-symbols-outlined text-[18px]">query_stats</span><span>Opportunities</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="compliance" href="#"><span class="material-symbols-outlined text-[18px]">verified</span><span>Compliance</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="documents" href="#"><span class="material-symbols-outlined text-[18px]">folder</span><span>Documents</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="reports" href="#"><span class="material-symbols-outlined text-[18px]">analytics</span><span>Reports</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="contacts" href="#"><span class="material-symbols-outlined text-[18px]">contacts</span><span>Contacts</span></a></nav></div><div class="flex flex-col gap-1 pt-4"><nav class="flex flex-col gap-0.5" data-active-classes="bg-surface-container text-on-surface font-medium rounded-lg"><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[18px]">settings</span><span>Settings</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="support" href="#"><span class="material-symbols-outlined text-[18px]">help_center</span><span>Support &amp; Help</span></a></nav></div></aside><div class="w-full lg:pl-[210px] flex flex-col flex-1"><header class="fixed top-margin-mobile lg:top-margin left-margin-mobile lg:left-[calc(2rem+210px)] right-margin-mobile lg:right-margin h-16 z-20 bg-surface-container-lowest/90 backdrop-blur-md rounded-tr-[28px] rounded-tl-[28px] lg:rounded-tl-none"><div class="h-16 w-full px-6 flex items-center justify-between"><div class="flex items-center gap-3"><div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md" style="box-shadow: rgba(78, 70, 57, 0.06) 0px 2px 6px -1px, rgba(78, 70, 57, 0.04) 0px 1px 3px 0px, rgba(210, 197, 180, 0.35) 0px 0px 0px 1px;"><span class="material-symbols-outlined text-[16px] text-primary">corporate_fare</span><span class="font-medium">Doha Towers Holdings Ltd</span><span class="text-outline">•</span><span class="font-metric-num-sm text-label-sm text-primary tracking-wider">QAR</span></div></div><div class="flex items-center gap-4"><div class="hidden sm:inline-flex items-center rounded-full bg-surface-container-low p-1 text-on-surface-variant font-label-sm text-label-sm"><span class="px-2 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-medium shadow-sm">EN</span><span class="px-2 py-0.5 text-on-surface-variant hover:text-on-surface cursor-pointer">العربية</span></div><button class="relative p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span></button><div class="flex items-center gap-3 pl-2 cursor-pointer group"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2zg4cmc6D0bCHEgnS1-d7OGk4vY-ySF71iclRTxxgmCVWzF5weAJqDRC-DOxPtLa9FfVZo7xWPFN9MMHugJz-IJAFjPfreuUvmZBqxRFSr4NkOnXGWt8HydQU2GH6iu6_VFGD2Nw5ywNsPLNq6zjh0XkoMZ3xY9f6iqNaC0INEg9iugR41nsa4gSGMyskSMbgymlAJQrGiWnhOpBRmcCKbO-UIMgG8Gt_D9EMNziu"><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-none">Tariq Al-Mansoor</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Portfolio Director</span></div><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-on-surface transition-colors">keyboard_arrow_down</span></div></div></div></header><main class="w-full pt-16 px-6 lg:px-8 pb-8 flex-1 bg-surface-container-lowest rounded-b-[28px]"><div class="flex flex-col w-full gap-6">
+<!-- TOP GREETING & HORIZONTAL KPI ROW -->
+<section class="flex flex-col xl:flex-row items-stretch gap-6 justify-between">
+<!-- Left Greeting Brief -->
+<div class="flex flex-col justify-between py-1 min-w-[280px] xl:max-w-[340px]"><div class="flex flex-col gap-1.5">
+<span class="font-section-kicker uppercase tracking-widest text-[11px] font-bold text-[#61656b]">
+          Daily Briefing
+        </span>
+<h1 class="font-headline-lg text-headline-lg text-[#1e2022] tracking-tight font-medium">
+          Good morning, Tariq.
+        </h1>
+<p class="font-body-md text-body-md text-[#4a4d52]">
+          Here’s what changed across your property portfolio today.
+        </p>
+</div>
+<div class="mt-4 flex items-center gap-2.5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eaf6ee] border border-[#b8e2c7] text-[#1f7a4a] font-label-sm text-label-sm font-semibold shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1f7a4a]"></span>
+          Markets Active • Doha QSE
+        </span>
+<span class="font-label-sm text-label-sm text-[#61656b] font-medium">Updated 14m ago</span>
+</div></div>
+<!-- Right 4 KPI Metric Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 flex-1"><!-- KPI 1: Portfolio Value -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col justify-between hover:-translate-y-0.5 transition-all duration-300" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 8px 24px -4px, rgba(49, 48, 46, 0.04) 0px 2px 6px -1px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between text-[#61656b]">
+<span class="font-section-kicker uppercase text-[11px] font-bold text-[#61656b] tracking-wider">Portfolio Value</span>
+<span class="material-symbols-outlined text-[16px] text-[#807667] cursor-pointer hover:text-[#1e2022]">info</span>
+</div>
+<div class="my-3 flex items-baseline gap-1.5">
+<span class="font-metric-num text-metric-num text-[#1e2022] font-semibold">28.4M</span>
+<span class="font-label-sm text-label-sm text-[#4a4d52] font-semibold">QAR</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="inline-flex items-center gap-1 text-[11px] font-label-sm font-semibold text-[#1f7a4a] bg-[#eaf6ee] border border-[#b8e2c7] px-2.5 py-0.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[13px]">trending_up</span>
+<span>+240K vs prev mo</span>
+</div>
+<svg class="w-14 h-5 text-[#b8893d]" fill="none" viewBox="0 0 56 20">
+<path d="M1 17L12 13L24 15L36 7L46 10L55 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- KPI 2: Monthly Collections -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col justify-between hover:-translate-y-0.5 transition-all duration-300" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 8px 24px -4px, rgba(49, 48, 46, 0.04) 0px 2px 6px -1px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between text-[#61656b]">
+<span class="font-section-kicker uppercase text-[11px] font-bold text-[#61656b] tracking-wider">Monthly Collections</span>
+<span class="material-symbols-outlined text-[16px] text-[#807667] cursor-pointer hover:text-[#1e2022]">payments</span>
+</div>
+<div class="my-3 flex items-baseline gap-1.5">
+<span class="font-metric-num text-metric-num text-[#1e2022] font-semibold">846K</span>
+<span class="font-label-sm text-label-sm text-[#4a4d52] font-semibold">QAR</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="inline-flex items-center gap-1 text-[11px] font-label-sm font-semibold text-[#1f7a4a] bg-[#eaf6ee] border border-[#b8e2c7] px-2.5 py-0.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[13px]">arrow_upward</span>
+<span>+4.6% vs last mo</span>
+</div>
+<div class="flex items-end gap-1.5 h-5">
+<span class="w-1.5 h-2 rounded-full bg-[#e5e2de]"></span>
+<span class="w-1.5 h-3 rounded-full bg-[#ded9cf]"></span>
+<span class="w-1.5 h-2.5 rounded-full bg-[#ded9cf]"></span>
+<span class="w-1.5 h-4 rounded-full bg-[#ebc076]"></span>
+<span class="w-1.5 h-5 rounded-full bg-[#b8893d]"></span>
+</div>
+</div>
+</div>
+<!-- KPI 3: Occupancy -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col justify-between hover:-translate-y-0.5 transition-all duration-300" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 8px 24px -4px, rgba(49, 48, 46, 0.04) 0px 2px 6px -1px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between text-[#61656b]">
+<span class="font-section-kicker uppercase text-[11px] font-bold text-[#61656b] tracking-wider">Occupancy</span>
+<span class="material-symbols-outlined text-[16px] text-[#807667] cursor-pointer hover:text-[#1e2022]">apartment</span>
+</div>
+<div class="my-3 flex items-baseline gap-2">
+<span class="font-metric-num text-metric-num text-[#1e2022] font-semibold">94.2%</span>
+<span class="px-2 py-0.5 rounded-full bg-[#eaf6ee] text-[#1f7a4a] border border-[#b8e2c7] font-label-sm text-[11px] font-bold">Optimal</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-body-sm text-body-sm text-[#4a4d52] font-medium">1,248 of 1,325 units</span>
+<span class="material-symbols-outlined text-[18px] text-[#1f7a4a]">domain_verification</span>
+</div>
+</div>
+<!-- KPI 4: Outstanding Rent -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col justify-between hover:-translate-y-0.5 transition-all duration-300" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 8px 24px -4px, rgba(49, 48, 46, 0.04) 0px 2px 6px -1px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between text-[#61656b]">
+<span class="font-section-kicker uppercase text-[11px] font-bold text-[#61656b] tracking-wider">Outstanding Rent</span>
+<span class="material-symbols-outlined text-[16px] text-[#807667] cursor-pointer hover:text-[#1e2022]">pending_actions</span>
+</div>
+<div class="my-3 flex items-baseline gap-1.5">
+<span class="font-metric-num text-metric-num text-[#1e2022] font-semibold">182K</span>
+<span class="font-label-sm text-label-sm text-[#4a4d52] font-semibold">QAR</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#fdf3e2] border border-[#edd8b5] text-[#a26514] font-label-sm text-[11px] font-semibold shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#a26514]"></span>
+<span>37 accounts review</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-[#a26514]">error_outline</span>
+</div>
+</div></div>
+</section>
+<!-- MIDDLE SECTION: PORTFOLIO HEALTH (SPLIT) & OPPORTUNITIES -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+<!-- LEFT FEATURE CARD: Portfolio Health (Col 7) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row min-h-[340px]" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 16px 36px -6px, rgba(49, 48, 46, 0.04) 0px 4px 12px -2px; border: 1px solid rgb(222, 217, 207);">
+<!-- Architectural Image with soft right fade -->
+<div class="relative w-full md:w-5/12 min-h-[220px] md:min-h-full overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Modern architectural luxury waterfront residential skyscraper tower in Lusail Doha Qatar at golden hour with warm sunset reflections on curving glass facades, private yacht marina harbor below with luxury cruisers, calm teal water and clear sky in contemporary Middle Eastern luxury editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChTCZp26Iy0FYO1RZDb_qTtOllKPHFVvYpUT__K8eoKQuKUE2-rI-oFqNqXzx0Ewj2s_rzZlsCk-OF5VAuAKOx3TL-lFBFkZzqUgnCY8qR8XHgB30fD5rA8Jkoya8sDd_rUkm51N2yBBnqLFKduPZWoD1YOpC4UaT13vP3p5dmcykLw9YSYEANz_rgHtY-ehsBvj73AgahUXv7J_3S0dxrggsDrogHZlgNpeD_zfMe">
+<div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent via-transparent to-surface-container-lowest opacity-90 md:opacity-100"></div>
+<div class="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-[#1e2022] font-label-sm text-label-sm font-semibold shadow-md border border-[#e2ded5]">
+<span class="w-2 h-2 rounded-full bg-[#1f7a4a]"></span>
+<span>Lusail Marina Tower 01</span>
+</div>
+</div>
+<!-- Right Health Content -->
+<div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between">
+<div class="flex flex-col gap-3.5">
+<div class="flex items-center justify-between">
+<span class="font-section-kicker uppercase tracking-wider text-[11px] font-bold text-[#61656b]">
+              Portfolio Health
+            </span>
+<span class="font-label-sm text-label-sm text-[#1f7a4a] bg-[#eaf6ee] border border-[#b8e2c7] px-3 py-0.5 rounded-full font-bold shadow-sm">
+              High Confidence
+            </span>
+</div>
+<div class="flex items-center gap-5 mt-1">
+<!-- Progress Ring with punchy deep gold tone -->
+<div class="relative flex items-center justify-center w-20 h-20 shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 72 72">
+<circle cx="36" cy="36" fill="none" r="30" stroke="#e5e2de" stroke-width="6"></circle>
+<circle cx="36" cy="36" fill="none" r="30" stroke="#b8893d" stroke-dasharray="188.5" stroke-dashoffset="26.4" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center">
+<span class="font-metric-num-sm text-metric-num-sm font-bold text-[#1e2022]">86%</span>
+</div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-[#1e2022] font-semibold tracking-tight">
+                Portfolio Confidence Index
+              </h2>
+<p class="font-body-sm text-body-sm text-[#4a4d52] mt-1 leading-relaxed">
+                Aggregated valuation stability, lease rollover risk, and PDC settlement rate across 14 commercial &amp; residential properties.
+              </p>
+</div>
+</div>
+<div class="bg-[#fcf9f5] border border-[#ded9cf] rounded-xl p-3.5 mt-2">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-[#b8893d] shrink-0 mt-0.5 font-medium">auto_graph</span>
+<p class="font-body-sm text-body-sm text-[#1e2022] leading-snug">
+                Three actionable opportunities could improve portfolio yield by <strong class="font-bold text-[#a9772c]">+1.8%</strong> and reduce vacancy risk this quarter.
+              </p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-6 pt-2">
+<button class="px-5 py-2.5 rounded-full bg-[#1e2022] text-[#ffffff] hover:bg-[#31302e] transition-all font-label-md text-label-md font-semibold shadow-md flex items-center gap-2" style="box-shadow: rgba(30, 32, 34, 0.3) 0px 8px 18px -4px;">
+<span>Review opportunities</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+<a class="font-label-md text-label-md text-[#b8893d] hover:text-[#1e2022] font-semibold flex items-center gap-1 transition-colors" href="#">
+<span>Full analysis</span>
+<span class="material-symbols-outlined text-[15px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Highest Impact Opportunities (Col 5) -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 16px 36px -6px, rgba(49, 48, 46, 0.04) 0px 4px 12px -2px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between mb-4">
+<span class="font-section-kicker uppercase tracking-wider text-[11px] font-bold text-[#61656b]">
+          Highest Impact Opportunities
+        </span>
+<a class="font-label-sm text-label-sm text-[#b8893d] hover:text-[#1e2022] font-semibold flex items-center gap-1 transition-colors" href="#">
+<span>View all</span>
+<span class="material-symbols-outlined text-[15px]">chevron_right</span>
+</a>
+</div>
+<div class="flex flex-col gap-2.5">
+<!-- Opp 1 -->
+<div class="group flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-all cursor-pointer" style="border: 1px solid #ded9cf;">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#fdf5e7] border border-[#edd8b5] flex items-center justify-center text-[#b8893d] shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">real_estate_agent</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate group-hover:text-[#b8893d] transition-colors">
+                Review rents on 8 properties
+              </span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">
+                Below current West Bay market benchmarks
+              </span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 shrink-0 ml-3">
+<div class="text-right">
+<span class="font-label-md text-label-md text-[#1f7a4a] font-bold block">+12,500</span>
+<span class="font-label-sm text-[10px] text-[#61656b] font-semibold">QAR / mo</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-[#807667] group-hover:text-[#1e2022] transition-transform group-hover:translate-x-0.5">chevron_right</span>
+</div>
+</div>
+<!-- Opp 2 -->
+<div class="group flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-all cursor-pointer" style="border: 1px solid #ded9cf;">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#fdf3e2] border border-[#edd8b5] flex items-center justify-center text-[#a26514] shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">event_repeat</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate group-hover:text-[#b8893d] transition-colors">
+                Renew 6 leases approaching expiry
+              </span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">
+                Mitigate Lusail Marina vacancy exposure
+              </span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 shrink-0 ml-3">
+<div class="text-right">
+<span class="font-label-md text-label-md text-[#a26514] font-bold block">86K at risk</span>
+<span class="font-label-sm text-[10px] text-[#61656b] font-semibold">QAR yield</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-[#807667] group-hover:text-[#1e2022] transition-transform group-hover:translate-x-0.5">chevron_right</span>
+</div>
+</div>
+<!-- Opp 3 -->
+<div class="group flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-all cursor-pointer" style="border: 1px solid #ded9cf;">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#e8f0f5] border border-[#adcbdf] flex items-center justify-center text-[#456273] shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">handyman</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate group-hover:text-[#b8893d] transition-colors">
+                Review facility maintenance SLAs
+              </span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">
+                Consolidate MEP vendor contracts
+              </span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 shrink-0 ml-3">
+<div class="text-right">
+<span class="font-label-md text-label-md text-[#1e2022] font-bold block">24,000 / yr</span>
+<span class="font-label-sm text-[10px] text-[#61656b] font-semibold">QAR savings</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-[#807667] group-hover:text-[#1e2022] transition-transform group-hover:translate-x-0.5">chevron_right</span>
+</div>
+</div>
+<!-- Opp 4 -->
+<div class="group flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-all cursor-pointer" style="border: 1px solid #ded9cf;">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#fcedeb] border border-[#f5b8b2] flex items-center justify-center text-[#b43838] shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate group-hover:text-[#b8893d] transition-colors">
+                Resolve overdue rent &amp; PDCs
+              </span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">
+                12 tenant accounts require swift dispatch
+              </span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 shrink-0 ml-3">
+<div class="text-right">
+<span class="font-label-md text-label-md text-[#b43838] font-bold block">38,400</span>
+<span class="font-label-sm text-[10px] text-[#61656b] font-semibold">QAR pending</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-[#807667] group-hover:text-[#1e2022] transition-transform group-hover:translate-x-0.5">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- LOWER SECTION: MARKET INTELLIGENCE & CALENDAR EVENTS -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+<!-- LEFT PANEL: Market & Portfolio Intelligence (Col 7) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 16px 36px -6px, rgba(49, 48, 46, 0.04) 0px 4px 12px -2px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between mb-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-[#b8893d]">insights</span>
+<span class="font-section-kicker uppercase tracking-wider text-[11px] font-bold text-[#61656b]">
+            Market &amp; Portfolio Intelligence
+          </span>
+</div>
+<a class="font-label-sm text-label-sm text-[#b8893d] hover:text-[#1e2022] font-semibold flex items-center gap-1 transition-colors" href="#">
+<span>View full feed</span>
+<span class="material-symbols-outlined text-[15px]">chevron_right</span>
+</a>
+</div>
+<!-- 5 Insight Tiles in Bento Flow -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+<!-- Tile 1 -->
+<div class="bg-[#fcf9f5] rounded-xl p-4 flex flex-col justify-between hover:bg-[#f6f3ef] transition-all" style="border: 1px solid #ded9cf;">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest border border-[#b8e2c7] flex items-center justify-center text-[#1f7a4a]">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#1f7a4a] font-bold bg-[#eaf6ee] px-2 py-0.5 rounded-full border border-[#b8e2c7]">+5.4%</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-[#1e2022] font-bold mb-1">West Bay Demand</h3>
+<p class="font-body-sm text-body-sm text-[#4a4d52] leading-snug">
+              Prime high-rise demand climbing among international embassies and energy firms.
+            </p>
+</div>
+<div class="mt-3 pt-2">
+<svg class="w-full h-4 text-[#1f7a4a]" fill="none" viewBox="0 0 100 16">
+<path d="M0 14L20 11L45 13L70 6L100 2" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Tile 2 -->
+<div class="bg-[#fcf9f5] rounded-xl p-4 flex flex-col justify-between hover:bg-[#f6f3ef] transition-all" style="border: 1px solid #ded9cf;">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest border border-[#edd8b5] flex items-center justify-center text-[#b8893d]">
+<span class="material-symbols-outlined text-[18px]">history_toggle_off</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#61656b] font-semibold bg-surface-container px-2 py-0.5 rounded-full">90 Days</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-[#1e2022] font-bold mb-1">Lease Rollovers</h3>
+<p class="font-body-sm text-body-sm text-[#4a4d52] leading-snug">
+              18 corporate leases due across 4 commercial towers in Doha Diplomatic Area.
+            </p>
+</div>
+<div class="mt-3 pt-2">
+<div class="w-full bg-[#e5e2de] h-2 rounded-full overflow-hidden">
+<div class="bg-[#b8893d] h-full rounded-full" style="width: 68%;"></div>
+</div>
+</div>
+</div>
+<!-- Tile 3 -->
+<div class="bg-[#fcf9f5] rounded-xl p-4 flex flex-col justify-between hover:bg-[#f6f3ef] transition-all" style="border: 1px solid #ded9cf;">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest border border-[#adcbdf] flex items-center justify-center text-[#456273]">
+<span class="material-symbols-outlined text-[18px]">pie_chart</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#456273] font-bold bg-[#e8f0f5] px-2 py-0.5 rounded-full">OPEX</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-[#1e2022] font-bold mb-1">Operating Costs</h3>
+<p class="font-body-sm text-body-sm text-[#4a4d52] leading-snug">
+              Chiller &amp; elevator maintenance spend +3.2% vs Q3 budget forecast.
+            </p>
+</div>
+<div class="mt-3 pt-2 flex items-center gap-1.5 text-[#61656b] text-[11px] font-medium">
+<span class="material-symbols-outlined text-[14px] text-[#807667]">tune</span>
+<span>Target audit in Dec</span>
+</div>
+</div>
+<!-- Tile 4 -->
+<div class="bg-[#fcf9f5] rounded-xl p-4 flex flex-col justify-between sm:col-span-2 md:col-span-2 hover:bg-[#f6f3ef] transition-all" style="border: 1px solid #ded9cf;">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest border border-[#b8e2c7] flex items-center justify-center text-[#1f7a4a]">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</span>
+<span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-[#1f7a4a]">Municipality Compliance</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-[#eaf6ee] text-[#1f7a4a] border border-[#b8e2c7] font-label-sm text-[10px] font-bold tracking-wide">
+              NEW REGULATION
+            </span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-1">
+<p class="font-body-sm text-body-sm text-[#4a4d52] leading-snug max-w-md">
+              Qatar Ministry of Municipality Tawtheeq digital lease contract synchronization is mandatory for all 2027 renewal terms.
+            </p>
+<button class="shrink-0 px-4 py-1.5 rounded-full bg-[#1e2022] text-[#ffffff] hover:bg-[#31302e] transition-colors font-label-sm text-label-sm font-semibold shadow-sm">
+              Sync Portal
+            </button>
+</div>
+</div>
+<!-- Tile 5 -->
+<div class="bg-[#fcf9f5] rounded-xl p-4 flex flex-col justify-between hover:bg-[#f6f3ef] transition-all" style="border: 1px solid #ded9cf;">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest border border-[#b8e2c7] flex items-center justify-center text-[#1f7a4a]">
+<span class="material-symbols-outlined text-[18px]">domain_add</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#1f7a4a] font-bold bg-[#eaf6ee] px-2 py-0.5 rounded-full border border-[#b8e2c7]">97.8%</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-[#1e2022] font-bold mb-1">Lusail Marina Hub</h3>
+<p class="font-body-sm text-body-sm text-[#4a4d52] leading-snug">
+              Zero retail vacancy across beachfront pavilions following 3 tenant signings.
+            </p>
+</div>
+<div class="mt-3 pt-2 text-[11px] font-label-sm text-[#1f7a4a] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Fully leased</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Upcoming Portfolio Events (Col 5) -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col justify-between" style="box-shadow: rgba(49, 48, 46, 0.08) 0px 16px 36px -6px, rgba(49, 48, 46, 0.04) 0px 4px 12px -2px; border: 1px solid rgb(222, 217, 207);">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-[#b8893d]">event_upcoming</span>
+<span class="font-section-kicker uppercase tracking-wider text-[11px] font-bold text-[#61656b]">
+            Upcoming Portfolio Events
+          </span>
+</div>
+<a class="font-label-sm text-label-sm text-[#b8893d] hover:text-[#1e2022] font-semibold flex items-center gap-1 transition-colors" href="#">
+<span>View calendar</span>
+<span class="material-symbols-outlined text-[15px]">calendar_month</span>
+</a>
+</div>
+<!-- Event Rows -->
+<div class="flex flex-col gap-2">
+<!-- Row 1 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-colors group border border-[#ded9cf]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-[#ded9cf] flex flex-col items-center justify-center shrink-0 text-[#1e2022] shadow-sm">
+<span class="text-[9px] uppercase font-bold leading-none text-[#61656b]">Nov</span>
+<span class="font-metric-num-sm text-[13px] font-bold leading-tight text-[#1e2022]">23</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate">Lease expiry renewal</span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">Tower B, Unit 1204 • Al Mirqab</span>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 ml-3">
+<span class="px-2.5 py-0.5 rounded-full bg-[#fdf3e2] border border-[#edd8b5] text-[#a26514] font-label-sm text-[11px] font-bold">
+              7 days
+            </span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-colors group border border-[#ded9cf]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-[#ded9cf] flex flex-col items-center justify-center shrink-0 text-[#1e2022] shadow-sm">
+<span class="text-[9px] uppercase font-bold leading-none text-[#61656b]">Dec</span>
+<span class="font-metric-num-sm text-[13px] font-bold leading-tight text-[#1e2022]">02</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate">Insurance policy renewal</span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">Al Sadd Residence Portfolio (Qatar General)</span>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 ml-3">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container border border-[#ded9cf] text-[#4a4d52] font-label-sm text-[11px] font-semibold">
+              16 days
+            </span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-colors group border border-[#ded9cf]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-[#ded9cf] flex flex-col items-center justify-center shrink-0 text-[#1e2022] shadow-sm">
+<span class="text-[9px] uppercase font-bold leading-none text-[#61656b]">Dec</span>
+<span class="font-metric-num-sm text-[13px] font-bold leading-tight text-[#1e2022]">05</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate">Post-dated cheque maturity</span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">Nasser Al-Kuwari • Unit 305 (QNB)</span>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 ml-3 text-right">
+<div>
+<span class="font-metric-num-sm text-label-md text-[#1e2022] font-bold block">18,500</span>
+<span class="font-label-sm text-[10px] text-[#61656b] font-semibold">QAR</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-[#eaf6ee] text-[#1f7a4a] border border-[#b8e2c7] font-label-sm text-[10px] font-bold">
+              Ready
+            </span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-colors group border border-[#ded9cf]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-[#ded9cf] flex flex-col items-center justify-center shrink-0 text-[#1e2022] shadow-sm">
+<span class="text-[9px] uppercase font-bold leading-none text-[#61656b]">Dec</span>
+<span class="font-metric-num-sm text-[13px] font-bold leading-tight text-[#1e2022]">08</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate">HVAC seasonal overhaul</span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">West Bay Commercial Tower • Floor 1-18</span>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 ml-3">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container border border-[#ded9cf] text-[#4a4d52] font-label-sm text-[11px] font-semibold">
+              22 days
+            </span>
+</div>
+</div>
+<!-- Row 5 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-[#fcf9f5] hover:bg-[#f6f3ef] transition-colors group border border-[#ded9cf]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-[#ded9cf] flex flex-col items-center justify-center shrink-0 text-[#1e2022] shadow-sm">
+<span class="text-[9px] uppercase font-bold leading-none text-[#61656b]">Dec</span>
+<span class="font-metric-num-sm text-[13px] font-bold leading-tight text-[#1e2022]">10</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-[#1e2022] font-semibold truncate">Quarterly owner disbursement</span>
+<span class="font-body-sm text-body-sm text-[#4a4d52] truncate">Lusail Marina Trust Holding Distribution</span>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 ml-3">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container border border-[#ded9cf] text-[#4a4d52] font-label-sm text-[11px] font-semibold">
+              24 days
+            </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Micro-interaction: Dynamic quick status refresh on hover
+  document.querySelectorAll('.group').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      item.classList.add('transition-transform');
+    });
+  });
+</script></main></div></div>
+
+</body></html>

@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "properties": "Properties",
+    "tenants": "Tenants",
+    "leases": "Leases",
+    "finance": "Finance",
+    "payments": "Payments",
+    "cheques": "Cheques",
+    "deposits": "Deposits",
+    "expenses": "Expenses",
+    "maintenance": "Maintenance",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "common": {
+    "appName": "Gulf Property",
+    "appTagline": "Management",
+    "language": "Language",
+    "currency": "QAR"
+  }
+}
