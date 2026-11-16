@@ -75,6 +75,90 @@ export type Database = {
         }
         Relationships: []
       }
+      buildings: {
+        Row: {
+          amenities: string[]
+          building_no: string | null
+          city: string | null
+          code: string
+          country_code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          national_address: Json | null
+          notes: string | null
+          org_id: string
+          owner_id: string
+          property_value_minor: number | null
+          street: string | null
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          amenities?: string[]
+          building_no?: string | null
+          city?: string | null
+          code: string
+          country_code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          national_address?: Json | null
+          notes?: string | null
+          org_id: string
+          owner_id: string
+          property_value_minor?: number | null
+          street?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          amenities?: string[]
+          building_no?: string | null
+          city?: string | null
+          code?: string
+          country_code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          national_address?: Json | null
+          notes?: string | null
+          org_id?: string
+          owner_id?: string
+          property_value_minor?: number | null
+          street?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buildings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buildings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           code: string
@@ -92,6 +176,54 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      floors: {
+        Row: {
+          building_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string | null
+          level: number
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          building_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          level: number
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          building_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          level?: number
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floors_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "floors_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       market_packs: {
         Row: {
@@ -140,6 +272,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "member_building_access_building_fk"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "member_building_access_org_id_fkey"
             columns: ["org_id"]
@@ -381,6 +520,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_org_id: string | null
           created_at: string
           created_by: string | null
           full_name: string | null
@@ -390,6 +530,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          active_org_id?: string | null
           created_at?: string
           created_by?: string | null
           full_name?: string | null
@@ -399,6 +540,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          active_org_id?: string | null
           created_at?: string
           created_by?: string | null
           full_name?: string | null
@@ -407,15 +549,291 @@ export type Database = {
           phone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_org_id_fkey"
+            columns: ["active_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          area_sqm: number | null
+          capacity: number
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          default_rent_minor: number | null
+          deleted_at: string | null
+          id: string
+          label: string | null
+          org_id: string
+          private_bathroom: boolean
+          room_no: string
+          status: Database["public"]["Enums"]["unit_status"]
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          area_sqm?: number | null
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          default_rent_minor?: number | null
+          deleted_at?: string | null
+          id?: string
+          label?: string | null
+          org_id: string
+          private_bathroom?: boolean
+          room_no: string
+          status?: Database["public"]["Enums"]["unit_status"]
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          area_sqm?: number | null
+          capacity?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          default_rent_minor?: number | null
+          deleted_at?: string | null
+          id?: string
+          label?: string | null
+          org_id?: string
+          private_bathroom?: boolean
+          room_no?: string
+          status?: Database["public"]["Enums"]["unit_status"]
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "rooms_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rooms_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          building_id: string
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          default_rent_minor: number | null
+          deleted_at: string | null
+          electricity_no: string | null
+          floor_id: string
+          furnished: boolean
+          id: string
+          occupancy_type: string
+          org_id: string
+          rentable_as: string
+          status: Database["public"]["Enums"]["unit_status"]
+          unit_no: string
+          unit_type: string | null
+          updated_at: string
+          water_no: string | null
+        }
+        Insert: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          building_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          default_rent_minor?: number | null
+          deleted_at?: string | null
+          electricity_no?: string | null
+          floor_id: string
+          furnished?: boolean
+          id?: string
+          occupancy_type?: string
+          org_id: string
+          rentable_as?: string
+          status?: Database["public"]["Enums"]["unit_status"]
+          unit_no: string
+          unit_type?: string | null
+          updated_at?: string
+          water_no?: string | null
+        }
+        Update: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          building_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          default_rent_minor?: number | null
+          deleted_at?: string | null
+          electricity_no?: string | null
+          floor_id?: string
+          furnished?: boolean
+          id?: string
+          occupancy_type?: string
+          org_id?: string
+          rentable_as?: string
+          status?: Database["public"]["Enums"]["unit_status"]
+          unit_no?: string
+          unit_type?: string | null
+          updated_at?: string
+          water_no?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "units_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "units_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "units_floor_id_fkey"
+            columns: ["floor_id"]
+            isOneToOne: false
+            referencedRelation: "floors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "units_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      pg_all_foreign_keys: {
+        Row: {
+          fk_columns: unknown[] | null
+          fk_constraint_name: unknown
+          fk_schema_name: unknown
+          fk_table_name: unknown
+          fk_table_oid: unknown
+          is_deferrable: boolean | null
+          is_deferred: boolean | null
+          match_type: string | null
+          on_delete: string | null
+          on_update: string | null
+          pk_columns: unknown[] | null
+          pk_constraint_name: unknown
+          pk_index_name: unknown
+          pk_schema_name: unknown
+          pk_table_name: unknown
+          pk_table_oid: unknown
+        }
+        Relationships: []
+      }
+      tap_funky: {
+        Row: {
+          args: string | null
+          is_definer: boolean | null
+          is_strict: boolean | null
+          is_visible: boolean | null
+          kind: unknown
+          langoid: unknown
+          name: unknown
+          oid: unknown
+          owner: unknown
+          returns: string | null
+          returns_set: boolean | null
+          schema: unknown
+          volatility: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      _cleanup: { Args: never; Returns: boolean }
+      _contract_on: { Args: { "": string }; Returns: unknown }
+      _currtest: { Args: never; Returns: number }
+      _db_privs: { Args: never; Returns: unknown[] }
+      _extensions: { Args: never; Returns: unknown[] }
+      _get: { Args: { "": string }; Returns: number }
+      _get_latest: { Args: { "": string }; Returns: number[] }
+      _get_note: { Args: { "": string }; Returns: string }
+      _is_verbose: { Args: never; Returns: boolean }
+      _prokind: { Args: { p_oid: unknown }; Returns: unknown }
+      _query: { Args: { "": string }; Returns: string }
+      _refine_vol: { Args: { "": string }; Returns: string }
+      _retval: { Args: { "": string }; Returns: string }
+      _table_privs: { Args: never; Returns: unknown[] }
+      _temptypes: { Args: { "": string }; Returns: string }
+      _todo: { Args: never; Returns: string }
       auth_org: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
+      can_access_building: { Args: { b: string }; Returns: boolean }
+      col_is_null:
+        | {
+            Args: {
+              column_name: unknown
+              description?: string
+              schema_name: unknown
+              table_name: unknown
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              column_name: unknown
+              description?: string
+              table_name: unknown
+            }
+            Returns: string
+          }
+      col_not_null:
+        | {
+            Args: {
+              column_name: unknown
+              description?: string
+              schema_name: unknown
+              table_name: unknown
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              column_name: unknown
+              description?: string
+              table_name: unknown
+            }
+            Returns: string
+          }
       create_organization: {
         Args: {
           p_base_currency?: string
@@ -426,6 +844,78 @@ export type Database = {
         }
         Returns: string
       }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      diag:
+        | {
+            Args: { msg: unknown }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.diag(msg => text), public.diag(msg => anyelement). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { msg: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.diag(msg => text), public.diag(msg => anyelement). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+      diag_test_name: { Args: { "": string }; Returns: string }
+      do_tap:
+        | { Args: never; Returns: string[] }
+        | { Args: { "": string }; Returns: string[] }
+      fail:
+        | { Args: never; Returns: string }
+        | { Args: { "": string }; Returns: string }
+      findfuncs: { Args: { "": string }; Returns: string[] }
+      finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      format_type_string: { Args: { "": string }; Returns: string }
+      generate_floors: {
+        Args: { p_building: string; p_from: number; p_to: number }
+        Returns: number
+      }
+      generate_units: {
+        Args: {
+          p_area_sqm?: number
+          p_count?: number
+          p_floor: string
+          p_pad?: number
+          p_prefix?: string
+          p_rent_minor?: number
+          p_start?: number
+          p_unit_type?: string
+        }
+        Returns: number
+      }
+      has_unique: { Args: { "": string }; Returns: string }
+      in_todo: { Args: never; Returns: boolean }
+      is_empty: { Args: { "": string }; Returns: string }
+      isnt_empty: { Args: { "": string }; Returns: string }
+      lives_ok: { Args: { "": string }; Returns: string }
+      no_plan: { Args: never; Returns: boolean[] }
+      num_failed: { Args: never; Returns: number }
+      os_name: { Args: never; Returns: string }
+      pass:
+        | { Args: never; Returns: string }
+        | { Args: { "": string }; Returns: string }
+      pg_version: { Args: never; Returns: string }
+      pg_version_num: { Args: never; Returns: number }
+      pgtap_version: { Args: never; Returns: number }
+      runtests:
+        | { Args: never; Returns: string[] }
+        | { Args: { "": string }; Returns: string[] }
+      set_active_org: { Args: { p_org: string }; Returns: undefined }
+      skip:
+        | { Args: { "": string }; Returns: string }
+        | { Args: { how_many: number; why: string }; Returns: string }
+      throws_ok: { Args: { "": string }; Returns: string }
+      todo:
+        | { Args: { how_many: number }; Returns: boolean[] }
+        | { Args: { how_many: number; why: string }; Returns: boolean[] }
+        | { Args: { why: string }; Returns: boolean[] }
+        | { Args: { how_many: number; why: string }; Returns: boolean[] }
+      todo_end: { Args: never; Returns: boolean[] }
+      todo_start:
+        | { Args: never; Returns: boolean[] }
+        | { Args: { "": string }; Returns: boolean[] }
     }
     Enums: {
       charge_status: "pending" | "partial" | "paid" | "overdue" | "void"
@@ -464,7 +954,9 @@ export type Database = {
       unit_status: "vacant" | "occupied" | "reserved" | "maintenance"
     }
     CompositeTypes: {
-      [_ in never]: never
+      _time_trial_type: {
+        a_time: number | null
+      }
     }
   }
 }
