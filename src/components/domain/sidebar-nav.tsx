@@ -12,6 +12,7 @@ import {
   Settings,
   Users,
   Wrench,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname } from "@/i18n/navigation";
@@ -28,6 +29,7 @@ const ICONS: Record<string, LucideIcon> = {
   deposits: PiggyBank,
   expenses: Receipt,
   maintenance: Wrench,
+  inspections: ClipboardCheck,
   reports: BarChart3,
   settings: Settings,
 };

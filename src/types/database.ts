@@ -641,6 +641,53 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          expires_on: string | null
+          id: string
+          kind: string
+          notes: string | null
+          org_id: string
+          path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          expires_on?: string | null
+          id?: string
+          kind: string
+          notes?: string | null
+          org_id: string
+          path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          expires_on?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          org_id?: string
+          path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount_minor: number
@@ -791,6 +838,63 @@ export type Database = {
           },
           {
             foreignKeyName: "floors_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspections: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          data: Json
+          id: string
+          inspector_id: string | null
+          kind: string
+          lease_id: string
+          notes: string | null
+          org_id: string
+          tenant_signed: boolean
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          inspector_id?: string | null
+          kind: string
+          lease_id: string
+          notes?: string | null
+          org_id: string
+          tenant_signed?: boolean
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          inspector_id?: string | null
+          kind?: string
+          lease_id?: string
+          notes?: string | null
+          org_id?: string
+          tenant_signed?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspections_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspections_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1210,6 +1314,183 @@ export type Database = {
           },
         ]
       }
+      maintenance_events: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          org_id: string
+          photo_paths: string[]
+          request_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          kind: string
+          org_id: string
+          photo_paths?: string[]
+          request_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          org_id?: string
+          photo_paths?: string[]
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_requests: {
+        Row: {
+          assigned_user_id: string | null
+          assigned_vendor_id: string | null
+          building_id: string
+          category: string
+          charge_to: string
+          cost_minor: number | null
+          created_at: string
+          currency: string
+          description: string | null
+          expense_id: string | null
+          id: string
+          opened_at: string
+          org_id: string
+          priority: Database["public"]["Enums"]["maint_priority"]
+          resolved_at: string | null
+          room_id: string | null
+          status: Database["public"]["Enums"]["maint_status"]
+          tenant_id: string | null
+          title: string
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_user_id?: string | null
+          assigned_vendor_id?: string | null
+          building_id: string
+          category?: string
+          charge_to?: string
+          cost_minor?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          expense_id?: string | null
+          id?: string
+          opened_at?: string
+          org_id: string
+          priority?: Database["public"]["Enums"]["maint_priority"]
+          resolved_at?: string | null
+          room_id?: string | null
+          status?: Database["public"]["Enums"]["maint_status"]
+          tenant_id?: string | null
+          title: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_user_id?: string | null
+          assigned_vendor_id?: string | null
+          building_id?: string
+          category?: string
+          charge_to?: string
+          cost_minor?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          expense_id?: string | null
+          id?: string
+          opened_at?: string
+          org_id?: string
+          priority?: Database["public"]["Enums"]["maint_priority"]
+          resolved_at?: string | null
+          room_id?: string | null
+          status?: Database["public"]["Enums"]["maint_status"]
+          tenant_id?: string | null
+          title?: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_requests_assigned_vendor_id_fkey"
+            columns: ["assigned_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_packs: {
         Row: {
           country_code: string
@@ -1266,6 +1547,212 @@ export type Database = {
           },
           {
             foreignKeyName: "member_building_access_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meter_readings: {
+        Row: {
+          created_at: string
+          id: string
+          meter_id: string
+          org_id: string
+          photo_path: string | null
+          read_by: string | null
+          read_on: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meter_id: string
+          org_id: string
+          photo_path?: string | null
+          read_by?: string | null
+          read_on: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meter_id?: string
+          org_id?: string
+          photo_path?: string | null
+          read_by?: string | null
+          read_on?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meter_readings_meter_id_fkey"
+            columns: ["meter_id"]
+            isOneToOne: false
+            referencedRelation: "meters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meter_readings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meters: {
+        Row: {
+          building_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          meter_no: string
+          notes: string | null
+          org_id: string
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          building_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          meter_no: string
+          notes?: string | null
+          org_id: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          building_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meter_no?: string
+          notes?: string | null
+          org_id?: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meters_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meters_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meters_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_outbox: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          error: string | null
+          event: string
+          id: string
+          locale: string
+          org_id: string
+          payload: Json | null
+          recipient: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          body: string
+          channel: string
+          created_at?: string
+          error?: string | null
+          event: string
+          id?: string
+          locale?: string
+          org_id: string
+          payload?: Json | null
+          recipient: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          error?: string | null
+          event?: string
+          id?: string
+          locale?: string
+          org_id?: string
+          payload?: Json | null
+          recipient?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_outbox_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_templates: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          event: string
+          id: string
+          locale: string
+          org_id: string
+          subject: string | null
+        }
+        Insert: {
+          body: string
+          channel: string
+          created_at?: string
+          event: string
+          id?: string
+          locale?: string
+          org_id: string
+          subject?: string | null
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          event?: string
+          id?: string
+          locale?: string
+          org_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_templates_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -2298,6 +2785,29 @@ export type Database = {
             }
             Returns: string
           }
+      complete_inspection: {
+        Args: {
+          p_data: Json
+          p_deduct_minor?: number
+          p_deduct_reason?: string
+          p_inspection_id: string
+        }
+        Returns: undefined
+      }
+      create_maintenance_request: {
+        Args: {
+          p_assigned_vendor_id?: string
+          p_building_id: string
+          p_category?: string
+          p_description?: string
+          p_priority?: Database["public"]["Enums"]["maint_priority"]
+          p_room_id?: string
+          p_tenant_id?: string
+          p_title: string
+          p_unit_id?: string
+        }
+        Returns: string
+      }
       create_organization: {
         Args: {
           p_base_currency?: string
@@ -2493,6 +3003,15 @@ export type Database = {
       todo_start:
         | { Args: never; Returns: boolean[] }
         | { Args: { "": string }; Returns: boolean[] }
+      update_maintenance_status: {
+        Args: {
+          p_cost_minor?: number
+          p_note?: string
+          p_request_id: string
+          p_status: Database["public"]["Enums"]["maint_status"]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       account_type: "asset" | "liability" | "equity" | "revenue" | "expense"

@@ -10,6 +10,7 @@ import {
   Settings,
   Users,
   Wrench,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 import { can, type Capability, type Role } from "@/lib/rbac";
@@ -32,6 +33,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/deposits", labelKey: "deposits", icon: PiggyBank, capability: "finance.read" },
   { href: "/expenses", labelKey: "expenses", icon: Receipt, capability: "expenses.write" },
   { href: "/maintenance", labelKey: "maintenance", icon: Wrench, capability: "maintenance.write" },
+  { href: "/inspections", labelKey: "inspections", icon: ClipboardCheck, capability: "maintenance.write" },
   { href: "/reports", labelKey: "reports", icon: BarChart3, capability: "reports.read" },
 ];
 

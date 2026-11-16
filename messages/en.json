@@ -10,6 +10,7 @@
     "deposits": "Deposits",
     "expenses": "Expenses",
     "maintenance": "Maintenance",
+    "inspections": "Inspections",
     "reports": "Reports",
     "settings": "Settings"
   },
@@ -427,5 +428,52 @@
       "paid": "Paid",
       "rejected": "Rejected"
     }
+  },
+  "maintenance": {
+    "title": "Maintenance & Work Orders",
+    "subtitle": "Track repair requests, assign vendors or staff, monitor status, and log costs.",
+    "createRequest": "New request",
+    "requestTitle": "Title",
+    "property": "Building",
+    "unit": "Unit",
+    "priority": "Priority",
+    "status": "Status",
+    "assignedVendor": "Assigned vendor",
+    "category": "Category",
+    "description": "Description",
+    "cost": "Cost",
+    "empty": "No maintenance requests found.",
+    "creating": "Creating…",
+    "created": "Maintenance request created.",
+    "updateStatus": "Update status",
+    "statusUpdated": "Status updated.",
+    "updating": "Updating…",
+    "priorities": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "statuses": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "waiting_parts": "Waiting for parts",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "inspections": {
+    "title": "Property Inspections",
+    "subtitle": "Move-in and move-out condition surveys with damage tracking and deposit deduction links.",
+    "newInspection": "New inspection",
+    "kind": "Inspection type",
+    "moveIn": "Move-in",
+    "moveOut": "Move-out",
+    "complete": "Complete survey",
+    "completed": "Inspection completed.",
+    "empty": "No inspection surveys on file.",
+    "deductDeposit": "Apply deposit deduction",
+    "deductReason": "Deduction reason",
+    "deductAmount": "Damage cost to deduct (QAR)"
   }
 }
