@@ -239,3 +239,4 @@ export default async function LeaseDetailPage({
     </div>
   );
 }
+

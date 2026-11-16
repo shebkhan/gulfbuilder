@@ -121,3 +121,4 @@ export function TenantForm({ labels }: Props) {
     </form>
   );
 }
+

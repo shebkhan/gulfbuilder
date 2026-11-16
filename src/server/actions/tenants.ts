@@ -154,3 +154,4 @@ export async function revealTenantIdAction(tenantId: string): Promise<TenantStat
   if (error || !data) return fail("not_found");
   return { ok: "revealed", plaintextId: data };
 }
+

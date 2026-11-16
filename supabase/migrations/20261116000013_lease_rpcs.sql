@@ -233,3 +233,4 @@ grant execute on function public.generate_lease_charges(uuid) to authenticated;
 
 revoke all on function public.activate_lease(uuid) from public;
 grant execute on function public.activate_lease(uuid) to authenticated;
+

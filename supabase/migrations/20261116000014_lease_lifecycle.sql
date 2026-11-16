@@ -183,3 +183,4 @@ grant execute on function public.terminate_lease(uuid, date, text) to authentica
 
 revoke all on function public.renew_lease(uuid, jsonb) from public;
 grant execute on function public.renew_lease(uuid, jsonb) to authenticated;
+

@@ -258,3 +258,4 @@ export async function approveSubletAction(leaseId: string): Promise<LeaseState> 
   revalidatePath(`/[locale]/leases/${leaseId}`, "page");
   return { ok: "approved" };
 }
+

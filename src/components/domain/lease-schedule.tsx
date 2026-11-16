@@ -97,3 +97,4 @@ export function LeaseSchedule({ charges, labels }: Props) {
     </div>
   );
 }
+

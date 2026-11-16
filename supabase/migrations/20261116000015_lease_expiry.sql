@@ -27,3 +27,4 @@ $$;
 
 revoke all on function public.leases_expiring(int) from public;
 grant execute on function public.leases_expiring(int) to authenticated;
+
