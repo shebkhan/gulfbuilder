@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import {
   completeInspectionAction,
@@ -163,18 +164,14 @@ export function InspectionForm({
                         "—"
                       )}
                     </td>
-                    <td className="p-4 text-on-surface">
-                      {insp.lease?.tenant?.full_name || "—"}
-                    </td>
+                    <td className="p-4 text-on-surface">{insp.lease?.tenant?.full_name || "—"}</td>
                     <td className="p-4">
                       <Badge variant={insp.completed_at ? "success" : "neutral"}>
                         {insp.completed_at ? "Completed" : "Pending survey"}
                       </Badge>
                     </td>
                     <td className="p-4 text-on-surface-variant">
-                      {insp.completed_at
-                        ? new Date(insp.completed_at).toLocaleDateString()
-                        : "—"}
+                      {insp.completed_at ? new Date(insp.completed_at).toLocaleDateString() : "—"}
                     </td>
                     <td className="p-4 text-on-surface-variant">{insp.notes || "—"}</td>
                     {writable && (
@@ -256,12 +253,7 @@ export function InspectionForm({
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
                   Notes
                 </label>
-                <textarea
-                  rows={2}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                />
+                <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -338,7 +330,7 @@ export function InspectionForm({
               </div>
 
               {completeTarget.kind === "move_out" && (
-                <div className="flex flex-col gap-3 rounded-xl border border-warning/40 bg-warning-container/20 p-3">
+                <div className="border-warning/40 bg-warning-container/20 flex flex-col gap-3 rounded-xl border p-3">
                   <span className="font-label-sm text-label-sm font-semibold text-on-surface">
                     {t("deductDeposit")} (Optional)
                   </span>

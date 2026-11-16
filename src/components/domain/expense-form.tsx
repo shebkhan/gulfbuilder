@@ -1,10 +1,11 @@
 "use client";
 
-import { CheckCircle2, CreditCard, Plus, Receipt, X } from "lucide-react";
+import { CheckCircle2, CreditCard, Plus, Receipt } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatMoney } from "@/lib/money";
 import {
   approveExpenseAction,
@@ -222,141 +223,130 @@ export function ExpenseForm({
       </div>
 
       {/* Modal */}
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-hairline pb-4">
-              <h2 className="font-headline-sm text-headline-sm text-on-surface">
-                {t("createExpense")}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("createExpense")}</DialogTitle>
+          </DialogHeader>
 
-            <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("category")} *
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="maintenance">{t("categories.maintenance")}</option>
-                    <option value="utilities">{t("categories.utilities")}</option>
-                    <option value="insurance">{t("categories.insurance")}</option>
-                    <option value="cleaning">{t("categories.cleaning")}</option>
-                    <option value="management_fee">{t("categories.management_fee")}</option>
-                    <option value="other">{t("categories.other")}</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("date")} *
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    value={expenseDate}
-                    onChange={(e) => setExpenseDate(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
+          <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("category")} *
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                >
+                  <option value="maintenance">{t("categories.maintenance")}</option>
+                  <option value="utilities">{t("categories.utilities")}</option>
+                  <option value="insurance">{t("categories.insurance")}</option>
+                  <option value="cleaning">{t("categories.cleaning")}</option>
+                  <option value="management_fee">{t("categories.management_fee")}</option>
+                  <option value="other">{t("categories.other")}</option>
+                </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("description")} *
+                  {t("date")} *
                 </label>
                 <input
                   required
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="AC Maintenance / Elevator Inspection"
+                  type="date"
+                  value={expenseDate}
+                  onChange={(e) => setExpenseDate(e.target.value)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("description")} *
+              </label>
+              <input
+                required
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="AC Maintenance / Elevator Inspection"
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("amount")} (QAR) *
+                </label>
+                <input
+                  required
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
                   className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("amount")} (QAR) *
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("property")}
-                  </label>
-                  <select
-                    value={buildingId}
-                    onChange={(e) => setBuildingId(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="">General property expense</option>
-                    {buildings.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.code} - {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("vendor")}
+                  {t("property")}
                 </label>
                 <select
-                  value={vendorId}
-                  onChange={(e) => setVendorId(e.target.value)}
+                  value={buildingId}
+                  onChange={(e) => setBuildingId(e.target.value)}
                   className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 >
-                  <option value="">Select vendor (optional)</option>
-                  {vendors.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
+                  <option value="">General property expense</option>
+                  {buildings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.code} - {b.name}
                     </option>
                   ))}
                 </select>
               </div>
+            </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setOpen(false)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {t("createExpense")}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("vendor")}
+              </label>
+              <select
+                value={vendorId}
+                onChange={(e) => setVendorId(e.target.value)}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              >
+                <option value="">Select vendor (optional)</option>
+                {vendors.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {t("createExpense")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -1,14 +1,20 @@
 import { MinusCircle, PiggyBank, RotateCcw } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DepositCard, type DepositItem } from "@/components/domain/deposit-card";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
+import { paginate } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
 
+type SearchParams = Promise<{ page?: string }>;
+
 export default async function DepositsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -16,6 +22,7 @@ export default async function DepositsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
+  const { page } = await searchParams;
   const t = await getTranslations("deposits");
   const writable = ["org_admin", "manager"].includes(ctx.role);
 
@@ -52,6 +59,8 @@ export default async function DepositsPage({
     tenant: d.tenants as unknown as { id: string; full_name: string } | null,
     lease: d.leases as unknown as { id: string; lease_no: string } | null,
   }));
+
+  const paged = paginate(transformedDeposits, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -106,9 +115,16 @@ export default async function DepositsPage({
       </div>
 
       <DepositCard
-        deposits={transformedDeposits}
+        deposits={paged.rows}
         writable={writable}
         locale={locale}
+      />
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/deposits"
       />
     </div>
   );

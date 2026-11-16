@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type ButtonProps, buttonVariants } from "@/components/ui/button";
@@ -28,37 +29,72 @@ PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = {
   isActive?: boolean;
+  asChild?: boolean;
 } & Pick<ButtonProps, "size"> &
   React.ComponentProps<"a">;
 
-const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
-  <a
-    aria-current={isActive ? "page" : undefined}
-    className={cn(
-      buttonVariants({ variant: isActive ? "primary" : "ghost", size }),
-      "rounded-full",
-      className,
-    )}
-    {...props}
-  />
-);
+const PaginationLink = ({
+  className,
+  isActive,
+  size = "icon",
+  asChild = false,
+  ...props
+}: PaginationLinkProps) => {
+  const Comp = asChild ? Slot : "a";
+  return (
+    <Comp
+      aria-current={isActive ? "page" : undefined}
+      className={cn(
+        buttonVariants({ variant: isActive ? "primary" : "ghost", size }),
+        "rounded-full",
+        className,
+      )}
+      {...props}
+    />
+  );
+};
 PaginationLink.displayName = "PaginationLink";
 
 const PaginationPrevious = ({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Previous page" size="md" className={cn("gap-1 ps-3", className)} {...props}>
-    <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
-    <span>Previous</span>
+  <PaginationLink
+    asChild
+    aria-label="Previous page"
+    size="md"
+    className={cn("gap-1 ps-3", className)}
+    {...props}
+  >
+    {children ?? (
+      <a>
+        <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
+        <span>Previous</span>
+      </a>
+    )}
   </PaginationLink>
 );
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Next page" size="md" className={cn("gap-1 pe-3", className)} {...props}>
-    <span>Next</span>
-    <ChevronRight className="size-4 rtl:rotate-180" aria-hidden />
+const PaginationNext = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    asChild
+    aria-label="Next page"
+    size="md"
+    className={cn("gap-1 pe-3", className)}
+    {...props}
+  >
+    {children ?? (
+      <a>
+        <span>Next</span>
+        <ChevronRight className="size-4 rtl:rotate-180" aria-hidden />
+      </a>
+    )}
   </PaginationLink>
 );
 PaginationNext.displayName = "PaginationNext";

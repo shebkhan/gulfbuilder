@@ -1,14 +1,17 @@
 import { AlertTriangle, Clock, Wrench } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { MaintenanceForm, type MaintenanceItem } from "@/components/domain/maintenance-form";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
   status?: string;
   priority?: string;
+  page?: string;
 }>;
 
 export default async function MaintenancePage({
@@ -24,7 +27,7 @@ export default async function MaintenancePage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { status, priority } = await searchParams;
+  const { page, status, priority } = await searchParams;
   const t = await getTranslations("maintenance");
   const writable = can(ctx.role, "maintenance.write");
 
@@ -113,6 +116,8 @@ export default async function MaintenancePage({
     vendor: r.vendors as unknown as { id: string; name: string } | null,
   }));
 
+  const paged = paginate(transformedRequests, Number(page ?? 1));
+
   const filterTabs = [
     { key: "all", label: "All" },
     { key: "open", label: t("statuses.open") },
@@ -194,12 +199,20 @@ export default async function MaintenancePage({
       </div>
 
       <MaintenanceForm
-        requests={transformedRequests}
+        requests={paged.rows}
         buildings={buildingOptions}
         units={unitOptions}
         vendors={vendorOptions}
         writable={writable}
         locale={locale}
+      />
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/maintenance"
+        params={{ status, priority }}
       />
     </div>
   );

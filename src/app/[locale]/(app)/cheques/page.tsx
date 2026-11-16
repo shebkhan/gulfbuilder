@@ -1,13 +1,16 @@
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ChequeTable, type ChequeItem } from "@/components/domain/cheque-table";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { paginate } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
   status?: string;
+  page?: string;
 }>;
 
 export default async function ChequesPage({
@@ -23,7 +26,7 @@ export default async function ChequesPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { status } = await searchParams;
+  const { status, page } = await searchParams;
   const t = await getTranslations("cheques");
   const writable = ["org_admin", "manager", "accountant"].includes(ctx.role);
 
@@ -102,6 +105,8 @@ export default async function ChequesPage({
     { key: "bounced", label: t("statuses.bounced") },
   ];
 
+  const paged = paginate(transformedCheques, Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-space-lg pt-2">
       <div className="flex flex-col gap-1">
@@ -175,11 +180,19 @@ export default async function ChequesPage({
       </div>
 
       <ChequeTable
-        cheques={transformedCheques}
+        cheques={paged.rows}
         tenants={tenantOptions}
         leases={leaseOptions}
         writable={writable}
         locale={locale}
+      />
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/cheques"
+        params={{ status }}
       />
     </div>
   );

@@ -1,20 +1,29 @@
 import { FileText } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function PortalDocumentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("portal.documents");
   const data = await getTenantPortalData();
   if (!data) return null;
+
+  const paged = paginate(data.documents, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-4">
@@ -32,7 +41,7 @@ export default async function PortalDocumentsPage({
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {data.documents.map((d) => (
+              {paged.rows.map((d) => (
                 <li key={d.id} className="flex items-center justify-between gap-3 py-3">
                   <span className="flex items-center gap-2 font-body-md text-body-md font-medium text-on-surface">
                     <FileText className="size-4 text-primary" />
@@ -49,6 +58,13 @@ export default async function PortalDocumentsPage({
               ))}
             </ul>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/portal/documents"
+          />
         </CardBody>
       </Card>
     </div>

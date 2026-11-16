@@ -1,14 +1,16 @@
 import { Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormDialog } from "@/components/domain/form-dialog";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { TenantForm } from "@/components/domain/tenant-form";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
-type SearchParams = Promise<{ q?: string }>;
+type SearchParams = Promise<{ q?: string; page?: string }>;
 
 export default async function TenantsPage({
   params,
@@ -23,7 +25,7 @@ export default async function TenantsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { q } = await searchParams;
+  const { q, page } = await searchParams;
   const t = await getTranslations("tenants");
   const writable = can(ctx.role, "tenants.write");
 
@@ -47,6 +49,8 @@ export default async function TenantsPage({
     return acc;
   }, {});
 
+  const paged = paginate(tenants ?? [], Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-space-lg pt-2">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -54,14 +58,8 @@ export default async function TenantsPage({
           <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
           <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
         </div>
-      </div>
-
-      {writable ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("new")}</CardTitle>
-          </CardHeader>
-          <CardBody>
+        {writable ? (
+          <FormDialog title={t("new")} triggerLabel={t("new")}>
             <TenantForm
               labels={{
                 fullName: t("fullName"),
@@ -84,9 +82,9 @@ export default async function TenantsPage({
                 errors: t.raw("errors") as Record<string, string>,
               }}
             />
-          </CardBody>
-        </Card>
-      ) : null}
+          </FormDialog>
+        ) : null}
+      </div>
 
       <div className="flex flex-col gap-3">
         <form method="get" className="max-w-md">
@@ -99,35 +97,45 @@ export default async function TenantsPage({
         </form>
 
         {tenants && tenants.length > 0 ? (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {tenants.map((tenant) => (
-              <Link
-                key={tenant.id}
-                href={`/tenants/${tenant.id}`}
-                className="flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-lowest p-5 shadow-card transition-shadow hover:shadow-md"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-headline-sm text-on-surface">
-                      {tenant.full_name}
-                    </span>
-                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-                      {tenant.kind === "company" ? t("company") : t("person")}
-                    </span>
+          <>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {paged.rows.map((tenant) => (
+                <Link
+                  key={tenant.id}
+                  href={`/tenants/${tenant.id}`}
+                  className="flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-lowest p-5 shadow-card transition-shadow hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-headline-sm text-on-surface">
+                        {tenant.full_name}
+                      </span>
+                      <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+                        {tenant.kind === "company" ? t("company") : t("person")}
+                      </span>
+                    </div>
+                    <Badge variant="neutral">
+                      {t("leasesCount", { count: leaseCountByTenant[tenant.id] ?? 0 })}
+                    </Badge>
                   </div>
-                  <Badge variant="neutral">
-                    {t("leasesCount", { count: leaseCountByTenant[tenant.id] ?? 0 })}
-                  </Badge>
-                </div>
 
-                <div className="flex flex-wrap gap-x-4 gap-y-1 font-body-sm text-body-sm text-on-surface-variant">
-                  {tenant.phone ? <span dir="ltr">{tenant.phone}</span> : null}
-                  {tenant.email ? <span>{tenant.email}</span> : null}
-                  <span className="uppercase">{tenant.language}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 font-body-sm text-body-sm text-on-surface-variant">
+                    {tenant.phone ? <span dir="ltr">{tenant.phone}</span> : null}
+                    {tenant.email ? <span>{tenant.email}</span> : null}
+                    <span className="uppercase">{tenant.language}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <ListPagination
+              page={paged.page}
+              pages={paged.pages}
+              total={paged.total}
+              href="/tenants"
+              params={{ q }}
+            />
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-hairline bg-surface-container-low p-12 text-center">
             <Users className="mb-3 h-10 w-10 text-on-surface-variant/60" />

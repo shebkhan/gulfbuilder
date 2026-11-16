@@ -1,19 +1,27 @@
 import { FileText } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocumentUploadForm } from "@/components/domain/document-upload-form";
+import { FormDialog } from "@/components/domain/form-dialog";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
+type SearchParams = Promise<{ page?: string }>;
+
 export default async function DocumentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("documents");
   const ctx = await getOrgContext();
   if (!ctx) return null;
@@ -45,14 +53,21 @@ export default async function DocumentsPage({
 
   const writable = can(ctx.role, "maintenance.write") || can(ctx.role, "finance.write");
 
+  const paged = paginate(documents ?? [], Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+          <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+        </div>
+        {writable ? (
+          <FormDialog title={t("upload")} triggerLabel={t("upload")}>
+            <DocumentUploadForm entities={entities} />
+          </FormDialog>
+        ) : null}
       </div>
-
-      {writable && <DocumentUploadForm entities={entities} />}
 
       <Card>
         <CardHeader className="pb-2">
@@ -76,7 +91,7 @@ export default async function DocumentsPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
-                  {documents.map((d) => (
+                  {paged.rows.map((d) => (
                     <tr key={d.id}>
                       <td className="p-3 font-medium text-on-surface">
                         {t(`kinds.${d.kind}` as never)}
@@ -108,6 +123,12 @@ export default async function DocumentsPage({
               </table>
             </div>
           )}
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/documents"
+          />
         </CardBody>
       </Card>
     </div>

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { formatMoney } from "@/lib/money";
 import {
   createMaintenanceRequestAction,
@@ -117,9 +118,7 @@ export function MaintenanceForm({
     });
   };
 
-  const filteredUnits = buildingId
-    ? units.filter((u) => u.building_id === buildingId)
-    : units;
+  const filteredUnits = buildingId ? units.filter((u) => u.building_id === buildingId) : units;
 
   const getPriorityBadgeVariant = (p: string) => {
     switch (p) {
@@ -210,8 +209,10 @@ export function MaintenanceForm({
                       {req.building ? `${req.building.code} - ${req.building.name}` : "—"}
                     </td>
                     <td className="p-4 text-on-surface">{req.unit?.unit_no || "Common"}</td>
-                    <td className="p-4 text-on-surface-variant capitalize">{req.category}</td>
-                    <td className="p-4 text-on-surface-variant">{req.vendor?.name || "Unassigned"}</td>
+                    <td className="p-4 capitalize text-on-surface-variant">{req.category}</td>
+                    <td className="p-4 text-on-surface-variant">
+                      {req.vendor?.name || "Unassigned"}
+                    </td>
                     <td className="p-4">
                       <Badge variant={getStatusBadgeVariant(req.status)}>
                         {t(`statuses.${req.status}` as never)}
@@ -378,11 +379,10 @@ export function MaintenanceForm({
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
                   {t("description")}
                 </label>
-                <textarea
+                <Textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 />
               </div>
 

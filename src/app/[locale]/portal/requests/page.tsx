@@ -1,24 +1,39 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormDialog } from "@/components/domain/form-dialog";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { TenantRequestForm } from "@/components/domain/tenant-request-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function PortalRequestsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("portal.requests");
   const data = await getTenantPortalData();
   if (!data) return null;
 
+  const paged = paginate(data.requests, Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+        <FormDialog title={t("newTitle")} triggerLabel={t("newTitle")}>
+          <TenantRequestForm />
+        </FormDialog>
+      </div>
 
       <Card>
         <CardHeader className="pb-2">
@@ -29,7 +44,7 @@ export default async function PortalRequestsPage({
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {data.requests.map((r) => (
+              {paged.rows.map((r) => (
                 <li key={r.id} className="flex flex-col gap-1 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-body-md text-body-md font-medium text-on-surface">
@@ -52,10 +67,15 @@ export default async function PortalRequestsPage({
               ))}
             </ul>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/portal/requests"
+          />
         </CardBody>
       </Card>
-
-      <TenantRequestForm />
     </div>
   );
 }

@@ -1,17 +1,24 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function PortalStatementPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("portal.statement");
   const data = await getTenantPortalData();
   if (!data) return null;
@@ -22,6 +29,8 @@ export default async function PortalStatementPage({
   const paidMinor = charges.reduce((acc, c) => acc + BigInt(c.paid_minor), 0n);
   const creditMinor = data.credits.reduce((acc, c) => acc + BigInt(c.remaining_minor), 0n);
   const currency = charges[0]?.currency ?? "QAR";
+  const pagedCharges = paginate(charges, Number(page ?? 1));
+  const pagedPayments = paginate(payments, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-4">
@@ -69,7 +78,7 @@ export default async function PortalStatementPage({
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {charges.map((c) => (
+              {pagedCharges.rows.map((c) => (
                 <li key={c.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="flex flex-col">
                     <span className="font-body-md text-body-md font-medium text-on-surface">
@@ -101,6 +110,13 @@ export default async function PortalStatementPage({
               ))}
             </ul>
           )}
+
+          <ListPagination
+            page={pagedCharges.page}
+            pages={pagedCharges.pages}
+            total={pagedCharges.total}
+            href="/portal/statement"
+          />
         </CardBody>
       </Card>
 
@@ -113,7 +129,7 @@ export default async function PortalStatementPage({
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {payments.map((p) => (
+              {pagedPayments.rows.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="flex flex-col">
                     <span className="font-body-md text-body-md font-medium text-on-surface">
@@ -135,6 +151,13 @@ export default async function PortalStatementPage({
               ))}
             </ul>
           )}
+
+          <ListPagination
+            page={pagedPayments.page}
+            pages={pagedPayments.pages}
+            total={pagedPayments.total}
+            href="/portal/statement"
+          />
         </CardBody>
       </Card>
     </div>

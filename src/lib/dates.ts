@@ -47,6 +47,21 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((b - a) / 86_400_000);
 }
 
+/** Days from today to a date: negative once the date has passed. */
+export function daysUntil(date: string, today = todayISO()): number {
+  return daysBetween(today, date.slice(0, 10));
+}
+
+/** A date in words, e.g. "16 Nov 2026". */
+export function formatDate(date: string, locale = "en"): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Qatar",
+  }).format(new Date(`${date.slice(0, 10)}T00:00:00Z`));
+}
+
 /** Period length in months for a lease payment frequency (SPEC 7.2). */
 export const FREQUENCY_MONTHS = {
   monthly: 1,

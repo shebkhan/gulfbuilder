@@ -1,8 +1,10 @@
 import { FileSignature, Filter } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
@@ -10,6 +12,7 @@ type SearchParams = Promise<{
   status?: string;
   buildingId?: string;
   expiring?: string;
+  page?: string;
 }>;
 
 export default async function LeasesPage({
@@ -25,7 +28,7 @@ export default async function LeasesPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { status, buildingId, expiring } = await searchParams;
+  const { page, status, buildingId, expiring } = await searchParams;
   const t = await getTranslations("leases");
   const writable = can(ctx.role, "leases.write");
 
@@ -72,6 +75,8 @@ export default async function LeasesPage({
   }
 
   const { data: leases } = await query;
+
+  const paged = paginate(leases ?? [], Number(page ?? 1));
 
   const getStatusVariant = (s: string) => {
     switch (s) {
@@ -155,58 +160,69 @@ export default async function LeasesPage({
       </div>
 
       {leases && leases.length > 0 ? (
-        <div className="overflow-x-auto rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
-          <table className="w-full text-start font-body-sm text-body-sm">
-            <thead>
-              <tr className="border-b border-hairline text-on-surface-variant">
-                <th className="p-4 text-start font-medium">{t("leaseNo")}</th>
-                <th className="p-4 text-start font-medium">{t("tenant")}</th>
-                <th className="p-4 text-start font-medium">{t("unit")}</th>
-                <th className="p-4 text-start font-medium">{t("endDate")}</th>
-                <th className="p-4 text-end font-medium">{t("rent")}</th>
-                <th className="p-4 text-center font-medium">{t("filterStatus")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-hairline">
-              {leases.map((lease) => {
-                const tenantName = (lease.tenants as unknown as { full_name: string })?.full_name ?? "—";
-                const unitData = lease.units as unknown as {
-                  unit_no: string;
-                  buildings: { name: string; code: string } | null;
-                } | null;
-                const unitLabel = unitData
-                  ? `${unitData.buildings?.code || ""} · ${unitData.unit_no}`
-                  : "—";
+        <>
+          <div className="overflow-x-auto rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
+            <table className="w-full text-start font-body-sm text-body-sm">
+              <thead>
+                <tr className="border-b border-hairline text-on-surface-variant">
+                  <th className="p-4 text-start font-medium">{t("leaseNo")}</th>
+                  <th className="p-4 text-start font-medium">{t("tenant")}</th>
+                  <th className="p-4 text-start font-medium">{t("unit")}</th>
+                  <th className="p-4 text-start font-medium">{t("endDate")}</th>
+                  <th className="p-4 text-end font-medium">{t("rent")}</th>
+                  <th className="p-4 text-center font-medium">{t("filterStatus")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {paged.rows.map((lease) => {
+                  const tenantName =
+                    (lease.tenants as unknown as { full_name: string })?.full_name ?? "—";
+                  const unitData = lease.units as unknown as {
+                    unit_no: string;
+                    buildings: { name: string; code: string } | null;
+                  } | null;
+                  const unitLabel = unitData
+                    ? `${unitData.buildings?.code || ""} · ${unitData.unit_no}`
+                    : "—";
 
-                return (
-                  <tr key={lease.id} className="hover:bg-surface-container-low/40">
-                    <td className="p-4 font-medium text-on-surface">
-                      <Link
-                        href={`/leases/${lease.id}`}
-                        className="text-primary hover:underline underline-offset-4"
-                      >
-                        {lease.lease_no}
-                      </Link>
-                    </td>
-                    <td className="p-4 text-on-surface">{tenantName}</td>
-                    <td className="p-4 text-on-surface-variant">{unitLabel}</td>
-                    <td className="p-4 text-on-surface-variant" dir="ltr">
-                      {lease.end_date}
-                    </td>
-                    <td className="p-4 text-end font-medium text-on-surface">
-                      {formatMoney(BigInt(lease.rent_minor), lease.currency)}
-                    </td>
-                    <td className="p-4 text-center">
-                      <Badge variant={getStatusVariant(lease.status)}>
-                        {t(`statuses.${lease.status}`)}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                  return (
+                    <tr key={lease.id} className="hover:bg-surface-container-low/40">
+                      <td className="p-4 font-medium text-on-surface">
+                        <Link
+                          href={`/leases/${lease.id}`}
+                          className="text-primary hover:underline underline-offset-4"
+                        >
+                          {lease.lease_no}
+                        </Link>
+                      </td>
+                      <td className="p-4 text-on-surface">{tenantName}</td>
+                      <td className="p-4 text-on-surface-variant">{unitLabel}</td>
+                      <td className="p-4 text-on-surface-variant">
+                        <DateCell date={lease.end_date} locale={locale} remaining />
+                      </td>
+                      <td className="p-4 text-end font-medium text-on-surface">
+                        {formatMoney(BigInt(lease.rent_minor), lease.currency)}
+                      </td>
+                      <td className="p-4 text-center">
+                        <Badge variant={getStatusVariant(lease.status)}>
+                          {t(`statuses.${lease.status}`)}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/leases"
+            params={{ status, buildingId, expiring }}
+          />
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-hairline bg-surface-container-low p-12 text-center">
           <FileSignature className="mb-3 h-10 w-10 text-on-surface-variant/60" />

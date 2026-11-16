@@ -368,14 +368,15 @@ async function wipe() {
   if (ledgerError) throw new Error(`demo_reset_ledger: ${ledgerError.message}`);
 
   await deleteIn("owner_ledger_entries", "building_id", buildingIds);
+  await deleteIn("member_building_access", "building_id", buildingIds);
   await deleteIn("expenses", "building_id", buildingIds);
   await deleteIn("meter_readings", "meter_id", meterIds);
   await deleteIn("meters", "id", meterIds);
   await deleteIn("maintenance_events", "request_id", requestIds);
   await deleteIn("maintenance_requests", "id", requestIds);
   await deleteIn("owner_expense_approvals", "owner_id", ownerIds);
-  await deleteIn("owner_statements", "owner_id", ownerIds);
   await deleteIn("owner_payouts", "owner_id", ownerIds);
+  await deleteIn("owner_statements", "owner_id", ownerIds);
 
   await deleteIn("leases", "id", leaseIds);
   await deleteIn("units", "id", unitIds);
@@ -475,6 +476,13 @@ async function main() {
   // ── logins ──────────────────────────────────────────────────────────────────
   const adminUserId = await ensureUser("admin@example.com", "Admin1234!", "Citadel Admin", "org_admin");
   const ownerUserId = await ensureUser("owner@example.com", "Owner1234!", "Al Manar Holding", "owner");
+  // A manager sees the whole portfolio without the admin MFA enrolment.
+  const managerUserId = await ensureUser(
+    "manager@example.com",
+    "Manager1234!",
+    "Demo Manager",
+    "manager",
+  );
   await db.from("platform_admins").upsert({ user_id: adminUserId });
   await db.from("owners").update({ user_id: ownerUserId }).eq("id", manar.id);
 
@@ -518,6 +526,16 @@ async function main() {
   }));
   const { data: buildings, error: buildingError } = await db.from("buildings").insert(buildingRows).select();
   if (buildingError) throw buildingError;
+
+  // The demo manager needs an access row per building to see the portfolio.
+  await chunkInsert(
+    "member_building_access",
+    buildings.map((building) => ({
+      org_id: ORG_ID,
+      user_id: managerUserId,
+      building_id: building.id,
+    })),
+  );
 
   const floorRows = [];
   for (const [index, building] of buildings.entries()) {
@@ -896,11 +914,12 @@ async function main() {
       });
     }
   }
-  const { data: expenses } = await db.from("expenses").insert(expenseRows).select();
+  const { data: expenses, error: expenseError } = await db.from("expenses").insert(expenseRows).select();
+  if (expenseError) throw new Error(`expenses: ${expenseError.message}`);
 
   // One expense waiting for owner approval, above the owner's threshold.
   const approvalBuilding = buildings[0];
-  const { data: pendingExpense } = await db
+  const { data: pendingExpense, error: pendingError } = await db
     .from("expenses")
     .insert({
       org_id: ORG_ID,
@@ -910,19 +929,21 @@ async function main() {
       description: "Full lift replacement — Capital works",
       amount_minor: 8_500_00,
       currency: CURRENCY,
-      status: "pending_owner_approval",
+      status: "submitted",
       expense_date: iso(addDays(TODAY, -6)),
       submitted_by: adminUserId,
     })
     .select();
+  if (pendingError) throw new Error(`pending expense: ${pendingError.message}`);
   if (pendingExpense?.[0]) {
-    await db.from("owner_expense_approvals").insert({
+    const { error: approvalError } = await db.from("owner_expense_approvals").insert({
       org_id: ORG_ID,
       expense_id: pendingExpense[0].id,
       owner_id: manar.id,
       status: "pending",
       requested_at: addDays(TODAY, -6).toISOString(),
     });
+    if (approvalError) throw new Error(`owner_expense_approvals: ${approvalError.message}`);
   }
   console.log(`expenses ${expenses?.length ?? 0}, vendors ${vendors?.length ?? 0}`);
 
@@ -1257,10 +1278,11 @@ async function main() {
       const periodFee = Math.round(fee * share);
       const net = periodCollections + periodExpenses - periodFee;
       const status = month === 0 ? "draft" : month === 1 ? "review" : "issued";
-      const { data: statement } = await db
+      const { data: statement, error: statementError } = await db
         .from("owner_statements")
         .insert({
           org_id: ORG_ID,
+          owner_id: owner.id,
           period_start: iso(start),
           period_end: iso(end),
           currency: CURRENCY,
@@ -1282,6 +1304,7 @@ async function main() {
           issued_by: status === "issued" ? adminUserId : null,
         })
         .select();
+      if (statementError) throw new Error(`owner_statements: ${statementError.message}`);
       const statementId = statement?.[0]?.id;
       if (statementId) statementRows.push(statementId);
       if (statementId && status === "issued" && net > 0) {
@@ -1422,7 +1445,7 @@ async function main() {
       `payouts ${payoutRows.length}`,
     ].join(", "),
   );
-  console.log("logins: tenant@example.com / Tenant1234!, owner@example.com / Owner1234!, admin@example.com / Admin1234!");
+  console.log("logins: manager@example.com / Manager1234!, tenant@example.com / Tenant1234!, owner@example.com / Owner1234!, admin@example.com / Admin1234! (needs MFA setup)");
 }
 
 main().catch((error) => {

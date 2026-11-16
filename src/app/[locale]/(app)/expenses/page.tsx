@@ -1,15 +1,18 @@
 import { CheckCircle2, Clock, Receipt } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ExpenseForm, type ExpenseItem } from "@/components/domain/expense-form";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
   status?: string;
   category?: string;
+  page?: string;
 }>;
 
 export default async function ExpensesPage({
@@ -25,7 +28,7 @@ export default async function ExpensesPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { status, category } = await searchParams;
+  const { page, status, category } = await searchParams;
   const t = await getTranslations("expenses");
 
   const canWrite = can(ctx.role, "expenses.write");
@@ -102,6 +105,8 @@ export default async function ExpensesPage({
     building: e.buildings as unknown as { id: string; name: string; code: string } | null,
     unit: e.units as unknown as { id: string; unit_no: string } | null,
   }));
+
+  const paged = paginate(transformedExpenses, Number(page ?? 1));
 
   const filterTabs = [
     { key: "all", label: "All" },
@@ -183,13 +188,21 @@ export default async function ExpensesPage({
       </div>
 
       <ExpenseForm
-        expenses={transformedExpenses}
+        expenses={paged.rows}
         vendors={vendorOptions}
         buildings={buildingOptions}
         canWrite={canWrite}
         canApprove={canApprove}
         canPay={canPay}
         locale={locale}
+      />
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/expenses"
+        params={{ status, category }}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import {
@@ -244,13 +245,12 @@ export function DepositCard({
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
                   {t("reason")} *
                 </label>
-                <textarea
+                <Textarea
                   required
                   rows={2}
                   value={deductReason}
                   onChange={(e) => setDeductReason(e.target.value)}
                   placeholder="Damage repairs / unpaid utility bills"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 />
               </div>
 

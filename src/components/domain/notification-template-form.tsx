@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { updateNotificationTemplateAction, type SettingsState } from "@/server/actions/settings";
 
 const selectClass =
@@ -50,14 +51,13 @@ export function NotificationTemplateForm() {
 
       <div>
         <Label htmlFor="body">{t("body")}</Label>
-        <textarea
+        <Textarea
           id="body"
           name="body"
           rows={4}
           required
           maxLength={4000}
           placeholder={t("bodyPlaceholder")}
-          className="w-full rounded-xl bg-surface-container-lowest px-3.5 py-2.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
         />
       </div>
 

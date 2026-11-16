@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { updateBrandingAction, type SettingsState } from "@/server/actions/settings";
 
 export type BrandingValues = {
@@ -69,14 +70,13 @@ export function BrandingForm({ values }: { values: BrandingValues }) {
 
       <div>
         <Label htmlFor="terminology">{t("terminology")}</Label>
-        <textarea
+        <Textarea
           id="terminology"
           name="terminology"
           rows={5}
           defaultValue={values.terminology}
           placeholder='{"leases": "Tenancy contracts"}'
           dir="ltr"
-          className="w-full rounded-xl bg-surface-container-lowest px-3.5 py-2.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
         />
       </div>
 

@@ -1,23 +1,31 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { getOwnerScope, getOwnerStatements } from "@/server/queries/owner-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function OwnerStatementsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("owner.statements");
   const scope = await getOwnerScope();
   if (!scope) return null;
 
   const statements = await getOwnerStatements(scope);
+  const paged = paginate(statements, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-6 pt-2">
@@ -44,7 +52,7 @@ export default async function OwnerStatementsPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
-                  {statements.map((s) => (
+                  {paged.rows.map((s) => (
                     <tr key={s.id}>
                       <td className="p-3">
                         <Link
@@ -76,6 +84,13 @@ export default async function OwnerStatementsPage({
               </table>
             </div>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/owner/statements"
+          />
         </CardBody>
       </Card>
     </div>

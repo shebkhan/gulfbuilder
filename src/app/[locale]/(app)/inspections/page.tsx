@@ -1,13 +1,16 @@
 import { ClipboardCheck, Clock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { InspectionForm, type InspectionItem } from "@/components/domain/inspection-form";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
   kind?: string;
+  page?: string;
 }>;
 
 export default async function InspectionsPage({
@@ -23,7 +26,7 @@ export default async function InspectionsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { kind } = await searchParams;
+  const { kind, page } = await searchParams;
   const t = await getTranslations("inspections");
   const writable = can(ctx.role, "maintenance.write");
 
@@ -105,6 +108,8 @@ export default async function InspectionsPage({
     { key: "move_out", label: t("moveOut") },
   ];
 
+  const paged = paginate(transformedInspections, Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-space-lg pt-2">
       <div className="flex flex-col gap-1">
@@ -178,9 +183,17 @@ export default async function InspectionsPage({
       </div>
 
       <InspectionForm
-        inspections={transformedInspections}
+        inspections={paged.rows}
         leases={leaseOptions}
         writable={writable}
+      />
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/inspections"
+        params={{ kind }}
       />
     </div>
   );

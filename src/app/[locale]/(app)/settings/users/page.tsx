@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormDialog } from "@/components/domain/form-dialog";
 import { InviteForm } from "@/components/domain/invite-form";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -35,25 +36,28 @@ export default async function UsersSettingsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">
-          {t("subtitle")}
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+          <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">
+            {t("subtitle")}
+          </p>
+        </div>
+        <FormDialog title={t("invite")} triggerLabel={t("invite")}>
+          <InviteForm
+            locale={locale}
+            labels={{
+              email: t("email"),
+              role: t("role"),
+              invite: t("invite"),
+              sending: t("sending"),
+              invited: t.raw("invited") as string,
+              errors: t.raw("errors") as Record<string, string>,
+            }}
+            roles={INVITABLE_ROLES.map((value) => ({ value, label: t(`roles.${value}`) }))}
+          />
+        </FormDialog>
       </div>
-
-      <InviteForm
-        locale={locale}
-        labels={{
-          email: t("email"),
-          role: t("role"),
-          invite: t("invite"),
-          sending: t("sending"),
-          invited: t.raw("invited") as string,
-          errors: t.raw("errors") as Record<string, string>,
-        }}
-        roles={INVITABLE_ROLES.map((value) => ({ value, label: t(`roles.${value}`) }))}
-      />
     </div>
   );
 }

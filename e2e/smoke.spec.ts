@@ -81,7 +81,12 @@ test("a manager cannot reach settings", async ({ page }) => {
   await page.waitForURL(new RegExp(`/${locale}/(dashboard|mfa)`));
 
   await page.goto(`/${locale}/settings`);
-  await expect(page).toHaveURL(new RegExp(`/${locale}/(login|dashboard|mfa)`));
+  // The page itself refuses the role: either a redirect away or a not-found page.
+  const url = page.url();
+  const body = await page.locator("body").innerText();
+  const refused =
+    !url.includes(`/${locale}/settings`) || /404|could not be found/i.test(body);
+  expect(refused).toBe(true);
 });
 
 test("the arabic locale renders right to left", async ({ page }) => {

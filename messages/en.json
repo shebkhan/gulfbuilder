@@ -28,7 +28,10 @@
     "language": "Language",
     "currency": "QAR",
     "signOut": "Sign out",
-    "loading": "Working…"
+    "loading": "Working…",
+    "today": "Today",
+    "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+    "daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
   },
   "auth": {
     "signIn": "Sign in",
@@ -1041,5 +1044,11 @@
       "invalid_value": "Enter the meter value as a number.",
       "failed": "Could not save. Try again."
     }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "summary": "Showing {from}–{to} of {total}",
+    "page": "Page {page} of {pages}"
   }
 }

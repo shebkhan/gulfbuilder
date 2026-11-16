@@ -1,27 +1,42 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormDialog } from "@/components/domain/form-dialog";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { PaymentProofForm } from "@/components/domain/payment-proof-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function PortalPaymentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("portal.payments");
   const data = await getTenantPortalData();
   if (!data) return null;
 
+  const paged = paginate(data.payments, Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+        </div>
+        <FormDialog title={t("uploadTitle")} triggerLabel={t("uploadTitle")}>
+          <PaymentProofForm locale={locale} />
+        </FormDialog>
       </div>
 
       <Card>
@@ -33,7 +48,7 @@ export default async function PortalPaymentsPage({
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {data.payments.map((p) => (
+              {paged.rows.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="flex flex-col">
                     <span className="font-body-md text-body-md font-medium text-on-surface">
@@ -58,10 +73,15 @@ export default async function PortalPaymentsPage({
               ))}
             </ul>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/portal/payments"
+          />
         </CardBody>
       </Card>
-
-      <PaymentProofForm locale={locale} />
     </div>
   );
 }

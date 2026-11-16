@@ -1,18 +1,26 @@
 import { Gauge } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormDialog } from "@/components/domain/form-dialog";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { MeterForms } from "@/components/domain/meter-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { paginate } from "@/lib/pagination";
 import { getOrgContext } from "@/server/org-context";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function MetersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("meters");
   const ctx = await getOrgContext();
   if (!ctx) return null;
@@ -46,14 +54,19 @@ export default async function MetersPage({
     };
   });
 
+  const paged = paginate(meters ?? [], Number(page ?? 1));
+
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+          <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+        </div>
+        <FormDialog title={t("title")} triggerLabel={t("newMeter")} wide>
+          <MeterForms buildings={buildingOptions} meters={meterOptions} />
+        </FormDialog>
       </div>
-
-      <MeterForms buildings={buildingOptions} meters={meterOptions} />
 
       <Card>
         <CardHeader className="pb-2">
@@ -67,7 +80,7 @@ export default async function MetersPage({
             </div>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
-              {meters.map((m) => {
+              {paged.rows.map((m) => {
                 const history = readingsByMeter.get(m.id) ?? [];
                 const latest = history[0];
                 const previous = history[1];
@@ -95,6 +108,12 @@ export default async function MetersPage({
               })}
             </ul>
           )}
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/meters"
+          />
         </CardBody>
       </Card>
     </div>

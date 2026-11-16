@@ -28,7 +28,10 @@
     "language": "اللغة",
     "currency": "ر.ق",
     "signOut": "تسجيل الخروج",
-    "loading": "جارٍ التنفيذ…"
+    "loading": "جارٍ التنفيذ…",
+    "today": "اليوم",
+    "daysLeft": "{count, plural, zero {اليوم} one {يوم واحد متبقٍ} two {يومان متبقيان} few {# أيام متبقية} many {# يوماً متبقياً} other {# يوم متبقي}}",
+    "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -1041,5 +1044,11 @@
       "invalid_value": "أدخل قيمة العداد كرقم.",
       "failed": "تعذر الحفظ. حاول مرة أخرى."
     }
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "summary": "عرض {from}–{to} من {total}",
+    "page": "صفحة {page} من {pages}"
   }
 }

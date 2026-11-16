@@ -1,21 +1,29 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { getOwnerPayouts, getOwnerScope } from "@/server/queries/owner-portal";
+
+type SearchParams = Promise<{ page?: string }>;
 
 export default async function OwnerPayoutsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("owner.payouts");
   const scope = await getOwnerScope();
   if (!scope) return null;
 
   const payouts = await getOwnerPayouts(scope);
+  const paged = paginate(payouts, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-6 pt-2">
@@ -43,7 +51,7 @@ export default async function OwnerPayoutsPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
-                  {payouts.map((p) => (
+                  {paged.rows.map((p) => (
                     <tr key={p.id}>
                       <td className="p-3 text-on-surface">{p.paid_on}</td>
                       <td className="p-3 text-on-surface-variant">{p.method}</td>
@@ -59,6 +67,13 @@ export default async function OwnerPayoutsPage({
               </table>
             </div>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/owner/payouts"
+          />
         </CardBody>
       </Card>
     </div>

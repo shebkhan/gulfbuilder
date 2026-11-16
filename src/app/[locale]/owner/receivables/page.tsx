@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { getOwnerReceivables, getOwnerScope } from "@/server/queries/owner-portal";
 
 const BUCKETS = [
@@ -10,20 +12,26 @@ const BUCKETS = [
   { key: "90+", min: 91, max: Number.MAX_SAFE_INTEGER },
 ] as const;
 
+type SearchParams = Promise<{ page?: string }>;
+
 export default async function OwnerReceivablesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { page } = await searchParams;
   const t = await getTranslations("owner.receivables");
   const scope = await getOwnerScope();
   if (!scope) return null;
 
   const rows = await getOwnerReceivables(scope);
   const totalMinor = rows.reduce((acc, r) => acc + BigInt(r.amount_minor), 0n);
+  const paged = paginate(rows, Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-6 pt-2">
@@ -72,7 +80,7 @@ export default async function OwnerReceivablesPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
-                  {rows.map((r, i) => (
+                  {paged.rows.map((r, i) => (
                     <tr key={`${r.tenant_name}-${r.due_date}-${i}`}>
                       <td className="p-3 font-medium text-on-surface">{r.tenant_name}</td>
                       <td className="p-3 text-on-surface-variant">{r.building_code ?? "—"}</td>
@@ -87,6 +95,13 @@ export default async function OwnerReceivablesPage({
               </table>
             </div>
           )}
+
+          <ListPagination
+            page={paged.page}
+            pages={paged.pages}
+            total={paged.total}
+            href="/owner/receivables"
+          />
         </CardBody>
       </Card>
     </div>

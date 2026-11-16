@@ -1,17 +1,23 @@
 import { CreditCard, Receipt, TrendingUp } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ListPagination } from "@/components/domain/list-pagination";
 import { PaymentForm } from "@/components/domain/payment-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
+import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
+type SearchParams = Promise<{ page?: string }>;
+
 export default async function PaymentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -19,6 +25,7 @@ export default async function PaymentsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
+  const { page } = await searchParams;
   const t = await getTranslations("payments");
   const writable = can(ctx.role, "finance.write") || ctx.role === "manager";
 
@@ -66,6 +73,8 @@ export default async function PaymentsPage({
     0n,
   );
   const paymentCount = payments?.length || 0;
+
+  const paged = paginate(payments ?? [], Number(page ?? 1));
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -151,7 +160,7 @@ export default async function PaymentsPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
-                {payments.map((p) => {
+                {paged.rows.map((p) => {
                   const tenant = p.tenants as unknown as { id: string; full_name: string } | null;
                   const lease = p.leases as unknown as { id: string; lease_no: string } | null;
                   const receiptFormatted = `#${p.receipt_year}-${String(p.receipt_no).padStart(4, "0")}`;
@@ -211,6 +220,13 @@ export default async function PaymentsPage({
           </div>
         )}
       </div>
+
+      <ListPagination
+        page={paged.page}
+        pages={paged.pages}
+        total={paged.total}
+        href="/payments"
+      />
     </div>
   );
 }

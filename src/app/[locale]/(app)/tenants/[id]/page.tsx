@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, FileSignature } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { TenantIdReveal } from "@/components/domain/tenant-id-reveal";
+import { DateCell } from "@/components/domain/date-cell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -9,6 +10,13 @@ import { maskId } from "@/lib/mask";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+
+/** The unit a lease belongs to, with the building it sits in. */
+type UnitRef = {
+  id: string;
+  unit_no: string;
+  buildings: { id: string; name: string; code: string } | null;
+} | null;
 
 export default async function TenantDetailPage({
   params,
@@ -35,10 +43,16 @@ export default async function TenantDetailPage({
 
   if (!tenant) notFound();
 
-  // Get tenant leases
+  // Get tenant leases, with the unit and building each one belongs to.
   const { data: leases } = await ctx.supabase
     .from("leases")
-    .select("id, lease_no, start_date, end_date, rent_minor, currency, status, unit_id, room_id")
+    .select(
+      `
+      id, lease_no, start_date, end_date, rent_minor, currency, status, unit_id, room_id,
+      units ( id, unit_no, buildings ( id, name, code ) ),
+      rooms ( units ( id, unit_no, buildings ( id, name, code ) ) )
+    `,
+    )
     .eq("tenant_id", id)
     .order("start_date", { ascending: false });
 
@@ -69,7 +83,9 @@ export default async function TenantDetailPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="font-headline-lg text-headline-lg text-on-surface">{tenant.full_name}</h1>
+            <h1 className="font-headline-lg text-headline-lg text-on-surface">
+              {tenant.full_name}
+            </h1>
             <Badge variant="neutral">
               {tenant.kind === "company" ? t("company") : t("person")}
             </Badge>
@@ -112,22 +128,26 @@ export default async function TenantDetailPage({
 
             <div className="flex justify-between py-2">
               <span className="font-body-sm text-body-sm text-on-surface-variant">{t("kind")}</span>
-              <span className="font-body-sm font-medium text-body-sm text-on-surface">
+              <span className="font-body-sm text-body-sm font-medium text-on-surface">
                 {tenant.kind === "company" ? t("company") : t("person")}
               </span>
             </div>
 
             <div className="flex justify-between py-2">
-              <span className="font-body-sm text-body-sm text-on-surface-variant">{t("language")}</span>
-              <span className="font-body-sm font-medium text-body-sm text-on-surface uppercase">
+              <span className="font-body-sm text-body-sm text-on-surface-variant">
+                {t("language")}
+              </span>
+              <span className="font-body-sm text-body-sm font-medium uppercase text-on-surface">
                 {tenant.language}
               </span>
             </div>
 
             {tenant.phone ? (
               <div className="flex justify-between py-2">
-                <span className="font-body-sm text-body-sm text-on-surface-variant">{t("phone")}</span>
-                <span className="font-body-sm font-medium text-body-sm text-on-surface" dir="ltr">
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  {t("phone")}
+                </span>
+                <span className="font-body-sm text-body-sm font-medium text-on-surface" dir="ltr">
                   {tenant.phone}
                 </span>
               </div>
@@ -135,8 +155,10 @@ export default async function TenantDetailPage({
 
             {tenant.whatsapp ? (
               <div className="flex justify-between py-2">
-                <span className="font-body-sm text-body-sm text-on-surface-variant">{t("whatsapp")}</span>
-                <span className="font-body-sm font-medium text-body-sm text-on-surface" dir="ltr">
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  {t("whatsapp")}
+                </span>
+                <span className="font-body-sm text-body-sm font-medium text-on-surface" dir="ltr">
                   {tenant.whatsapp}
                 </span>
               </div>
@@ -144,8 +166,10 @@ export default async function TenantDetailPage({
 
             {tenant.email ? (
               <div className="flex justify-between py-2">
-                <span className="font-body-sm text-body-sm text-on-surface-variant">{t("email")}</span>
-                <span className="font-body-sm font-medium text-body-sm text-on-surface">
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  {t("email")}
+                </span>
+                <span className="font-body-sm text-body-sm font-medium text-on-surface">
                   {tenant.email}
                 </span>
               </div>
@@ -153,8 +177,10 @@ export default async function TenantDetailPage({
 
             {tenant.employer ? (
               <div className="flex justify-between py-2">
-                <span className="font-body-sm text-body-sm text-on-surface-variant">{t("employer")}</span>
-                <span className="font-body-sm font-medium text-body-sm text-on-surface">
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  {t("employer")}
+                </span>
+                <span className="font-body-sm text-body-sm font-medium text-on-surface">
                   {tenant.employer}
                 </span>
               </div>
@@ -168,40 +194,88 @@ export default async function TenantDetailPage({
           </CardHeader>
           <CardBody>
             {leases && leases.length > 0 ? (
-              <div className="flex flex-col divide-y divide-hairline">
-                {leases.map((lease) => (
-                  <Link
-                    key={lease.id}
-                    href={`/leases/${lease.id}`}
-                    className="flex flex-wrap items-center justify-between gap-3 py-3 transition-colors hover:bg-surface-container-low/50 px-2 rounded-lg"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-label-lg text-label-lg font-semibold text-on-surface">
-                        {lease.lease_no}
-                      </span>
-                      <span className="font-body-sm text-body-sm text-on-surface-variant">
-                        {lease.start_date} → {lease.end_date}
-                      </span>
-                    </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[40rem] text-start font-body-sm text-body-sm">
+                  <thead>
+                    <tr className="border-b border-hairline text-on-surface-variant">
+                      <th className="py-2 text-start font-medium">{tl("leaseNo")}</th>
+                      <th className="py-2 text-start font-medium">{tl("building")}</th>
+                      <th className="py-2 text-start font-medium">{tl("unit")}</th>
+                      <th className="py-2 text-start font-medium">{tl("startDate")}</th>
+                      <th className="py-2 text-start font-medium">{tl("endDate")}</th>
+                      <th className="py-2 text-end font-medium">{tl("rent")}</th>
+                      <th className="py-2 text-center font-medium">{tl("filterStatus")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-hairline">
+                    {leases.map((lease) => {
+                      const unit =
+                        (lease.units as unknown as UnitRef) ??
+                        (lease.rooms as unknown as { units: UnitRef } | null)?.units ??
+                        null;
+                      const building = unit?.buildings ?? null;
 
-                    <div className="flex items-center gap-3">
-                      <span className="font-title-sm text-title-sm text-on-surface">
-                        {formatMoney(lease.rent_minor, lease.currency)}
-                      </span>
-                      <Badge
-                        variant={
-                          lease.status === "active"
-                            ? "success"
-                            : lease.status === "draft"
-                              ? "info"
-                              : "neutral"
-                        }
-                      >
-                        {tl(`statuses.${lease.status}`)}
-                      </Badge>
-                    </div>
-                  </Link>
-                ))}
+                      return (
+                        <tr key={lease.id} className="hover:bg-surface-container-low/40">
+                          <td className="py-2.5">
+                            <Link
+                              href={`/leases/${lease.id}`}
+                              className="font-medium text-primary underline-offset-4 hover:underline"
+                            >
+                              {lease.lease_no}
+                            </Link>
+                          </td>
+                          <td className="py-2.5 text-on-surface">
+                            {building ? (
+                              <Link
+                                href={`/buildings/${building.id}`}
+                                className="text-primary underline-offset-4 hover:underline"
+                              >
+                                {building.name}
+                              </Link>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td className="py-2.5 text-on-surface-variant">
+                            {unit ? (
+                              <Link
+                                href={`/units/${unit.id}`}
+                                className="text-primary underline-offset-4 hover:underline"
+                              >
+                                {unit.unit_no}
+                              </Link>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td className="py-2.5 text-on-surface-variant">
+                            <DateCell date={lease.start_date} locale={locale} />
+                          </td>
+                          <td className="py-2.5 text-on-surface-variant">
+                            <DateCell date={lease.end_date} locale={locale} remaining />
+                          </td>
+                          <td className="py-2.5 text-end font-medium text-on-surface">
+                            {formatMoney(lease.rent_minor, lease.currency)}
+                          </td>
+                          <td className="py-2.5 text-center">
+                            <Badge
+                              variant={
+                                lease.status === "active"
+                                  ? "success"
+                                  : lease.status === "draft"
+                                    ? "info"
+                                    : "neutral"
+                              }
+                            >
+                              {tl(`statuses.${lease.status}`)}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">
