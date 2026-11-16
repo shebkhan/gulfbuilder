@@ -4,15 +4,16 @@ import {
   Banknote,
   BarChart3,
   Building2,
+  ClipboardCheck,
   CreditCard,
   FileSignature,
+  FileText,
   LayoutDashboard,
   PiggyBank,
   Receipt,
   Settings,
   Users,
   Wrench,
-  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 import { usePathname } from "@/i18n/navigation";
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils";
 const ICONS: Record<string, LucideIcon> = {
   dashboard: LayoutDashboard,
   properties: Building2,
+  buildings: Building2,
   tenants: Users,
   leases: FileSignature,
   payments: CreditCard,
@@ -32,6 +34,12 @@ const ICONS: Record<string, LucideIcon> = {
   inspections: ClipboardCheck,
   reports: BarChart3,
   settings: Settings,
+  rentRoll: FileSignature,
+  receivables: CreditCard,
+  statements: Receipt,
+  payouts: Banknote,
+  approvals: ClipboardCheck,
+  documents: FileText,
 };
 
 export type SidebarItem = { href: string; label: string; icon: string };

@@ -12,7 +12,14 @@
     "maintenance": "Maintenance",
     "inspections": "Inspections",
     "reports": "Reports",
-    "settings": "Settings"
+    "settings": "Settings",
+    "buildings": "Buildings",
+    "rentRoll": "Rent roll",
+    "receivables": "Receivables",
+    "statements": "Statements",
+    "payouts": "Payouts",
+    "approvals": "Approvals",
+    "documents": "Documents"
   },
   "common": {
     "appName": "Gulf Property",
@@ -691,6 +698,117 @@
         "receipt": "Receipt",
         "payment_proof": "Payment proof"
       },
+      "expiresOn": "Expires {date}"
+    }
+  },
+  "owner": {
+    "title": "Owner portal",
+    "subtitle": "Your buildings, collections and statements",
+    "occupancy": "Occupancy",
+    "units": "units",
+    "collectedVsExpected": "Collected this month",
+    "expected": "Expected",
+    "arrears": "Arrears",
+    "noi": "NOI",
+    "noiYearToDate": "Year to date",
+    "upcomingCheques": "Upcoming cheques",
+    "noCheques": "No cheques in the pipeline.",
+    "cheque": "Cheque",
+    "expiringLeases": "Leases expiring in 90 days",
+    "noExpiring": "No leases expiring soon.",
+    "openMaintenance": "Open maintenance",
+    "balance": "Balance owed",
+    "balanceHint": "Closing balance of the latest statement",
+    "viewAll": "View all",
+    "buildings": {
+      "title": "Buildings",
+      "subtitle": "Buildings you own",
+      "empty": "No buildings assigned to you yet.",
+      "unitsOccupied": "units occupied",
+      "units": "Units",
+      "unit": "Unit",
+      "status": "Status",
+      "rent": "Rent"
+    },
+    "rentRoll": {
+      "title": "Rent roll",
+      "subtitle": "Every lease on your buildings",
+      "list": "Leases",
+      "empty": "No leases yet.",
+      "unit": "Unit",
+      "tenant": "Tenant",
+      "period": "Period",
+      "rent": "Rent",
+      "deposit": "Deposit",
+      "paidToDate": "Paid to date",
+      "status": "Status"
+    },
+    "receivables": {
+      "title": "Aged receivables",
+      "subtitle": "Open charges by age",
+      "buckets": {
+        "0-30": "0-30 days",
+        "31-60": "31-60 days",
+        "61-90": "61-90 days",
+        "90+": "90+ days"
+      },
+      "total": "Total outstanding",
+      "empty": "Nothing outstanding.",
+      "tenant": "Tenant",
+      "building": "Building",
+      "dueDate": "Due date",
+      "daysOverdue": "Days",
+      "amount": "Amount"
+    },
+    "statements": {
+      "title": "Statements",
+      "subtitle": "Period statements issued to you",
+      "list": "Statements",
+      "empty": "No statements yet.",
+      "period": "Period",
+      "status": "Status",
+      "closing": "Closing",
+      "opening": "Opening balance",
+      "collections": "Collections",
+      "expenses": "Expenses",
+      "managementFee": "Management fee",
+      "netPayable": "Net payable",
+      "totals": "Summary",
+      "lines": "Lines",
+      "kind": "Kind",
+      "description": "Description",
+      "amount": "Amount"
+    },
+    "payouts": {
+      "title": "Payouts",
+      "subtitle": "Payments made to you",
+      "list": "Payout history",
+      "empty": "No payouts yet.",
+      "paidOn": "Paid on",
+      "method": "Method",
+      "reference": "Reference",
+      "amount": "Amount"
+    },
+    "approvals": {
+      "title": "Expense approvals",
+      "subtitle": "Expenses waiting for your decision",
+      "list": "Approvals",
+      "empty": "Nothing waiting for approval.",
+      "expense": "Expense",
+      "approve": "Approve",
+      "reject": "Reject",
+      "errors": {
+        "not_authorised": "You are not allowed to do that.",
+        "invalid_input": "Check the details and try again.",
+        "failed": "The decision could not be saved.",
+        "not_found": "That approval is no longer waiting."
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "Files for your buildings",
+      "list": "Files",
+      "empty": "No documents yet.",
       "expiresOn": "Expires {date}"
     }
   }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getOrgContext } from "@/server/org-context";
 
 export type OwnerState = {
@@ -120,4 +121,70 @@ export async function recordOwnerPayoutAction(
 
   revalidatePath("/reports");
   return { ok: "payout_recorded", payoutId };
+}
+
+/**
+ * Give an owner a portal login (SPEC §8 O1). The service-role client creates the
+ * login; the owner record and membership are written through the caller's session so
+ * RLS still applies.
+ */
+export async function grantOwnerPortalAccessAction(
+  _prev: OwnerState,
+  formData: FormData,
+): Promise<OwnerState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  const ownerId = formData.get("ownerId");
+  if (typeof ownerId !== "string" || ownerId.length === 0) return fail("invalid_input");
+
+  const { data: owner } = await ctx.supabase
+    .from("owners")
+    .select("id, name, contact, user_id")
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  if (!owner) return fail("not_found");
+  if (owner.user_id) return { ok: "already_linked" };
+
+  const contact = (owner.contact ?? {}) as Record<string, string | undefined>;
+  const email = String(formData.get("email") ?? contact.email ?? "").trim();
+  if (!email) return fail("email_required");
+
+  const admin = createSupabaseAdminClient();
+  let userId: string | undefined;
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    password: `${crypto.randomUUID()}Aa1!`,
+  });
+
+  if (created?.user) {
+    userId = created.user.id;
+  } else if (createError?.message.toLowerCase().includes("already")) {
+    const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    userId = list?.users.find((u) => u.email?.toLowerCase() === email.toLowerCase())?.id;
+  }
+  if (!userId) return fail("portal_failed");
+
+  await admin.from("profiles").upsert({
+    id: userId,
+    full_name: owner.name,
+    active_org_id: ctx.orgId,
+  });
+  await admin.from("org_members").upsert({
+    org_id: ctx.orgId,
+    user_id: userId,
+    role: "owner",
+  });
+
+  const { error } = await ctx.supabase
+    .from("owners")
+    .update({ user_id: userId })
+    .eq("id", ownerId)
+    .eq("org_id", ctx.orgId);
+  if (error) return fail("failed");
+
+  revalidatePath("/reports");
+  return { ok: "portal_enabled" };
 }

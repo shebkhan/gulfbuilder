@@ -12,7 +12,14 @@
     "maintenance": "الصيانة",
     "inspections": "المعاينات",
     "reports": "التقارير",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "buildings": "المباني",
+    "rentRoll": "كشف الإيجارات",
+    "receivables": "المتأخرات",
+    "statements": "كشوف الحساب",
+    "payouts": "المدفوعات",
+    "approvals": "الموافقات",
+    "documents": "المستندات"
   },
   "common": {
     "appName": "عقارات الخليج",
@@ -691,6 +698,117 @@
         "receipt": "إيصال",
         "payment_proof": "إثبات دفع"
       },
+      "expiresOn": "ينتهي في {date}"
+    }
+  },
+  "owner": {
+    "title": "بوابة المالك",
+    "subtitle": "مبانيك والتحصيلات وكشوف الحساب",
+    "occupancy": "نسبة الإشغال",
+    "units": "وحدة",
+    "collectedVsExpected": "المحصّل هذا الشهر",
+    "expected": "المتوقع",
+    "arrears": "المتأخرات",
+    "noi": "صافي التشغيل",
+    "noiYearToDate": "منذ بداية العام",
+    "upcomingCheques": "الشيكات القادمة",
+    "noCheques": "لا توجد شيكات في الانتظار.",
+    "cheque": "شيك",
+    "expiringLeases": "عقود تنتهي خلال 90 يوماً",
+    "noExpiring": "لا توجد عقود تنتهي قريباً.",
+    "openMaintenance": "بلاغات صيانة مفتوحة",
+    "balance": "الرصيد المستحق",
+    "balanceHint": "رصيد آخر كشف حساب",
+    "viewAll": "عرض الكل",
+    "buildings": {
+      "title": "المباني",
+      "subtitle": "المباني التي تملكها",
+      "empty": "لا توجد مبانٍ مسندة إليك بعد.",
+      "unitsOccupied": "وحدة مشغولة",
+      "units": "الوحدات",
+      "unit": "الوحدة",
+      "status": "الحالة",
+      "rent": "الإيجار"
+    },
+    "rentRoll": {
+      "title": "كشف الإيجارات",
+      "subtitle": "كل عقود مبانيك",
+      "list": "العقود",
+      "empty": "لا توجد عقود بعد.",
+      "unit": "الوحدة",
+      "tenant": "المستأجر",
+      "period": "المدة",
+      "rent": "الإيجار",
+      "deposit": "الضمان",
+      "paidToDate": "المسدد",
+      "status": "الحالة"
+    },
+    "receivables": {
+      "title": "المتأخرات حسب العمر",
+      "subtitle": "الفواتير المفتوحة حسب العمر",
+      "buckets": {
+        "0-30": "0-30 يوم",
+        "31-60": "31-60 يوم",
+        "61-90": "61-90 يوم",
+        "90+": "أكثر من 90 يوم"
+      },
+      "total": "إجمالي المستحق",
+      "empty": "لا يوجد مستحق.",
+      "tenant": "المستأجر",
+      "building": "المبنى",
+      "dueDate": "تاريخ الاستحقاق",
+      "daysOverdue": "الأيام",
+      "amount": "المبلغ"
+    },
+    "statements": {
+      "title": "كشوف الحساب",
+      "subtitle": "كشوف الفترة الصادرة لك",
+      "list": "الكشوف",
+      "empty": "لا توجد كشوف بعد.",
+      "period": "الفترة",
+      "status": "الحالة",
+      "closing": "الرصيد الختامي",
+      "opening": "رصيد أول المدة",
+      "collections": "التحصيلات",
+      "expenses": "المصروفات",
+      "managementFee": "رسوم الإدارة",
+      "netPayable": "صافي المستحق",
+      "totals": "الملخص",
+      "lines": "البنود",
+      "kind": "النوع",
+      "description": "الوصف",
+      "amount": "المبلغ"
+    },
+    "payouts": {
+      "title": "المدفوعات",
+      "subtitle": "المبالغ المدفوعة لك",
+      "list": "سجل المدفوعات",
+      "empty": "لا توجد مدفوعات بعد.",
+      "paidOn": "تاريخ الدفع",
+      "method": "الطريقة",
+      "reference": "المرجع",
+      "amount": "المبلغ"
+    },
+    "approvals": {
+      "title": "موافقات المصروفات",
+      "subtitle": "مصروفات بانتظار قرارك",
+      "list": "الموافقات",
+      "empty": "لا شيء بانتظار الموافقة.",
+      "expense": "مصروف",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "errors": {
+        "not_authorised": "غير مسموح لك بهذا الإجراء.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "failed": "تعذر حفظ القرار.",
+        "not_found": "لم يعد هذا الطلب بانتظار القرار."
+      }
+    },
+    "documents": {
+      "title": "المستندات",
+      "subtitle": "ملفات مبانيك",
+      "list": "الملفات",
+      "empty": "لا توجد مستندات بعد.",
       "expiresOn": "ينتهي في {date}"
     }
   }

@@ -2,15 +2,16 @@ import {
   Banknote,
   BarChart3,
   Building2,
+  ClipboardCheck,
   CreditCard,
   FileSignature,
+  FileText,
   LayoutDashboard,
   PiggyBank,
   Receipt,
   Settings,
   Users,
   Wrench,
-  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 import { can, type Capability, type Role } from "@/lib/rbac";
@@ -39,6 +40,33 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const FOOTER_NAV: NavItem[] = [
   { href: "/settings", labelKey: "settings", icon: Settings, capability: "settings.write" },
+];
+
+/** Owner portal (SPEC §8 O1): read-only views of the owner's own buildings. */
+export const OWNER_NAV: NavItem[] = [
+  { href: "/owner", labelKey: "dashboard", icon: LayoutDashboard, capability: "reports.read" },
+  { href: "/owner/buildings", labelKey: "buildings", icon: Building2, capability: "reports.read" },
+  {
+    href: "/owner/rent-roll",
+    labelKey: "rentRoll",
+    icon: FileSignature,
+    capability: "reports.read",
+  },
+  {
+    href: "/owner/receivables",
+    labelKey: "receivables",
+    icon: CreditCard,
+    capability: "reports.read",
+  },
+  { href: "/owner/statements", labelKey: "statements", icon: Receipt, capability: "reports.read" },
+  { href: "/owner/payouts", labelKey: "payouts", icon: Banknote, capability: "reports.read" },
+  {
+    href: "/owner/approvals",
+    labelKey: "approvals",
+    icon: ClipboardCheck,
+    capability: "reports.read",
+  },
+  { href: "/owner/documents", labelKey: "documents", icon: FileText, capability: "reports.read" },
 ];
 
 export function visibleNav(role: Role | null, items: NavItem[] = NAV_ITEMS): NavItem[] {

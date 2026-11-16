@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Role } from "@/lib/rbac";
 import { signOutAction } from "@/server/actions/auth";
 import { LocaleSwitcher } from "./locale-switcher";
-import { FOOTER_NAV, visibleNav, type NavItem } from "./nav-items";
+import { FOOTER_NAV, NAV_ITEMS, visibleNav, type NavItem } from "./nav-items";
 import { SidebarNav, type SidebarItem } from "./sidebar-nav";
 
 type AppShellProps = {
@@ -13,6 +13,9 @@ type AppShellProps = {
   role: Role;
   userName: string;
   locale: string;
+  /** Overrides the staff navigation (the owner portal passes its own). */
+  items?: NavItem[];
+  footerItems?: NavItem[];
 };
 
 export async function AppShell({
@@ -22,14 +25,16 @@ export async function AppShell({
   role,
   userName,
   locale,
+  items,
+  footerItems,
 }: AppShellProps) {
   const t = await getTranslations();
 
   const toItems = (nav: NavItem[]): SidebarItem[] =>
     nav.map((item) => ({ href: item.href, label: t(`nav.${item.labelKey}`), icon: item.labelKey }));
 
-  const nav = toItems(visibleNav(role));
-  const footer = toItems(visibleNav(role, FOOTER_NAV));
+  const nav = toItems(visibleNav(role, items ?? NAV_ITEMS));
+  const footer = toItems(visibleNav(role, footerItems ?? FOOTER_NAV));
 
   return (
     <div className="min-h-screen bg-surface-container-low p-margin-mobile lg:p-margin">
@@ -47,7 +52,7 @@ export async function AppShell({
             </div>
             <SidebarNav items={nav} />
           </div>
-          <SidebarNav items={footer} />
+          {footer.length > 0 && <SidebarNav items={footer} />}
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
