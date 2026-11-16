@@ -5,6 +5,14 @@ section it departs from and why.
 
 ## 2026-11-16
 
+**D-009 · `auth_org()`/`auth_role()` fall back to the database when the token hook is absent.**
+SPEC 6 expects `org_id` and `org_role` to arrive in the JWT from a custom access token hook, but the
+hook is a dashboard toggle. Until it is enabled, a fresh token has neither claim and every
+`org_id = auth_org()` policy filtered to zero rows. The helpers now prefer the claims and fall back
+to `profiles.active_org_id` plus the matching `org_members` row, both read in a `security definer`
+function that only ever looks at `auth.uid()`. Enabling the hook still wins and removes the extra
+lookup. `create_organization()` sets `active_org_id`, and existing memberships were backfilled.
+
 **D-008 · pgTAP is not run for new milestones (owner instruction).**
 `supabase test db` needs Docker, which is not installed on the build machine; the existing suite is
 run ad hoc through the Supabase MCP inside a rolled-back transaction. From M1 onward, verification
