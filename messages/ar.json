@@ -19,7 +19,8 @@
     "statements": "كشوف الحساب",
     "payouts": "المدفوعات",
     "approvals": "الموافقات",
-    "documents": "المستندات"
+    "documents": "المستندات",
+    "meters": "العدادات"
   },
   "common": {
     "appName": "عقارات الخليج",
@@ -122,6 +123,159 @@
         "not_authorised": "مدير المؤسسة فقط يمكنه دعوة الأشخاص.",
         "already_member": "هذا الشخص عضو في مساحة العمل بالفعل.",
         "invite_failed": "تعذّر إرسال الدعوة."
+      }
+    },
+    "sections": {
+      "users": "الفريق",
+      "organization": "المنشأة",
+      "branding": "الهوية",
+      "accounting": "المحاسبة",
+      "notifications": "الإشعارات",
+      "audit": "سجل التدقيق",
+      "export": "تصدير البيانات"
+    },
+    "organization": {
+      "title": "إعدادات المنشأة",
+      "subtitle": "العملة واللغة وقواعد المال التي يطبقها النظام.",
+      "name": "الاسم",
+      "legalName": "الاسم القانوني",
+      "taxId": "الرقم الضريبي",
+      "baseCurrency": "العملة الأساسية",
+      "defaultLocale": "اللغة الافتراضية",
+      "timezone": "المنطقة الزمنية",
+      "policy": "قواعد المال",
+      "graceDays": "أيام السماح",
+      "lateFee": "غرامة التأخير",
+      "lateFeeType": "نوع الغرامة",
+      "lateFeePercent": "نسبة الغرامة %",
+      "taxRate": "نسبة الضريبة %",
+      "reminderDays": "أيام التذكير",
+      "revenueRecognition": "الاعتراف بالإيراد",
+      "save": "حفظ الإعدادات",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم حفظ الإعدادات.",
+      "lateFeeTypes": {
+        "flat": "مبلغ ثابت",
+        "percent": "نسبة من الإيجار"
+      },
+      "recognition": {
+        "on_due": "عند الاستحقاق",
+        "straight_line_monthly": "قسط شهري ثابت"
+      },
+      "errors": {
+        "not_authorised": "مدير المنشأة فقط يمكنه تغيير هذه الإعدادات.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "invalid_amount": "أدخل الغرامة مثل 50.00.",
+        "failed": "تعذر الحفظ. حاول مرة أخرى."
+      }
+    },
+    "branding": {
+      "appName": "اسم التطبيق",
+      "logoUrl": "رابط الشعار",
+      "faviconUrl": "رابط الأيقونة",
+      "primaryColor": "اللون الأساسي",
+      "secondaryColor": "اللون الثانوي",
+      "fontFamily": "الخط",
+      "terminology": "تعاريف بديلة (JSON)",
+      "customDomain": "نطاق مخصص",
+      "customDomainHint": "أضف سجل CNAME يشير إلى المنصة، ثم يتم التحقق من النطاق ويُقدَّم التطبيق منه.",
+      "save": "حفظ الهوية",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم حفظ الهوية.",
+      "domainStatus": {
+        "none": "غير محدد",
+        "pending": "بانتظار التحقق",
+        "verified": "موثّق",
+        "failed": "فشل التحقق"
+      },
+      "errors": {
+        "not_authorised": "مدير المنشأة فقط يمكنه تغيير الهوية.",
+        "invalid_input": "راجع الألوان والحقول.",
+        "invalid_terminology": "التعاريف يجب أن تكون كائن JSON من مفاتيح وقيم.",
+        "domain_taken": "النطاق مستخدم بالفعل من منشأة أخرى.",
+        "failed": "تعذر الحفظ. حاول مرة أخرى."
+      }
+    },
+    "accounting": {
+      "title": "المحاسبة",
+      "subtitle": "إغلاق الفترات وإعادة فتحها وتشغيل مسح المتأخرات.",
+      "periods": "الفترات",
+      "noPeriods": "لا توجد فترات بعد.",
+      "month": "الشهر",
+      "status": "الحالة",
+      "closedAt": "أُغلقت في",
+      "closePeriod": "إغلاق فترة",
+      "reopenPeriod": "إعادة فتح فترة",
+      "reason": "السبب",
+      "overdueSweep": "مسح المتأخرات",
+      "overdueSweepHint": "يضع الفواتير المتجاوزة(days السماح) متأخرة ويطبق الغرامة مرة واحدة لكل فاتورة.",
+      "close": "إغلاق الفترة",
+      "reopen": "إعادة الفتح",
+      "runSweep": "تشغيل المسح",
+      "working": "جارٍ التنفيذ…",
+      "periodClosed": "تم إغلاق الفترة.",
+      "periodReopened": "تم إعادة فتح الفترة.",
+      "sweepDone": "انتهى المسح.",
+      "errors": {
+        "not_authorised": "المحاسبون والمديرون فقط يمكنهم ذلك.",
+        "invalid_input": "راجع الشهر والسبب.",
+        "close_failed": "تعذر إغلاق الفترة.",
+        "reopen_failed": "تعذر إعادة فتح الفترة.",
+        "sweep_failed": "تعذر تشغيل المسح."
+      }
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "subtitle": "قوالب الرسائل وطابور الرسائل بانتظار الإرسال.",
+      "templates": "القوالب",
+      "outbox": "صندوق الصادر",
+      "empty": "لا يوجد شيء بعد.",
+      "event": "الحدث",
+      "channel": "القناة",
+      "locale": "اللغة",
+      "subject": "الموضوع",
+      "body": "النص",
+      "bodyPlaceholder": "استخدم {{tenant}} و{{amount}} و{{date}} كعناصر نائبة.",
+      "save": "حفظ القالب",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم حفظ القالب.",
+      "channels": {
+        "email": "بريد",
+        "whatsapp": "واتساب",
+        "sms": "رسالة نصية",
+        "in_app": "داخل التطبيق",
+        "web_push": "إشعار"
+      },
+      "errors": {
+        "not_authorised": "مدير المنشأة فقط يمكنه تعديل القوالب.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "failed": "تعذر الحفظ. حاول مرة أخرى."
+      }
+    },
+    "audit": {
+      "title": "سجل التدقيق",
+      "subtitle": "كل تغيير على بيانات المنشأة، الأحدث أولاً.",
+      "list": "السجلات",
+      "empty": "لم تُسجَّل تغييرات بعد.",
+      "when": "الوقت",
+      "table": "الجدول",
+      "action": "الإجراء",
+      "row": "السجل"
+    },
+    "export": {
+      "title": "تصدير البيانات",
+      "subtitle": "حمّل بياناتك بصيغة CSV.",
+      "datasets": {
+        "tenants": "المستأجرون",
+        "leases": "العقود",
+        "charges": "الفواتير",
+        "payments": "المدفوعات",
+        "journal_lines": "قيود اليومية"
+      },
+      "errors": {
+        "not_authorised": "مدير المنشأة فقط يمكنه تصدير البيانات.",
+        "unknown_dataset": "مجموعة بيانات غير معروفة.",
+        "export_failed": "فشل التصدير. حاول مرة أخرى."
       }
     }
   },
@@ -810,6 +964,80 @@
       "list": "الملفات",
       "empty": "لا توجد مستندات بعد.",
       "expiresOn": "ينتهي في {date}"
+    }
+  },
+  "documents": {
+    "title": "خزنة المستندات",
+    "subtitle": "العقود والبطاقات والإيصارات والصور لكل سجل.",
+    "list": "الملفات",
+    "empty": "لا توجد مستندات بعد.",
+    "kind": "النوع",
+    "entityType": "مرتبط بـ",
+    "entity": "السجل",
+    "selectEntity": "اختر…",
+    "expiresOn": "ينتهي في",
+    "uploadedOn": "تاريخ الرفع",
+    "file": "الملف",
+    "upload": "رفع",
+    "uploading": "جارٍ الرفع…",
+    "uploaded": "تم رفع المستند.",
+    "entityTypes": {
+      "lease": "عقد",
+      "tenant": "مستأجر",
+      "building": "مبنى",
+      "unit": "وحدة",
+      "vendor": "مورد",
+      "inspection": "فحص"
+    },
+    "kinds": {
+      "contract": "عقد",
+      "id_card": "بطاقة هوية",
+      "trade_license": "سجل تجاري",
+      "photo": "صورة",
+      "receipt": "إيصال",
+      "title_deed": "صند ملكية"
+    },
+    "errors": {
+      "not_authorised": "غير مسموح لك بهذا الإجراء.",
+      "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+      "file_required": "اختر ملفاً للرفع.",
+      "file_too_large": "حجم الملف يجب ألا يتجاوز 10 ميجابايت.",
+      "unsupported_file_type": "يُقبل ملفات الصور و PDF فقط.",
+      "upload_failed": "تعذر رفع الملف. حاول مرة أخرى.",
+      "failed": "تعذر حفظ المستند. حاول مرة أخرى."
+    }
+  },
+  "meters": {
+    "title": "العدادات والقراءات",
+    "subtitle": "تابع عدادات المرافق وسجل الاستهلاك.",
+    "list": "العدادات",
+    "empty": "لا توجد عدادات بعد.",
+    "newMeter": "إضافة عداد",
+    "newReading": "تسجيل قراءة",
+    "kind": "نوع العداد",
+    "building": "المبنى",
+    "selectBuilding": "اختر المبنى…",
+    "meterNo": "رقم العداد",
+    "meter": "العداد",
+    "selectMeter": "اختر العداد…",
+    "readOn": "تاريخ القراءة",
+    "value": "القيمة",
+    "create": "إضافة عداد",
+    "saving": "جارٍ الحفظ…",
+    "record": "تسجيل القراءة",
+    "recorded": "تم تسجيل القراءة.",
+    "lastReading": "آخر قراءة",
+    "consumption": "الاستهلاك",
+    "kinds": {
+      "electricity": "كهرباء",
+      "water": "مياه",
+      "gas": "غاز"
+    },
+    "errors": {
+      "not_authorised": "غير مسموح لك بهذا الإجراء.",
+      "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+      "invalid_value": "أدخل قيمة العداد كرقم.",
+      "failed": "تعذر الحفظ. حاول مرة أخرى."
     }
   }
 }

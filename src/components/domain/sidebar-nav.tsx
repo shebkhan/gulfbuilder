@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileSignature,
   FileText,
+  Gauge,
   LayoutDashboard,
   PiggyBank,
   Receipt,
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   payouts: Banknote,
   approvals: ClipboardCheck,
   documents: FileText,
+  meters: Gauge,
 };
 
 export type SidebarItem = { href: string; label: string; icon: string };

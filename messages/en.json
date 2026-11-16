@@ -19,7 +19,8 @@
     "statements": "Statements",
     "payouts": "Payouts",
     "approvals": "Approvals",
-    "documents": "Documents"
+    "documents": "Documents",
+    "meters": "Meters"
   },
   "common": {
     "appName": "Gulf Property",
@@ -122,6 +123,159 @@
         "not_authorised": "Only organization admins can invite people.",
         "already_member": "That person is already in this workspace.",
         "invite_failed": "The invite could not be sent."
+      }
+    },
+    "sections": {
+      "users": "Team",
+      "organization": "Organization",
+      "branding": "Branding",
+      "accounting": "Accounting",
+      "notifications": "Notifications",
+      "audit": "Audit log",
+      "export": "Data export"
+    },
+    "organization": {
+      "title": "Organization settings",
+      "subtitle": "Currency, locale and the money rules the platform applies.",
+      "name": "Name",
+      "legalName": "Legal name",
+      "taxId": "Tax ID",
+      "baseCurrency": "Base currency",
+      "defaultLocale": "Default language",
+      "timezone": "Time zone",
+      "policy": "Money rules",
+      "graceDays": "Grace days",
+      "lateFee": "Late fee",
+      "lateFeeType": "Late fee type",
+      "lateFeePercent": "Late fee percent",
+      "taxRate": "Tax rate %",
+      "reminderDays": "Reminder days",
+      "revenueRecognition": "Revenue recognition",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "saved": "Settings saved.",
+      "lateFeeTypes": {
+        "flat": "Flat amount",
+        "percent": "Percent of rent"
+      },
+      "recognition": {
+        "on_due": "On due date",
+        "straight_line_monthly": "Straight line monthly"
+      },
+      "errors": {
+        "not_authorised": "Only organization admins can change these settings.",
+        "invalid_input": "Check the details and try again.",
+        "invalid_amount": "Enter the late fee like 50.00.",
+        "failed": "Could not save. Try again."
+      }
+    },
+    "branding": {
+      "appName": "App name",
+      "logoUrl": "Logo URL",
+      "faviconUrl": "Favicon URL",
+      "primaryColor": "Primary colour",
+      "secondaryColor": "Secondary colour",
+      "fontFamily": "Font family",
+      "terminology": "Terminology overrides (JSON)",
+      "customDomain": "Custom domain",
+      "customDomainHint": "Point a CNAME at the platform, then the domain is verified and the app is served from it.",
+      "save": "Save branding",
+      "saving": "Saving…",
+      "saved": "Branding saved.",
+      "domainStatus": {
+        "none": "not set",
+        "pending": "awaiting verification",
+        "verified": "verified",
+        "failed": "verification failed"
+      },
+      "errors": {
+        "not_authorised": "Only organization admins can change branding.",
+        "invalid_input": "Check the colours and fields.",
+        "invalid_terminology": "Terminology must be a JSON object of key/value pairs.",
+        "domain_taken": "That domain is already used by another organization.",
+        "failed": "Could not save. Try again."
+      }
+    },
+    "accounting": {
+      "title": "Accounting",
+      "subtitle": "Close and reopen periods, and run the overdue sweep.",
+      "periods": "Periods",
+      "noPeriods": "No periods yet.",
+      "month": "Month",
+      "status": "Status",
+      "closedAt": "Closed at",
+      "closePeriod": "Close a period",
+      "reopenPeriod": "Reopen a period",
+      "reason": "Reason",
+      "overdueSweep": "Overdue sweep",
+      "overdueSweepHint": "Marks charges past the grace days as overdue and applies the late fee once per charge.",
+      "close": "Close period",
+      "reopen": "Reopen period",
+      "runSweep": "Run sweep",
+      "working": "Working…",
+      "periodClosed": "Period closed.",
+      "periodReopened": "Period reopened.",
+      "sweepDone": "Sweep finished.",
+      "errors": {
+        "not_authorised": "Only accountants and admins can do that.",
+        "invalid_input": "Check the month and reason.",
+        "close_failed": "The period could not be closed.",
+        "reopen_failed": "The period could not be reopened.",
+        "sweep_failed": "The sweep could not run."
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Message templates and the queue of messages waiting to be sent.",
+      "templates": "Templates",
+      "outbox": "Outbox",
+      "empty": "Nothing here yet.",
+      "event": "Event",
+      "channel": "Channel",
+      "locale": "Language",
+      "subject": "Subject",
+      "body": "Body",
+      "bodyPlaceholder": "Use {{tenant}}, {{amount}} and {{date}} for placeholders.",
+      "save": "Save template",
+      "saving": "Saving…",
+      "saved": "Template saved.",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "sms": "SMS",
+        "in_app": "In-app",
+        "web_push": "Push"
+      },
+      "errors": {
+        "not_authorised": "Only organization admins can edit templates.",
+        "invalid_input": "Check the details and try again.",
+        "failed": "Could not save. Try again."
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Every change to the organization's data, newest first.",
+      "list": "Entries",
+      "empty": "No changes recorded yet.",
+      "when": "When",
+      "table": "Table",
+      "action": "Action",
+      "row": "Row"
+    },
+    "export": {
+      "title": "Data export",
+      "subtitle": "Download your data as CSV.",
+      "datasets": {
+        "tenants": "Tenants",
+        "leases": "Leases",
+        "charges": "Charges",
+        "payments": "Payments",
+        "journal_lines": "Journal lines"
+      },
+      "errors": {
+        "not_authorised": "Only organization admins can export data.",
+        "unknown_dataset": "Unknown dataset.",
+        "export_failed": "The export failed. Try again."
       }
     }
   },
@@ -810,6 +964,80 @@
       "list": "Files",
       "empty": "No documents yet.",
       "expiresOn": "Expires {date}"
+    }
+  },
+  "documents": {
+    "title": "Document vault",
+    "subtitle": "Contracts, IDs, receipts and photos for every entity.",
+    "list": "Files",
+    "empty": "No documents yet.",
+    "kind": "Kind",
+    "entityType": "Attached to",
+    "entity": "Entity",
+    "selectEntity": "Select…",
+    "expiresOn": "Expires on",
+    "uploadedOn": "Uploaded",
+    "file": "File",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "uploaded": "Document uploaded.",
+    "entityTypes": {
+      "lease": "Lease",
+      "tenant": "Tenant",
+      "building": "Building",
+      "unit": "Unit",
+      "vendor": "Vendor",
+      "inspection": "Inspection"
+    },
+    "kinds": {
+      "contract": "Contract",
+      "id_card": "ID card",
+      "trade_license": "Trade licence",
+      "photo": "Photo",
+      "receipt": "Receipt",
+      "title_deed": "Title deed"
+    },
+    "errors": {
+      "not_authorised": "You are not allowed to do that.",
+      "invalid_input": "Check the details and try again.",
+      "file_required": "Choose a file to upload.",
+      "file_too_large": "The file must be 10 MB or smaller.",
+      "unsupported_file_type": "Only images and PDF files are accepted.",
+      "upload_failed": "The file could not be uploaded. Try again.",
+      "failed": "The document could not be saved. Try again."
+    }
+  },
+  "meters": {
+    "title": "Meters & readings",
+    "subtitle": "Track utility meters and their consumption history.",
+    "list": "Meters",
+    "empty": "No meters yet.",
+    "newMeter": "Add a meter",
+    "newReading": "Record a reading",
+    "kind": "Meter type",
+    "building": "Building",
+    "selectBuilding": "Select building…",
+    "meterNo": "Meter number",
+    "meter": "Meter",
+    "selectMeter": "Select meter…",
+    "readOn": "Reading date",
+    "value": "Value",
+    "create": "Add meter",
+    "saving": "Saving…",
+    "record": "Record reading",
+    "recorded": "Reading recorded.",
+    "lastReading": "Last reading",
+    "consumption": "Consumption",
+    "kinds": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "gas": "Gas"
+    },
+    "errors": {
+      "not_authorised": "You are not allowed to do that.",
+      "invalid_input": "Check the details and try again.",
+      "invalid_value": "Enter the meter value as a number.",
+      "failed": "Could not save. Try again."
     }
   }
 }

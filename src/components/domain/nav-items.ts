@@ -6,6 +6,7 @@ import {
   CreditCard,
   FileSignature,
   FileText,
+  Gauge,
   LayoutDashboard,
   PiggyBank,
   Receipt,
@@ -36,6 +37,8 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/maintenance", labelKey: "maintenance", icon: Wrench, capability: "maintenance.write" },
   { href: "/inspections", labelKey: "inspections", icon: ClipboardCheck, capability: "maintenance.write" },
   { href: "/reports", labelKey: "reports", icon: BarChart3, capability: "reports.read" },
+  { href: "/documents", labelKey: "documents", icon: FileText, capability: "properties.read" },
+  { href: "/meters", labelKey: "meters", icon: Gauge, capability: "maintenance.write" },
 ];
 
 export const FOOTER_NAV: NavItem[] = [

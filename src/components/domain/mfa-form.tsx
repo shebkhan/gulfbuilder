@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +24,6 @@ type Props = {
 type Step = "loading" | "enroll" | "verify";
 
 export function MfaForm({ next, labels }: Props) {
-  const router = useRouter();
   const [step, setStep] = useState<Step>("loading");
   const [factorId, setFactorId] = useState<string>();
   const [qr, setQr] = useState<string>();
@@ -77,8 +75,8 @@ export function MfaForm({ next, labels }: Props) {
       setError(labels.failed);
       return;
     }
-    router.replace(next);
-    router.refresh();
+    // A full navigation, not the client router: the server has to read the new aal2 cookie.
+    window.location.assign(next);
   }
 
   return (
