@@ -635,6 +635,80 @@ export type Database = {
           },
         ]
       }
+      tenants: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          email: string | null
+          emergency_contact: Json | null
+          employer: string | null
+          full_name: string
+          id: string
+          id_expiry: string | null
+          id_number_enc: string | null
+          id_type: string | null
+          kind: string
+          language: string
+          nationality: string | null
+          org_id: string
+          phone: string | null
+          updated_at: string
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          emergency_contact?: Json | null
+          employer?: string | null
+          full_name: string
+          id?: string
+          id_expiry?: string | null
+          id_number_enc?: string | null
+          id_type?: string | null
+          kind?: string
+          language?: string
+          nationality?: string | null
+          org_id: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          emergency_contact?: Json | null
+          employer?: string | null
+          full_name?: string
+          id?: string
+          id_expiry?: string | null
+          id_number_enc?: string | null
+          id_type?: string | null
+          kind?: string
+          language?: string
+          nationality?: string | null
+          org_id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenants_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       units: {
         Row: {
           area_sqm: number | null
@@ -777,6 +851,59 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_directory: {
+        Row: {
+          deleted_at: string | null
+          email: string | null
+          employer: string | null
+          full_name: string | null
+          id: string | null
+          kind: string | null
+          language: string | null
+          nationality: string | null
+          org_id: string | null
+          phone: string | null
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          deleted_at?: string | null
+          email?: string | null
+          employer?: string | null
+          full_name?: string | null
+          id?: string | null
+          kind?: string | null
+          language?: string | null
+          nationality?: string | null
+          org_id?: string | null
+          phone?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          deleted_at?: string | null
+          email?: string | null
+          employer?: string | null
+          full_name?: string | null
+          id?: string | null
+          kind?: string | null
+          language?: string | null
+          nationality?: string | null
+          org_id?: string | null
+          phone?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenants_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       _cleanup: { Args: never; Returns: boolean }
@@ -845,6 +972,7 @@ export type Database = {
         Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      decrypt_id: { Args: { p_ciphertext: string }; Returns: string }
       diag:
         | {
             Args: { msg: unknown }
@@ -862,6 +990,7 @@ export type Database = {
       do_tap:
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
+      encrypt_id: { Args: { p_plaintext: string }; Returns: string }
       fail:
         | { Args: never; Returns: string }
         | { Args: { "": string }; Returns: string }
@@ -886,6 +1015,10 @@ export type Database = {
         Returns: number
       }
       has_unique: { Args: { "": string }; Returns: string }
+      import_property_rows: {
+        Args: { p_dry_run?: boolean; p_rows: Json }
+        Returns: Json
+      }
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
       isnt_empty: { Args: { "": string }; Returns: string }
@@ -906,6 +1039,7 @@ export type Database = {
       skip:
         | { Args: { "": string }; Returns: string }
         | { Args: { how_many: number; why: string }; Returns: string }
+      tenant_id_number: { Args: { p_tenant: string }; Returns: string }
       throws_ok: { Args: { "": string }; Returns: string }
       todo:
         | { Args: { how_many: number }; Returns: boolean[] }
