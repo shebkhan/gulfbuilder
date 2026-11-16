@@ -1766,6 +1766,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           custom_domain: string | null
+          custom_domain_status: string
+          custom_domain_verified_at: string | null
           email_from: string | null
           favicon_url: string | null
           font_family: string | null
@@ -1781,6 +1783,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verified_at?: string | null
           email_from?: string | null
           favicon_url?: string | null
           font_family?: string | null
@@ -1796,6 +1800,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verified_at?: string | null
           email_from?: string | null
           favicon_url?: string | null
           font_family?: string | null
@@ -2316,10 +2322,12 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
           org_id: string
-          receipt_no: number
-          receipt_year: number
+          proof_path: string | null
+          receipt_no: number | null
+          receipt_year: number | null
           received_at: string
           reference: string | null
+          status: string
           tenant_id: string
           updated_at: string
         }
@@ -2334,10 +2342,12 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           org_id: string
-          receipt_no: number
-          receipt_year: number
+          proof_path?: string | null
+          receipt_no?: number | null
+          receipt_year?: number | null
           received_at: string
           reference?: string | null
+          status?: string
           tenant_id: string
           updated_at?: string
         }
@@ -2352,10 +2362,12 @@ export type Database = {
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           org_id?: string
-          receipt_no?: number
-          receipt_year?: number
+          proof_path?: string | null
+          receipt_no?: number | null
+          receipt_year?: number | null
           received_at?: string
           reference?: string | null
+          status?: string
           tenant_id?: string
           updated_at?: string
         }
@@ -2396,6 +2408,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plans: {
+        Row: {
+          code: string
+          currency: string | null
+          features: Json
+          limits: Json
+          name: string | null
+          price_minor: number | null
+        }
+        Insert: {
+          code: string
+          currency?: string | null
+          features?: Json
+          limits?: Json
+          name?: string | null
+          price_minor?: number | null
+        }
+        Update: {
+          code?: string
+          currency?: string | null
+          features?: Json
+          limits?: Json
+          name?: string | null
+          price_minor?: number | null
+        }
+        Relationships: []
+      }
+      platform_admins: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -2619,6 +2676,51 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          org_id: string
+          period_end: string | null
+          plan_code: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          org_id: string
+          period_end?: string | null
+          plan_code?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          org_id?: string
+          period_end?: string | null
+          plan_code?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_plan_code_fkey"
+            columns: ["plan_code"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -2855,6 +2957,38 @@ export type Database = {
           },
           {
             foreignKeyName: "units_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_snapshots: {
+        Row: {
+          org_id: string
+          storage_mb: number
+          taken_on: string
+          units: number
+          users: number
+        }
+        Insert: {
+          org_id: string
+          storage_mb?: number
+          taken_on: string
+          units?: number
+          users?: number
+        }
+        Update: {
+          org_id?: string
+          storage_mb?: number
+          taken_on?: string
+          units?: number
+          users?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_snapshots_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -3137,6 +3271,10 @@ export type Database = {
       do_tap:
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
+      document_visible: {
+        Args: { p_entity_id: string; p_entity_type: string }
+        Returns: boolean
+      }
       encrypt_id: { Args: { p_plaintext: string }; Returns: string }
       fail:
         | { Args: never; Returns: string }
@@ -3179,6 +3317,8 @@ export type Database = {
       }
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
+      is_platform_admin: { Args: never; Returns: boolean }
+      is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
       lease_building_id: { Args: { p_lease: string }; Returns: string }
       lease_capacity: { Args: { p_lease: string }; Returns: number }
@@ -3199,7 +3339,15 @@ export type Database = {
       }
       no_plan: { Args: never; Returns: boolean[] }
       num_failed: { Args: never; Returns: number }
+      org_feature_enabled: {
+        Args: { p_feature: string; p_org: string }
+        Returns: boolean
+      }
       os_name: { Args: never; Returns: string }
+      owner_building_ids: { Args: never; Returns: string[] }
+      owner_ids: { Args: never; Returns: string[] }
+      owner_lease_ids: { Args: never; Returns: string[] }
+      owner_tenant_ids: { Args: never; Returns: string[] }
       pass:
         | { Args: never; Returns: string }
         | { Args: { "": string }; Returns: string }
@@ -3308,6 +3456,8 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
         | { Args: { how_many: number; why: string }; Returns: string }
       tenant_id_number: { Args: { p_tenant: string }; Returns: string }
+      tenant_ids: { Args: never; Returns: string[] }
+      tenant_lease_ids: { Args: never; Returns: string[] }
       terminate_lease: {
         Args: { p_date: string; p_lease: string; p_reason: string }
         Returns: undefined
