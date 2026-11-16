@@ -159,6 +159,82 @@ export type Database = {
           },
         ]
       }
+      charges: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          due_date: string
+          id: string
+          lease_id: string
+          org_id: string
+          paid_minor: number
+          period_end: string | null
+          period_start: string | null
+          status: Database["public"]["Enums"]["charge_status"]
+          type: Database["public"]["Enums"]["charge_type"]
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          description?: string | null
+          due_date: string
+          id?: string
+          lease_id: string
+          org_id: string
+          paid_minor?: number
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["charge_status"]
+          type: Database["public"]["Enums"]["charge_type"]
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          lease_id?: string
+          org_id?: string
+          paid_minor?: number
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["charge_status"]
+          type?: Database["public"]["Enums"]["charge_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charges_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "charges_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           code: string
@@ -221,6 +297,262 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lease_occupants: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          full_name: string | null
+          id: string
+          lease_id: string
+          org_id: string
+          relation: string | null
+          tenant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          full_name?: string | null
+          id?: string
+          lease_id: string
+          org_id: string
+          relation?: string | null
+          tenant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          full_name?: string | null
+          id?: string
+          lease_id?: string
+          org_id?: string
+          relation?: string | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lease_occupants_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_occupants_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_occupants_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_occupants_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lease_terms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          id: string
+          lease_id: string
+          note: string | null
+          org_id: string
+          rent_minor: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          id?: string
+          lease_id: string
+          note?: string | null
+          org_id: string
+          rent_minor: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          id?: string
+          lease_id?: string
+          note?: string | null
+          org_id?: string
+          rent_minor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lease_terms_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_terms_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leases: {
+        Row: {
+          contract_path: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          deposit_minor: number
+          due_day: number
+          end_date: string
+          id: string
+          installments: number
+          lease_no: string
+          notice_days: number
+          org_id: string
+          parent_lease_id: string | null
+          payment_frequency: string
+          registration_no: string | null
+          registration_status: string
+          rent_collected_by: string
+          rent_minor: number
+          room_id: string | null
+          signed_at: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["lease_status"]
+          sublet_approved_at: string | null
+          sublet_approved_by: string | null
+          tenant_id: string
+          terminated_at: string | null
+          termination_reason: string | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          contract_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          deposit_minor?: number
+          due_day?: number
+          end_date: string
+          id?: string
+          installments?: number
+          lease_no: string
+          notice_days?: number
+          org_id: string
+          parent_lease_id?: string | null
+          payment_frequency: string
+          registration_no?: string | null
+          registration_status?: string
+          rent_collected_by?: string
+          rent_minor: number
+          room_id?: string | null
+          signed_at?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["lease_status"]
+          sublet_approved_at?: string | null
+          sublet_approved_by?: string | null
+          tenant_id: string
+          terminated_at?: string | null
+          termination_reason?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contract_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deposit_minor?: number
+          due_day?: number
+          end_date?: string
+          id?: string
+          installments?: number
+          lease_no?: string
+          notice_days?: number
+          org_id?: string
+          parent_lease_id?: string | null
+          payment_frequency?: string
+          registration_no?: string | null
+          registration_status?: string
+          rent_collected_by?: string
+          rent_minor?: number
+          room_id?: string | null
+          signed_at?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["lease_status"]
+          sublet_approved_at?: string | null
+          sublet_approved_by?: string | null
+          tenant_id?: string
+          terminated_at?: string | null
+          termination_reason?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leases_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "leases_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leases_parent_lease_id_fkey"
+            columns: ["parent_lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leases_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leases_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leases_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leases_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -925,6 +1257,10 @@ export type Database = {
       auth_org: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
       can_access_building: { Args: { b: string }; Returns: boolean }
+      can_access_lease: {
+        Args: { p_room: string; p_unit: string }
+        Returns: boolean
+      }
       col_is_null:
         | {
             Args: {
@@ -1022,6 +1358,8 @@ export type Database = {
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
       isnt_empty: { Args: { "": string }; Returns: string }
+      lease_building_id: { Args: { p_lease: string }; Returns: string }
+      lease_capacity: { Args: { p_lease: string }; Returns: number }
       lives_ok: { Args: { "": string }; Returns: string }
       no_plan: { Args: never; Returns: boolean[] }
       num_failed: { Args: never; Returns: number }
