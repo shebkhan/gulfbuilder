@@ -527,5 +527,171 @@
     "managementFee": "أتعاب الإدارة",
     "netPayable": "صافي المستحق للمالك",
     "issued": "تم الإصدار"
+  },
+  "portal": {
+    "nav": {
+      "home": "الرئيسية",
+      "statement": "كشف الحساب",
+      "payments": "المدفوعات",
+      "requests": "الطلبات",
+      "documents": "المستندات"
+    },
+    "title": "عقد الإيجار",
+    "subtitle": "العقد والمتطلبات والبلاغات في مكان واحد",
+    "greeting": "مرحباً، {name}",
+    "outstanding": "المستحق",
+    "openRequests": "بلاغات مفتوحة",
+    "myLease": "عقدي",
+    "rent": "الإيجار",
+    "period": "المدة",
+    "noLease": "لا يوجد عقد مسجل بعد.",
+    "nextDue": "القسط القادم",
+    "dueOn": "تاريخ الاستحقاق",
+    "statement": {
+      "title": "كشف الحساب",
+      "billed": "المستحق",
+      "paid": "المدفوع",
+      "balance": "الرصيد",
+      "credit": "رصيد دائن",
+      "charges": "الفواتير",
+      "payments": "المدفوعات",
+      "empty": "لا توجد بيانات بعد.",
+      "dueOn": "تاريخ الاستحقاق",
+      "types": {
+        "rent": "إيجار",
+        "deposit": "ضمان",
+        "utility": "مرافق",
+        "maintenance": "صيانة",
+        "late_fee": "غرامة تأخير",
+        "other": "أخرى"
+      },
+      "status": {
+        "pending": "قيد الانتظار",
+        "partial": "مسدد جزئياً",
+        "paid": "مدفوع",
+        "overdue": "متأخر",
+        "void": "ملغى"
+      },
+      "methods": {
+        "cash": "نقداً",
+        "bank_transfer": "تحويل بنكي",
+        "cheque": "شيك",
+        "card": "بطاقة",
+        "online": "دفع إلكتروني"
+      },
+      "pending": "بانتظار التأكيد"
+    },
+    "statementHint": "الفواتير والمدفوعات",
+    "payments": {
+      "title": "المدفوعات",
+      "subtitle": "ارفع إثبات التحويل ليؤكده المكتب",
+      "history": "سجل المدفوعات",
+      "empty": "لا توجد مدفوعات بعد.",
+      "uploadTitle": "رفع إثبات الدفع",
+      "uploadHint": "صور وملفات PDF حتى 10 ميجابايت. يؤكد المكتب المبلغ قبل احتسابه مدفوعاً.",
+      "amount": "المبلغ",
+      "method": "طريقة الدفع",
+      "date": "تاريخ الدفع",
+      "note": "الرقم المرجعي",
+      "notePlaceholder": "رقم عملية التحويل",
+      "proof": "ملف الإثبات",
+      "submit": "إرسال الإثبات",
+      "submitting": "جارٍ الإرسال…",
+      "submitted": "تم استلام الإثبات وسيؤكده المكتب.",
+      "pending": "بانتظار التأكيد",
+      "confirmed": "مؤكد",
+      "methods": {
+        "cash": "نقداً",
+        "bank_transfer": "تحويل بنكي",
+        "cheque": "شيك",
+        "card": "بطاقة",
+        "online": "دفع إلكتروني"
+      },
+      "errors": {
+        "not_authorised": "غير مسموح لك بهذا الإجراء.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "invalid_amount": "أدخل المبلغ مثل 1250.00.",
+        "amount_must_be_positive": "يجب أن يكون المبلغ أكبر من صفر.",
+        "proof_required": "أرفق إيصال التحويل.",
+        "file_too_large": "حجم الملف يجب ألا يتجاوز 10 ميجابايت.",
+        "unsupported_file_type": "يُقبل ملفات الصور و PDF فقط.",
+        "upload_failed": "تعذر رفع الملف. حاول مرة أخرى.",
+        "payment_failed": "تعذر حفظ الدفعة. حاول مرة أخرى.",
+        "no_tenant_profile": "لا يوجد حساب مستأجر مرتبط بتسجيل الدخول."
+      }
+    },
+    "paymentsHint": "ارفع إثبات التحويل",
+    "requests": {
+      "title": "ما المشكلة؟",
+      "newTitle": "الإبلاغ عن مشكلة",
+      "list": "بلاغاتك",
+      "empty": "لا توجد بلاغات.",
+      "description": "التفاصيل",
+      "category": "النوع",
+      "priority": "الأولوية",
+      "submit": "إرسال البلاغ",
+      "submitting": "جارٍ الإرسال…",
+      "created": "تم إرسال البلاغ وسيتواصل معك المكتب.",
+      "categories": {
+        "general": "عام",
+        "plumbing": "سباكة",
+        "electrical": "كهرباء",
+        "air_conditioning": "تكييف",
+        "appliance": "أجهزة",
+        "other": "أخرى"
+      },
+      "priorities": {
+        "low": "منخفضة",
+        "normal": "عادية",
+        "high": "مرتفعة",
+        "urgent": "عاجلة"
+      },
+      "status": {
+        "open": "مفتوح",
+        "assigned": "تم التعيين",
+        "in_progress": "قيد التنفيذ",
+        "resolved": "تم الحل",
+        "closed": "مغلق",
+        "cancelled": "ملغى"
+      },
+      "errors": {
+        "not_authorised": "غير مسموح لك بهذا الإجراء.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "no_tenant_profile": "لا يوجد حساب مستأجر مرتبط بتسجيل الدخول.",
+        "no_active_lease": "لا يوجد عقد ساري.",
+        "request_failed": "تعذر إرسال البلاغ. حاول مرة أخرى."
+      }
+    },
+    "requestsHint": "أبلغ عن مشكلة",
+    "leaseStatus": {
+      "draft": "مسودة",
+      "active": "ساري",
+      "expired": "منتهي",
+      "terminated": "ملغى",
+      "renewed": "مجدّد"
+    },
+    "chargeStatus": {
+      "pending": "قيد الانتظار",
+      "partial": "مسدد جزئياً",
+      "paid": "مدفوع",
+      "overdue": "متأخر",
+      "void": "ملغى"
+    },
+    "documents": {
+      "title": "المستندات",
+      "subtitle": "الإيصالات والعقود وملفات عقدك",
+      "list": "الملفات",
+      "empty": "لا توجد مستندات بعد.",
+      "kinds": {
+        "contract": "عقد",
+        "id_card": "بطاقة هوية",
+        "trade_license": "سجل تجاري",
+        "title_deed": "صند ملكية",
+        "photo": "صورة",
+        "receipt": "إيصال",
+        "payment_proof": "إثبات دفع"
+      },
+      "expiresOn": "ينتهي في {date}"
+    }
   }
 }

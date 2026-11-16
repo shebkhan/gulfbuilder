@@ -33,7 +33,30 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
   if (error) return { error: error.status === 400 ? "invalid_credentials" : "auth_failed" };
 
   revalidatePath(`/${locale}`, "layout");
-  redirect(`/${locale}/dashboard`);
+  redirect(await landingPath(supabase, locale));
+}
+
+/** Tenants land in the tenant portal, owners in the owner portal, everyone else in the app. */
+export async function landingPath(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  locale: string,
+): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return `/${locale}/login`;
+
+  const { data: membership } = await supabase
+    .from("org_members")
+    .select("role")
+    .eq("user_id", user.id)
+    .order("created_at")
+    .limit(1)
+    .maybeSingle();
+
+  if (membership?.role === "tenant") return `/${locale}/portal`;
+  if (membership?.role === "owner") return `/${locale}/owner`;
+  return `/${locale}/dashboard`;
 }
 
 export async function signUpAction(_prev: AuthState, formData: FormData): Promise<AuthState> {

@@ -527,5 +527,171 @@
     "managementFee": "Management fee",
     "netPayable": "Net payable",
     "issued": "Issued"
+  },
+  "portal": {
+    "nav": {
+      "home": "Home",
+      "statement": "Statement",
+      "payments": "Payments",
+      "requests": "Requests",
+      "documents": "Documents"
+    },
+    "title": "My tenancy",
+    "subtitle": "Your lease, dues and requests in one place",
+    "greeting": "Hello, {name}",
+    "outstanding": "Outstanding",
+    "openRequests": "Open requests",
+    "myLease": "My lease",
+    "rent": "Rent",
+    "period": "Period",
+    "noLease": "No lease on file yet.",
+    "nextDue": "Next due",
+    "dueOn": "Due on",
+    "statement": {
+      "title": "Statement",
+      "billed": "Billed",
+      "paid": "Paid",
+      "balance": "Balance",
+      "credit": "Credit",
+      "charges": "Charges",
+      "payments": "Payments",
+      "empty": "Nothing here yet.",
+      "dueOn": "Due on",
+      "types": {
+        "rent": "Rent",
+        "deposit": "Deposit",
+        "utility": "Utility",
+        "maintenance": "Maintenance",
+        "late_fee": "Late fee",
+        "other": "Other"
+      },
+      "status": {
+        "pending": "Pending",
+        "partial": "Part paid",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "void": "Void"
+      },
+      "methods": {
+        "cash": "Cash",
+        "bank_transfer": "Bank transfer",
+        "cheque": "Cheque",
+        "card": "Card",
+        "online": "Online"
+      },
+      "pending": "Awaiting confirmation"
+    },
+    "statementHint": "Charges and payments",
+    "payments": {
+      "title": "Payments",
+      "subtitle": "Upload proof of a transfer and the office will confirm it",
+      "history": "Payment history",
+      "empty": "No payments yet.",
+      "uploadTitle": "Upload payment proof",
+      "uploadHint": "Photos and PDFs up to 10 MB. The office confirms the amount before it counts as paid.",
+      "amount": "Amount",
+      "method": "Method",
+      "date": "Date paid",
+      "note": "Reference",
+      "notePlaceholder": "Transaction reference",
+      "proof": "Proof file",
+      "submit": "Submit proof",
+      "submitting": "Sending…",
+      "submitted": "Proof received. The office will confirm it.",
+      "pending": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "methods": {
+        "cash": "Cash",
+        "bank_transfer": "Bank transfer",
+        "cheque": "Cheque",
+        "card": "Card",
+        "online": "Online"
+      },
+      "errors": {
+        "not_authorised": "You are not allowed to do that.",
+        "invalid_input": "Check the details and try again.",
+        "invalid_amount": "Enter the amount like 1250.00.",
+        "amount_must_be_positive": "The amount must be more than zero.",
+        "proof_required": "Attach the transfer receipt.",
+        "file_too_large": "The file must be 10 MB or smaller.",
+        "unsupported_file_type": "Only images and PDF files are accepted.",
+        "upload_failed": "The file could not be uploaded. Try again.",
+        "payment_failed": "The payment could not be saved. Try again.",
+        "no_tenant_profile": "No tenant account is linked to your login."
+      }
+    },
+    "paymentsHint": "Upload transfer proof",
+    "requests": {
+      "title": "What is wrong?",
+      "newTitle": "Report a problem",
+      "list": "Your requests",
+      "empty": "You have no requests.",
+      "description": "Details",
+      "category": "Category",
+      "priority": "Priority",
+      "submit": "Send request",
+      "submitting": "Sending…",
+      "created": "Request sent. The office will follow up.",
+      "categories": {
+        "general": "General",
+        "plumbing": "Plumbing",
+        "electrical": "Electrical",
+        "air_conditioning": "Air conditioning",
+        "appliance": "Appliance",
+        "other": "Other"
+      },
+      "priorities": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "status": {
+        "open": "Open",
+        "assigned": "Assigned",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "closed": "Closed",
+        "cancelled": "Cancelled"
+      },
+      "errors": {
+        "not_authorised": "You are not allowed to do that.",
+        "invalid_input": "Check the details and try again.",
+        "no_tenant_profile": "No tenant account is linked to your login.",
+        "no_active_lease": "No active lease found.",
+        "request_failed": "The request could not be sent. Try again."
+      }
+    },
+    "requestsHint": "Report a problem",
+    "leaseStatus": {
+      "draft": "Draft",
+      "active": "Active",
+      "expired": "Expired",
+      "terminated": "Terminated",
+      "renewed": "Renewed"
+    },
+    "chargeStatus": {
+      "pending": "Pending",
+      "partial": "Part paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "Receipts, contracts and other files for your lease",
+      "list": "Files",
+      "empty": "No documents yet.",
+      "kinds": {
+        "contract": "Contract",
+        "id_card": "ID card",
+        "trade_license": "Trade licence",
+        "title_deed": "Title deed",
+        "photo": "Photo",
+        "receipt": "Receipt",
+        "payment_proof": "Payment proof"
+      },
+      "expiresOn": "Expires {date}"
+    }
   }
 }

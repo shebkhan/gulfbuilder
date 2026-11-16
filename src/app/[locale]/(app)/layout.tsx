@@ -33,6 +33,10 @@ export default async function AppLayout({
 
   const role = isRole(membership.role) ? membership.role : "tenant";
 
+  // Tenants and owners work in their own portals (SPEC §8 T1, O1).
+  if (role === "tenant") redirect(`/${locale}/portal`);
+  if (role === "owner") redirect(`/${locale}/owner`);
+
   // SPEC 7.1: TOTP is mandatory for admin roles.
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (requiresMfa(role) && aal?.currentLevel !== "aal2") redirect(`/${locale}/mfa`);

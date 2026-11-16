@@ -23,6 +23,9 @@ const PROTECTED = [
   "/reports",
   "/documents",
   "/settings",
+  "/portal",
+  "/owner",
+  "/platform",
 ];
 
 function splitLocale(pathname: string) {
