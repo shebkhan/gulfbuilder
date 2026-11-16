@@ -150,6 +150,7 @@ test("an owner without a factor is walked through MFA enrolment", async ({ page 
 
     // A code can straddle a 30 second window, so try the current one and the next one.
     for (const code of totpCandidates(secret)) {
+      if (!page.url().includes(`/${locale}/mfa`)) break;
       await page.fill("#code", code);
       await page.click("button[type=submit]");
       await page.waitForTimeout(1500);
