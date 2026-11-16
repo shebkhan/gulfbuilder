@@ -39,6 +39,14 @@
     "haveAccount": "Already have an account?",
     "forgot": "Forgot your password?",
     "checkEmail": "Check your inbox — we sent you a link.",
+    "mfaTitle": "Two-factor authentication",
+    "mfaSubtitle": "Admin accounts must confirm a 6-digit code from an authenticator app.",
+    "mfaEnroll": "Set up authenticator app",
+    "mfaScan": "Scan this QR code",
+    "mfaSecret": "Or enter this key",
+    "mfaCode": "6-digit code",
+    "mfaVerify": "Verify",
+    "mfaFailed": "That code is not valid. Try again.",
     "errors": {
       "invalid_input": "Check the fields and try again.",
       "invalid_credentials": "Email or password is incorrect.",
@@ -67,5 +75,29 @@
     "title": "Dashboard",
     "empty": "Your workspace is ready. Buildings and leases arrive in the next milestone.",
     "orgCreated": "Organization created"
+  },
+  "settings": {
+    "users": {
+      "title": "Team",
+      "subtitle": "Invite people into your workspace and choose their role.",
+      "email": "Email",
+      "role": "Role",
+      "invite": "Send invite",
+      "sending": "Sending…",
+      "invited": "Invite sent to {email}.",
+      "roles": {
+        "manager": "Manager",
+        "accountant": "Accountant",
+        "caretaker": "Caretaker",
+        "owner": "Owner",
+        "tenant": "Tenant"
+      },
+      "errors": {
+        "invalid_input": "Check the email and role.",
+        "not_authorised": "Only organization admins can invite people.",
+        "already_member": "That person is already in this workspace.",
+        "invite_failed": "The invite could not be sent."
+      }
+    }
   }
 }

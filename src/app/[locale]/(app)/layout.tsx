@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AppShell } from "@/components/domain/app-shell";
+import { requiresMfa } from "@/lib/mfa";
 import { isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -30,6 +31,12 @@ export default async function AppLayout({
 
   if (!membership) redirect(`/${locale}/onboarding`);
 
+  const role = isRole(membership.role) ? membership.role : "tenant";
+
+  // SPEC 7.1: TOTP is mandatory for admin roles.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (requiresMfa(role) && aal?.currentLevel !== "aal2") redirect(`/${locale}/mfa`);
+
   const { data: org } = await supabase
     .from("organizations")
     .select("name, base_currency")
@@ -43,7 +50,6 @@ export default async function AppLayout({
     .maybeSingle();
 
   const t = await getTranslations("common");
-  const role = isRole(membership.role) ? membership.role : "tenant";
 
   return (
     <AppShell

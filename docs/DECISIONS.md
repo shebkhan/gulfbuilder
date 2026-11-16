@@ -5,6 +5,16 @@ section it departs from and why.
 
 ## 2026-11-16
 
+**D-008 · pgTAP is not run for new milestones (owner instruction).**
+`supabase test db` needs Docker, which is not installed on the build machine; the existing suite is
+run ad hoc through the Supabase MCP inside a rolled-back transaction. From M1 onward, verification
+is manual SQL probes plus the app's own tests. SPEC 11's pgTAP requirement stays unmet by design.
+
+**D-007 · Team invites use the service-role key.**
+`auth.admin.inviteUserByEmail` only exists on the service-role client. Authorisation is checked
+first against the caller's session (`org_admin`), and the membership row is then written with that
+same user-scoped client so RLS still applies. The key never leaves the server.
+
 **D-006 · Design tokens come from the mockups, not DESIGN.md prose.**
 `docs/design_brief/*/code.html` embed a Material 3 palette (`primary #795919`, `surface #fcf9f5`,
 `secondary #156c47`). DESIGN.md's Colour section lists different values (`#C9A15A` gold,

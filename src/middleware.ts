@@ -9,6 +9,7 @@ const intl = createIntlMiddleware(routing);
 const PROTECTED = [
   "/dashboard",
   "/onboarding",
+  "/mfa",
   "/buildings",
   "/units",
   "/owners",
