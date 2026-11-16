@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap;
 
-select plan(20);
+select plan(23);
 
 -- fixtures -----------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -29,6 +29,10 @@ insert into owners (id, org_id, name, ownership_model, user_id) values
   ('aaaaaaaa-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Owner A1', 'self', '00000000-0000-0000-0000-00000000000e'),
   ('aaaaaaaa-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'Owner A2', 'managed', null),
   ('bbbbbbbb-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'Owner B1', 'managed', null);
+
+-- Backdate so the updated_at trigger can be proven inside one transaction.
+update owners set created_at = now() - interval '1 day'
+where id = 'aaaaaaaa-0000-0000-0000-000000000002';
 
 insert into market_packs (country_code, version, effective_from, rules)
 values ('QA', 1, '2026-01-01', '{"weekend":["fri","sat"],"currency":"QAR"}');
@@ -107,6 +111,9 @@ select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-0000-0000-00000000000a"}', true);
 select isnt(create_organization('New Org', 'new-org'), null::uuid,
   'create_organization returns a new organization id');
+
+-- The new org is not the JWT's active org, so inspect it without RLS.
+reset role;
 select is(
   (select count(*) from org_members m
    join organizations o on o.id = m.org_id
@@ -119,7 +126,6 @@ select is(
   1::bigint, 'creating an organization creates its self owner');
 
 -- updated_at trigger ---------------------------------------------------
-reset role;
 update owners set name = 'Owner A2' where id = 'aaaaaaaa-0000-0000-0000-000000000002';
 select ok(
   (select updated_at > created_at from owners where id = 'aaaaaaaa-0000-0000-0000-000000000002'),

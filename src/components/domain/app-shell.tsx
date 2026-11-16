@@ -1,10 +1,10 @@
-import { Bell } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import type { Role } from "@/lib/rbac";
-import { cn } from "@/lib/utils";
+import { signOutAction } from "@/server/actions/auth";
 import { LocaleSwitcher } from "./locale-switcher";
 import { FOOTER_NAV, visibleNav, type NavItem } from "./nav-items";
+import { SidebarNav, type SidebarItem } from "./sidebar-nav";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -12,29 +12,8 @@ type AppShellProps = {
   currency: string;
   role: Role;
   userName: string;
-  active?: string;
+  locale: string;
 };
-
-function NavLink({ item, label, active }: { item: NavItem; label: string; active?: string }) {
-  const isActive = active === item.href;
-  const Icon = item.icon;
-
-  return (
-    <Link
-      href={item.href}
-      aria-current={isActive ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md transition-all",
-        isActive
-          ? "bg-surface-container font-medium text-on-surface"
-          : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface",
-      )}
-    >
-      <Icon className="size-[18px] shrink-0" aria-hidden />
-      <span>{label}</span>
-    </Link>
-  );
-}
 
 export async function AppShell({
   children,
@@ -42,11 +21,15 @@ export async function AppShell({
   currency,
   role,
   userName,
-  active,
+  locale,
 }: AppShellProps) {
   const t = await getTranslations();
-  const nav = visibleNav(role);
-  const footer = visibleNav(role, FOOTER_NAV);
+
+  const toItems = (nav: NavItem[]): SidebarItem[] =>
+    nav.map((item) => ({ href: item.href, label: t(`nav.${item.labelKey}`), icon: item.labelKey }));
+
+  const nav = toItems(visibleNav(role));
+  const footer = toItems(visibleNav(role, FOOTER_NAV));
 
   return (
     <div className="min-h-screen bg-surface-container-low p-margin-mobile lg:p-margin">
@@ -55,51 +38,33 @@ export async function AppShell({
         <aside className="hidden w-[210px] shrink-0 flex-col justify-between border-e border-surface-container-high px-3 py-6 lg:flex">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col px-3 pb-2">
-              <span className="font-headline-sm text-label-md leading-tight font-semibold tracking-tight text-on-surface">
+              <span className="truncate font-headline-sm text-label-md leading-tight font-semibold tracking-tight text-on-surface">
                 {orgName}
               </span>
               <span className="font-section-kicker text-[9px] uppercase tracking-widest text-on-surface-variant">
                 {t("common.appTagline")}
               </span>
             </div>
-            <nav className="flex flex-col gap-0.5" aria-label={t("nav.dashboard")}>
-              {nav.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  label={t(`nav.${item.labelKey}`)}
-                  active={active}
-                />
-              ))}
-            </nav>
+            <SidebarNav items={nav} />
           </div>
-          <nav className="flex flex-col gap-0.5">
-            {footer.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                label={t(`nav.${item.labelKey}`)}
-                active={active}
-              />
-            ))}
-          </nav>
+          <SidebarNav items={footer} />
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-16 items-center justify-between gap-4 px-6">
             <div className="flex items-center gap-2 rounded-full bg-surface-container-low px-3 py-1.5 font-label-md text-label-md text-on-surface shadow-sm">
-              <span className="font-medium">{orgName}</span>
+              <span className="max-w-[40vw] truncate font-medium">{orgName}</span>
               <span className="text-outline">•</span>
               <span className="font-metric-num-sm text-label-sm tracking-wider text-primary">
                 {currency}
               </span>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <LocaleSwitcher />
               <button
                 type="button"
-                aria-label={t("nav.dashboard")}
+                aria-label={t("dashboard.title")}
                 className="relative rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
               >
                 <Bell className="size-5" />
@@ -110,7 +75,7 @@ export async function AppShell({
                   {userName.slice(0, 1).toUpperCase()}
                 </div>
                 <div className="hidden flex-col md:flex">
-                  <span className="font-label-md text-label-md font-medium leading-none text-on-surface">
+                  <span className="max-w-[10rem] truncate font-label-md text-label-md font-medium leading-none text-on-surface">
                     {userName}
                   </span>
                   <span className="mt-0.5 font-label-sm text-label-sm leading-tight text-on-surface-variant">
@@ -118,6 +83,17 @@ export async function AppShell({
                   </span>
                 </div>
               </div>
+              <form action={signOutAction}>
+                <input type="hidden" name="locale" value={locale} />
+                <button
+                  type="submit"
+                  title={t("common.signOut")}
+                  aria-label={t("common.signOut")}
+                  className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+                >
+                  <LogOut className="size-[18px]" />
+                </button>
+              </form>
             </div>
           </header>
 
