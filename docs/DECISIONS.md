@@ -5,6 +5,18 @@ section it departs from and why.
 
 ## 2026-11-16
 
+**D-013 · Lease contract PDFs and signed-copy upload move to M4.**
+SPEC M2 includes bilingual contract PDFs and uploading the signed copy. Both need object storage and
+the documents table that arrive with `0005_ops` in M4, so building them now would mean a second
+storage pass later. `leases.contract_path` stays unused until then. M2's DoD is unaffected: criteria
+3 and 6 are about schedule generation and room-versus-unit rules, not documents.
+
+**D-012 · `charges` is created in `0003_tenancy`, not `0004_finance`.**
+M2's DoD requires `activate_lease` to generate a charge schedule, and `generate_lease_charges`
+cannot write to a table that does not exist yet. The table ships with SPEC §5.4's shape unchanged, so
+M3 adds only the finance tables around it. `payments` and allocations arrive in M3; until then
+charges carry `paid_minor = 0`.
+
 **D-011 · Tenant ID encryption moves into Postgres via Vault + pgcrypto (resolves O2/D13).**
 `src/lib/crypto.ts` held the AES key in the Next process, so only the web app could ever write a
 tenant and a mobile client would need a server round-trip through an endpoint that owns the secret.
