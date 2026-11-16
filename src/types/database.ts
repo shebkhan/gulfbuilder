@@ -39,6 +39,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting_periods: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          month: string
+          org_id: string
+          status: Database["public"]["Enums"]["period_status"]
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          month: string
+          org_id: string
+          status?: Database["public"]["Enums"]["period_status"]
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          month?: string
+          org_id?: string
+          status?: Database["public"]["Enums"]["period_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_periods_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounts: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_system: boolean
+          name: string
+          org_id: string
+          parent_id: string | null
+          type: Database["public"]["Enums"]["account_type"]
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name: string
+          org_id: string
+          parent_id?: string | null
+          type: Database["public"]["Enums"]["account_type"]
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          org_id?: string
+          parent_id?: string | null
+          type?: Database["public"]["Enums"]["account_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -74,6 +154,50 @@ export type Database = {
           table_name?: string
         }
         Relationships: []
+      }
+      bank_accounts: {
+        Row: {
+          account_no: string | null
+          bank_name: string | null
+          created_at: string
+          currency: string
+          id: string
+          is_default: boolean
+          name: string
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_no?: string | null
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_no?: string | null
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       buildings: {
         Row: {
@@ -235,6 +359,125 @@ export type Database = {
           },
         ]
       }
+      cheques: {
+        Row: {
+          amount_minor: number
+          bank_account_id: string | null
+          bank_name: string | null
+          bounce_reason: string | null
+          cheque_date: string
+          cheque_no: string
+          cleared_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          deposited_at: string | null
+          id: string
+          lease_id: string | null
+          notes: string | null
+          org_id: string
+          payment_id: string | null
+          replaced_by: string | null
+          status: Database["public"]["Enums"]["cheque_status"]
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          bank_account_id?: string | null
+          bank_name?: string | null
+          bounce_reason?: string | null
+          cheque_date: string
+          cheque_no: string
+          cleared_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deposited_at?: string | null
+          id?: string
+          lease_id?: string | null
+          notes?: string | null
+          org_id: string
+          payment_id?: string | null
+          replaced_by?: string | null
+          status?: Database["public"]["Enums"]["cheque_status"]
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          bank_account_id?: string | null
+          bank_name?: string | null
+          bounce_reason?: string | null
+          cheque_date?: string
+          cheque_no?: string
+          cleared_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deposited_at?: string | null
+          id?: string
+          lease_id?: string | null
+          notes?: string | null
+          org_id?: string
+          payment_id?: string | null
+          replaced_by?: string | null
+          status?: Database["public"]["Enums"]["cheque_status"]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cheques_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_replaced_by_fkey"
+            columns: ["replaced_by"]
+            isOneToOne: false
+            referencedRelation: "cheques"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           code: string
@@ -252,6 +495,260 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      deposit_transactions: {
+        Row: {
+          amount_minor: number
+          charge_id: string | null
+          created_at: string
+          created_by: string | null
+          deposit_id: string
+          id: string
+          journal_id: string | null
+          kind: string
+          org_id: string
+          reason: string | null
+        }
+        Insert: {
+          amount_minor: number
+          charge_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deposit_id: string
+          id?: string
+          journal_id?: string | null
+          kind: string
+          org_id: string
+          reason?: string | null
+        }
+        Update: {
+          amount_minor?: number
+          charge_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deposit_id?: string
+          id?: string
+          journal_id?: string | null
+          kind?: string
+          org_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_transactions_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_transactions_deposit_id_fkey"
+            columns: ["deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_transactions_journal_id_fk"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_transactions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposits: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          deducted_minor: number
+          held_minor: number
+          id: string
+          lease_id: string
+          notes: string | null
+          org_id: string
+          received_at: string | null
+          refunded_minor: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          currency?: string
+          deducted_minor?: number
+          held_minor?: number
+          id?: string
+          lease_id: string
+          notes?: string | null
+          org_id: string
+          received_at?: string | null
+          refunded_minor?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          deducted_minor?: number
+          held_minor?: number
+          id?: string
+          lease_id?: string
+          notes?: string | null
+          org_id?: string
+          received_at?: string | null
+          refunded_minor?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposits_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: true
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposits_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposits_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposits_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount_minor: number
+          approved_by: string | null
+          bank_account_id: string | null
+          building_id: string | null
+          category: string
+          created_at: string
+          currency: string
+          description: string
+          expense_date: string
+          id: string
+          journal_id: string | null
+          notes: string | null
+          org_id: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["expense_status"]
+          submitted_by: string | null
+          unit_id: string | null
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          amount_minor: number
+          approved_by?: string | null
+          bank_account_id?: string | null
+          building_id?: string | null
+          category: string
+          created_at?: string
+          currency?: string
+          description: string
+          expense_date: string
+          id?: string
+          journal_id?: string | null
+          notes?: string | null
+          org_id: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          submitted_by?: string | null
+          unit_id?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          amount_minor?: number
+          approved_by?: string | null
+          bank_account_id?: string | null
+          building_id?: string | null
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          journal_id?: string | null
+          notes?: string | null
+          org_id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          submitted_by?: string | null
+          unit_id?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_journal_id_fk"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       floors: {
         Row: {
@@ -297,6 +794,162 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_lines: {
+        Row: {
+          account_id: string
+          building_id: string | null
+          created_at: string
+          credit_minor: number
+          debit_minor: number
+          description: string | null
+          id: string
+          journal_id: string
+          lease_id: string | null
+          org_id: string
+          tenant_id: string | null
+          unit_id: string | null
+        }
+        Insert: {
+          account_id: string
+          building_id?: string | null
+          created_at?: string
+          credit_minor?: number
+          debit_minor?: number
+          description?: string | null
+          id?: string
+          journal_id: string
+          lease_id?: string | null
+          org_id: string
+          tenant_id?: string | null
+          unit_id?: string | null
+        }
+        Update: {
+          account_id?: string
+          building_id?: string | null
+          created_at?: string
+          credit_minor?: number
+          debit_minor?: number
+          description?: string | null
+          id?: string
+          journal_id?: string
+          lease_id?: string | null
+          org_id?: string
+          tenant_id?: string | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journals: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          memo: string | null
+          org_id: string
+          posted_at: string
+          posted_by: string | null
+          reversal_of: string | null
+          source_id: string | null
+          source_type: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          memo?: string | null
+          org_id: string
+          posted_at?: string
+          posted_by?: string | null
+          reversal_of?: string | null
+          source_id?: string | null
+          source_type: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          memo?: string | null
+          org_id?: string
+          posted_at?: string
+          posted_by?: string | null
+          reversal_of?: string | null
+          source_id?: string | null
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journals_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journals_reversal_of_fkey"
+            columns: ["reversal_of"]
+            isOneToOne: false
+            referencedRelation: "journals"
             referencedColumns: ["id"]
           },
         ]
@@ -773,6 +1426,67 @@ export type Database = {
           },
         ]
       }
+      owner_ledger_entries: {
+        Row: {
+          amount_minor: number
+          building_id: string
+          created_at: string
+          currency: string
+          description: string | null
+          entry_date: string
+          id: string
+          journal_id: string | null
+          kind: string
+          org_id: string
+        }
+        Insert: {
+          amount_minor: number
+          building_id: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          entry_date: string
+          id?: string
+          journal_id?: string | null
+          kind: string
+          org_id: string
+        }
+        Update: {
+          amount_minor?: number
+          building_id?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          entry_date?: string
+          id?: string
+          journal_id?: string | null
+          kind?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_ledger_entries_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_ledger_entries_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_ledger_entries_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       owners: {
         Row: {
           approval_threshold_minor: number | null
@@ -850,6 +1564,138 @@ export type Database = {
           },
         ]
       }
+      payment_allocations: {
+        Row: {
+          amount_minor: number
+          charge_id: string
+          created_at: string
+          id: string
+          payment_id: string
+        }
+        Insert: {
+          amount_minor: number
+          charge_id: string
+          created_at?: string
+          id?: string
+          payment_id: string
+        }
+        Update: {
+          amount_minor?: number
+          charge_id?: string
+          created_at?: string
+          id?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_allocations_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_allocations_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          journal_id: string | null
+          lease_id: string | null
+          method: Database["public"]["Enums"]["payment_method"]
+          notes: string | null
+          org_id: string
+          receipt_no: number
+          receipt_year: number
+          received_at: string
+          reference: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          journal_id?: string | null
+          lease_id?: string | null
+          method: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          org_id: string
+          receipt_no: number
+          receipt_year: number
+          received_at: string
+          reference?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          journal_id?: string | null
+          lease_id?: string | null
+          method?: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          org_id?: string
+          receipt_no?: number
+          receipt_year?: number
+          received_at?: string
+          reference?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_journal_id_fk"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active_org_id: string | null
@@ -885,6 +1731,32 @@ export type Database = {
           {
             foreignKeyName: "profiles_active_org_id_fkey"
             columns: ["active_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipt_sequences: {
+        Row: {
+          last_no: number
+          org_id: string
+          year: number
+        }
+        Insert: {
+          last_no?: number
+          org_id: string
+          year: number
+        }
+        Update: {
+          last_no?: number
+          org_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_sequences_org_id_fkey"
+            columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
@@ -963,6 +1835,71 @@ export type Database = {
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_credits: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          id: string
+          note: string | null
+          org_id: string
+          remaining_minor: number
+          source_payment_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          org_id: string
+          remaining_minor: number
+          source_payment_id?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          org_id?: string
+          remaining_minor?: number
+          source_payment_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_credits_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_credits_source_payment_id_fkey"
+            columns: ["source_payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_credits_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_credits_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -1142,6 +2079,53 @@ export type Database = {
           },
         ]
       }
+      vendors: {
+        Row: {
+          category: string | null
+          contact: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          org_id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          contact?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          org_id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          contact?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       pg_all_foreign_keys: {
@@ -1255,13 +2239,29 @@ export type Database = {
       _temptypes: { Args: { "": string }; Returns: string }
       _todo: { Args: never; Returns: string }
       activate_lease: { Args: { p_lease: string }; Returns: undefined }
+      apply_deposit_deduction: {
+        Args: {
+          p_amount: number
+          p_charge_id?: string
+          p_deposit_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      approve_expense: { Args: { p_expense_id: string }; Returns: undefined }
       auth_org: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
+      bounce_cheque: {
+        Args: { p_cheque_id: string; p_reason?: string }
+        Returns: undefined
+      }
       can_access_building: { Args: { b: string }; Returns: boolean }
       can_access_lease: {
         Args: { p_room: string; p_unit: string }
         Returns: boolean
       }
+      clear_cheque: { Args: { p_cheque_id: string }; Returns: string }
+      close_period: { Args: { p_month: string }; Returns: undefined }
       col_is_null:
         | {
             Args: {
@@ -1310,6 +2310,10 @@ export type Database = {
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       decrypt_id: { Args: { p_ciphertext: string }; Returns: string }
+      deposit_cheque: {
+        Args: { p_bank_account_id?: string; p_cheque_id: string }
+        Returns: undefined
+      }
       diag:
         | {
             Args: { msg: unknown }
@@ -1373,19 +2377,103 @@ export type Database = {
         }[]
       }
       lives_ok: { Args: { "": string }; Returns: string }
+      next_receipt_number: {
+        Args: { p_org: string; p_year?: number }
+        Returns: number
+      }
       no_plan: { Args: never; Returns: boolean[] }
       num_failed: { Args: never; Returns: number }
       os_name: { Args: never; Returns: string }
       pass:
         | { Args: never; Returns: string }
         | { Args: { "": string }; Returns: string }
+      pay_expense: {
+        Args: { p_bank_account_id?: string; p_expense_id: string }
+        Returns: undefined
+      }
       pg_version: { Args: never; Returns: string }
       pg_version_num: { Args: never; Returns: number }
       pgtap_version: { Args: never; Returns: number }
+      post_journal: {
+        Args: {
+          p_currency?: string
+          p_lines: Json
+          p_memo?: string
+          p_source_id: string
+          p_source_type: string
+        }
+        Returns: string
+      }
+      record_expense: {
+        Args: {
+          p_amount: number
+          p_building_id?: string
+          p_category: string
+          p_currency?: string
+          p_date: string
+          p_description: string
+          p_notes?: string
+          p_unit_id?: string
+          p_vendor_id?: string
+        }
+        Returns: string
+      }
+      record_payment: {
+        Args: {
+          p_allocations?: Json
+          p_amount: number
+          p_currency?: string
+          p_lease_id?: string
+          p_method?: Database["public"]["Enums"]["payment_method"]
+          p_notes?: string
+          p_received_at?: string
+          p_reference?: string
+          p_tenant_id: string
+        }
+        Returns: string
+      }
+      refund_deposit: {
+        Args: { p_amount: number; p_deposit_id: string; p_reason?: string }
+        Returns: undefined
+      }
+      register_cheque: {
+        Args: {
+          p_amount: number
+          p_bank_name: string
+          p_cheque_date: string
+          p_cheque_no: string
+          p_currency?: string
+          p_lease_id: string
+          p_notes?: string
+          p_tenant_id: string
+        }
+        Returns: string
+      }
       renew_lease: { Args: { p_lease: string; p_terms: Json }; Returns: string }
+      reopen_period: {
+        Args: { p_month: string; p_reason?: string }
+        Returns: undefined
+      }
+      replace_cheque: {
+        Args: {
+          p_amount: number
+          p_bank_name: string
+          p_cheque_date: string
+          p_cheque_no: string
+          p_currency?: string
+          p_notes?: string
+          p_old_cheque_id: string
+        }
+        Returns: string
+      }
+      reverse_journal: {
+        Args: { p_journal_id: string; p_reason?: string }
+        Returns: string
+      }
       runtests:
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
+      seed_chart_of_accounts: { Args: { p_org: string }; Returns: undefined }
       set_active_org: { Args: { p_org: string }; Returns: undefined }
       skip:
         | { Args: { "": string }; Returns: string }
@@ -1407,6 +2495,7 @@ export type Database = {
         | { Args: { "": string }; Returns: boolean[] }
     }
     Enums: {
+      account_type: "asset" | "liability" | "equity" | "revenue" | "expense"
       charge_status: "pending" | "partial" | "paid" | "overdue" | "void"
       charge_type:
         | "rent"
@@ -1422,6 +2511,7 @@ export type Database = {
         | "bounced"
         | "returned"
         | "replaced"
+      expense_status: "draft" | "submitted" | "approved" | "paid" | "rejected"
       lease_status: "draft" | "active" | "expired" | "terminated" | "renewed"
       maint_priority: "low" | "normal" | "high" | "urgent"
       maint_status:
@@ -1440,6 +2530,7 @@ export type Database = {
         | "tenant"
       ownership_model: "self" | "managed"
       payment_method: "cash" | "bank_transfer" | "cheque" | "card" | "online"
+      period_status: "open" | "closed"
       unit_status: "vacant" | "occupied" | "reserved" | "maintenance"
     }
     CompositeTypes: {
@@ -1573,6 +2664,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      account_type: ["asset", "liability", "equity", "revenue", "expense"],
       charge_status: ["pending", "partial", "paid", "overdue", "void"],
       charge_type: [
         "rent",
@@ -1590,6 +2682,7 @@ export const Constants = {
         "returned",
         "replaced",
       ],
+      expense_status: ["draft", "submitted", "approved", "paid", "rejected"],
       lease_status: ["draft", "active", "expired", "terminated", "renewed"],
       maint_priority: ["low", "normal", "high", "urgent"],
       maint_status: [
@@ -1610,6 +2703,7 @@ export const Constants = {
       ],
       ownership_model: ["self", "managed"],
       payment_method: ["cash", "bank_transfer", "cheque", "card", "online"],
+      period_status: ["open", "closed"],
       unit_status: ["vacant", "occupied", "reserved", "maintenance"],
     },
   },

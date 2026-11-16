@@ -1,0 +1,216 @@
+import { CreditCard, Receipt, TrendingUp } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PaymentForm } from "@/components/domain/payment-form";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardBody, KpiLabel } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
+import { formatMoney } from "@/lib/money";
+import { can } from "@/lib/rbac";
+import { getOrgContext } from "@/server/org-context";
+
+export default async function PaymentsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const ctx = await getOrgContext();
+  if (!ctx) return null;
+
+  const t = await getTranslations("payments");
+  const writable = can(ctx.role, "finance.write") || ctx.role === "manager";
+
+  // Fetch payments
+  const { data: payments } = await ctx.supabase
+    .from("payments")
+    .select(`
+      id,
+      receipt_no,
+      receipt_year,
+      amount_minor,
+      currency,
+      method,
+      received_at,
+      reference,
+      notes,
+      tenants ( id, full_name ),
+      leases ( id, lease_no )
+    `)
+    .order("receipt_year", { ascending: false })
+    .order("receipt_no", { ascending: false });
+
+  // Fetch tenants & leases for modal form
+  const { data: rawTenants } = await ctx.supabase
+    .from("tenants")
+    .select("id, full_name")
+    .order("full_name");
+
+  const { data: rawLeases } = await ctx.supabase
+    .from("leases")
+    .select("id, lease_no, tenant_id")
+    .in("status", ["active", "draft"])
+    .order("lease_no");
+
+  const tenantOptions = (rawTenants || []).map((t) => ({ id: t.id, name: t.full_name }));
+  const leaseOptions = (rawLeases || []).map((l) => ({
+    id: l.id,
+    lease_no: l.lease_no,
+    tenant_id: l.tenant_id,
+  }));
+
+  // KPI aggregates
+  const totalReceivedMinor = (payments || []).reduce(
+    (acc, p) => acc + BigInt(p.amount_minor),
+    0n,
+  );
+  const paymentCount = payments?.length || 0;
+
+  return (
+    <div className="flex flex-col gap-space-lg pt-2">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+        </div>
+
+        {writable && (
+          <PaymentForm
+            tenants={tenantOptions}
+            leases={leaseOptions}
+            locale={locale}
+          />
+        )}
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-primary-fixed/40 text-primary">
+              <TrendingUp className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Total Collections</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                {formatMoney(totalReceivedMinor, "QAR", locale)}
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-secondary-container/60 text-secondary">
+              <Receipt className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Receipts Issued</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                {paymentCount}
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-tertiary-fixed/40 text-tertiary">
+              <CreditCard className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Default Currency</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                QAR
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Payments List */}
+      <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
+        {(!payments || payments.length === 0) ? (
+          <div className="flex flex-col items-center justify-center gap-3 p-12 text-center">
+            <Receipt className="size-12 text-on-surface-variant/40" />
+            <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-start font-body-sm text-body-sm">
+              <thead>
+                <tr className="border-b border-hairline bg-surface-container-low font-label-md text-label-md text-on-surface-variant">
+                  <th className="p-4 text-start">{t("receiptNo")}</th>
+                  <th className="p-4 text-start">{t("tenant")}</th>
+                  <th className="p-4 text-start">{t("lease")}</th>
+                  <th className="p-4 text-start">{t("method")}</th>
+                  <th className="p-4 text-start">{t("reference")}</th>
+                  <th className="p-4 text-start">{t("date")}</th>
+                  <th className="p-4 text-end">{t("amount")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {payments.map((p) => {
+                  const tenant = p.tenants as unknown as { id: string; full_name: string } | null;
+                  const lease = p.leases as unknown as { id: string; lease_no: string } | null;
+                  const receiptFormatted = `#${p.receipt_year}-${String(p.receipt_no).padStart(4, "0")}`;
+
+                  return (
+                    <tr key={p.id} className="transition-colors hover:bg-surface-container-low/50">
+                      <td className="p-4 font-mono font-semibold text-primary">
+                        {receiptFormatted}
+                      </td>
+                      <td className="p-4 font-medium text-on-surface">
+                        {tenant ? (
+                          <Link
+                            href={`/tenants/${tenant.id}`}
+                            className="hover:text-primary hover:underline"
+                          >
+                            {tenant.full_name}
+                          </Link>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="p-4 text-on-surface-variant">
+                        {lease ? (
+                          <Link
+                            href={`/leases/${lease.id}`}
+                            className="font-mono hover:text-primary hover:underline"
+                          >
+                            {lease.lease_no}
+                          </Link>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="neutral">
+                          {t(`methods.${p.method}` as never)}
+                        </Badge>
+                      </td>
+                      <td className="p-4 font-mono text-xs text-on-surface-variant">
+                        {p.reference || "—"}
+                      </td>
+                      <td className="p-4 text-on-surface-variant">
+                        {new Date(p.received_at).toLocaleDateString(locale, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="p-4 text-end font-semibold text-on-surface">
+                        {formatMoney(BigInt(p.amount_minor), p.currency, locale)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

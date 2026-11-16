@@ -1,0 +1,196 @@
+import { CheckCircle2, Clock, Receipt } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ExpenseForm, type ExpenseItem } from "@/components/domain/expense-form";
+import { Card, CardBody, KpiLabel } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
+import { formatMoney } from "@/lib/money";
+import { can } from "@/lib/rbac";
+import { getOrgContext } from "@/server/org-context";
+
+type SearchParams = Promise<{
+  status?: string;
+  category?: string;
+}>;
+
+export default async function ExpensesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const ctx = await getOrgContext();
+  if (!ctx) return null;
+
+  const { status, category } = await searchParams;
+  const t = await getTranslations("expenses");
+
+  const canWrite = can(ctx.role, "expenses.write");
+  const canApprove = can(ctx.role, "expenses.approve");
+  const canPay = ["org_admin", "accountant"].includes(ctx.role);
+
+  // Fetch expenses
+  let query = ctx.supabase
+    .from("expenses")
+    .select(`
+      id,
+      category,
+      description,
+      amount_minor,
+      currency,
+      status,
+      expense_date,
+      paid_at,
+      vendors ( id, name ),
+      buildings ( id, name, code ),
+      units ( id, unit_no )
+    `)
+    .order("expense_date", { ascending: false });
+
+  if (status && status !== "all") {
+    query = query.eq("status", status as never);
+  }
+
+  if (category && category !== "all") {
+    query = query.eq("category", category);
+  }
+
+  const { data: expenses } = await query;
+
+  // Options for vendors & buildings
+  const { data: rawVendors } = await ctx.supabase
+    .from("vendors")
+    .select("id, name")
+    .order("name");
+
+  const { data: rawBuildings } = await ctx.supabase
+    .from("buildings")
+    .select("id, name, code")
+    .is("deleted_at", null)
+    .order("code");
+
+  const vendorOptions = (rawVendors || []).map((v) => ({ id: v.id, name: v.name }));
+  const buildingOptions = (rawBuildings || []).map((b) => ({
+    id: b.id,
+    name: b.name,
+    code: b.code,
+  }));
+
+  const allExpenses = expenses || [];
+
+  const totalExpenseMinor = allExpenses.reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
+  const pendingApprovalMinor = allExpenses
+    .filter((e) => e.status === "submitted")
+    .reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
+  const paidMinor = allExpenses
+    .filter((e) => e.status === "paid")
+    .reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
+
+  const transformedExpenses: ExpenseItem[] = allExpenses.map((e) => ({
+    id: e.id,
+    category: e.category,
+    description: e.description,
+    amount_minor: e.amount_minor,
+    currency: e.currency,
+    status: e.status as ExpenseItem["status"],
+    expense_date: e.expense_date,
+    paid_at: e.paid_at,
+    vendor: e.vendors as unknown as { id: string; name: string } | null,
+    building: e.buildings as unknown as { id: string; name: string; code: string } | null,
+    unit: e.units as unknown as { id: string; unit_no: string } | null,
+  }));
+
+  const filterTabs = [
+    { key: "all", label: "All" },
+    { key: "submitted", label: t("statuses.submitted") },
+    { key: "approved", label: t("statuses.approved") },
+    { key: "paid", label: t("statuses.paid") },
+  ];
+
+  return (
+    <div className="flex flex-col gap-space-lg pt-2">
+      <div className="flex flex-col gap-1">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
+        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-primary-fixed/40 text-primary">
+              <Receipt className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Total Expenses</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                {formatMoney(totalExpenseMinor, "QAR", locale)}
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-tertiary-fixed/40 text-tertiary">
+              <Clock className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Pending Approval</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                {formatMoney(pendingApprovalMinor, "QAR", locale)}
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="flex items-center gap-4 p-5">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-secondary-container/60 text-secondary">
+              <CheckCircle2 className="size-6" />
+            </div>
+            <div className="flex flex-col">
+              <KpiLabel>Disbursed</KpiLabel>
+              <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                {formatMoney(paidMinor, "QAR", locale)}
+              </span>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-hairline pb-2">
+        {filterTabs.map((tab) => {
+          const isActive = (!status && tab.key === "all") || status === tab.key;
+          return (
+            <Link
+              key={tab.key}
+              href={tab.key === "all" ? "/expenses" : `/expenses?status=${tab.key}`}
+              className={`rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors ${
+                isActive
+                  ? "bg-primary text-on-primary"
+                  : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      <ExpenseForm
+        expenses={transformedExpenses}
+        vendors={vendorOptions}
+        buildings={buildingOptions}
+        canWrite={canWrite}
+        canApprove={canApprove}
+        canPay={canPay}
+        locale={locale}
+      />
+    </div>
+  );
+}
