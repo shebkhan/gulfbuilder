@@ -1254,6 +1254,7 @@ export type Database = {
       _table_privs: { Args: never; Returns: unknown[] }
       _temptypes: { Args: { "": string }; Returns: string }
       _todo: { Args: never; Returns: string }
+      activate_lease: { Args: { p_lease: string }; Returns: undefined }
       auth_org: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
       can_access_building: { Args: { b: string }; Returns: boolean }
@@ -1337,6 +1338,7 @@ export type Database = {
         Args: { p_building: string; p_from: number; p_to: number }
         Returns: number
       }
+      generate_lease_charges: { Args: { p_lease: string }; Returns: number }
       generate_units: {
         Args: {
           p_area_sqm?: number
