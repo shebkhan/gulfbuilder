@@ -49,7 +49,7 @@ export default async function UsersSettingsPage({
           role: t("role"),
           invite: t("invite"),
           sending: t("sending"),
-          invited: t("invited"),
+          invited: t.raw("invited") as string,
           errors: t.raw("errors") as Record<string, string>,
         }}
         roles={INVITABLE_ROLES.map((value) => ({ value, label: t(`roles.${value}`) }))}

@@ -101,7 +101,7 @@ export default async function BuildingPage({
     rent: t("rent"),
     generate: t("generate"),
     generating: t("generating"),
-    result: t("result"),
+    result: t.raw("result") as string,
     errors: t.raw("errors") as Record<string, string>,
   };
 

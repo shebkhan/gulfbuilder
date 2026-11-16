@@ -43,7 +43,7 @@ export default async function ImportBuildingsPage({
               file: t("file"),
               dryRun: t("dryRun"),
               commit: t("commit"),
-              report: t("report"),
+              report: t.raw("report") as string,
               committed: t("committed"),
               nothingWritten: t("nothingWritten"),
               row: t("row"),

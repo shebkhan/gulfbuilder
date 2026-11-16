@@ -5,6 +5,22 @@ section it departs from and why.
 
 ## 2026-11-16
 
+**D-011 · Tenant ID encryption moves into Postgres via Vault + pgcrypto (resolves O2/D13).**
+`src/lib/crypto.ts` held the AES key in the Next process, so only the web app could ever write a
+tenant and a mobile client would need a server round-trip through an endpoint that owns the secret.
+`encrypt_id`/`decrypt_id` are now `security definer` SQL functions reading `id_encryption_key` from
+Supabase Vault, with plaintext exposed only through a role-gated view so RLS still governs access.
+Chosen over pgsodium columns to stay on plain Postgres primitives. The TS module and its test are
+deleted in M2; `ID_ENCRYPTION_KEY` leaves `.env.local`.
+
+**D-010 · No API layer; Supabase is the client-facing API (clarifies D10).**
+PostgREST already exposes every table under RLS, plus the RPCs, so a native client can call it
+directly with `supabase-js`. Three rules apply from M2 onward: business rules that more than one
+client must execute live in SQL functions; secrets never appear in a request path; values cross the
+wire in the table's own shape (minor units + currency, ISO timestamps, UUIDs). Presentation work
+(CSV parsing, PDFs, form messages) stays in the client. Vendor posture is Postgres-portable, not
+database-agnostic. Full reasoning in `docs/superpowers/specs/2026-11-16-mobile-ready-foundation-design.md`.
+
 **D-009 · `auth_org()`/`auth_role()` fall back to the database when the token hook is absent.**
 SPEC 6 expects `org_id` and `org_role` to arrive in the JWT from a custom access token hook, but the
 hook is a dashboard toggle. Until it is enabled, a fresh token has neither claim and every
