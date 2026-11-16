@@ -74,12 +74,25 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "empty": "Your workspace is ready. Buildings and leases arrive in the next milestone.",
+    "empty": "Portfolio overview, operational alerts, and real-time financial metrics.",
     "orgCreated": "Organization created",
     "expiringLeases": "Leases expiring soon",
     "expiringSubtitle": "Active leases ending within the next 30 days that may require renewal or termination notice.",
     "daysLeft": "{days} days left",
-    "viewAll": "View all leases"
+    "viewAll": "View all",
+    "quickActions": "Quick Actions",
+    "newLease": "New lease",
+    "recordPayment": "Record payment",
+    "newMaintenance": "New work order",
+    "registerCheque": "Register cheque",
+    "viewReports": "Reports",
+    "recentPayments": "Recent Collections",
+    "upcomingCheques": "Cheques Maturing Soon",
+    "recentMaintenance": "Active Work Orders",
+    "buildingsOccupancy": "Building Occupancy",
+    "noUpcomingCheques": "No post-dated cheques due in the next 30 days.",
+    "noRecentPayments": "No recent payments recorded.",
+    "noRecentMaintenance": "No active maintenance tickets."
   },
   "settings": {
     "users": {

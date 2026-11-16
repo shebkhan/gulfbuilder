@@ -74,12 +74,25 @@
   },
   "dashboard": {
     "title": "لوحة التحكم",
-    "empty": "مساحة العمل جاهزة. العقارات وعقود الإيجار في المرحلة التالية.",
+    "empty": "نظرة عامة على المحفظة العقارية، والتنبيهات التشغيلية، والمؤشرات المالية المباشرة.",
     "orgCreated": "تم إنشاء المؤسسة",
     "expiringLeases": "عقود تنتهي قريبًا",
     "expiringSubtitle": "عقود إيجار نشطة تنتهي خلال الـ ٣٠ يومًا القادمة قد تتطلب إشعار تجديد أو إنهاء.",
     "daysLeft": "باقٍ {days} يومًا",
-    "viewAll": "عرض جميع العقود"
+    "viewAll": "عرض الكل",
+    "quickActions": "إجراءات سريعة",
+    "newLease": "عقد جديد",
+    "recordPayment": "تسجيل دفعة",
+    "newMaintenance": "أمر عمل جديد",
+    "registerCheque": "تسجيل شيك",
+    "viewReports": "التقارير",
+    "recentPayments": "أحدث التحصيلات",
+    "upcomingCheques": "شيكات تستحق قريباً",
+    "recentMaintenance": "أوامر العمل النشطة",
+    "buildingsOccupancy": "نسبة إشغال المباني",
+    "noUpcomingCheques": "لا توجد شيكات تستحق خلال الـ ٣٠ يومًا القادمة.",
+    "noRecentPayments": "لم يتم تسجيل دفعات مؤخرًا.",
+    "noRecentMaintenance": "لا توجد طلبات صيانة نشطة حاليًا."
   },
   "settings": {
     "users": {
