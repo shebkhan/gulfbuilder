@@ -1372,6 +1372,7 @@ export type Database = {
       pg_version: { Args: never; Returns: string }
       pg_version_num: { Args: never; Returns: number }
       pgtap_version: { Args: never; Returns: number }
+      renew_lease: { Args: { p_lease: string; p_terms: Json }; Returns: string }
       runtests:
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
@@ -1380,6 +1381,10 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
         | { Args: { how_many: number; why: string }; Returns: string }
       tenant_id_number: { Args: { p_tenant: string }; Returns: string }
+      terminate_lease: {
+        Args: { p_date: string; p_lease: string; p_reason: string }
+        Returns: undefined
+      }
       throws_ok: { Args: { "": string }; Returns: string }
       todo:
         | { Args: { how_many: number }; Returns: boolean[] }
