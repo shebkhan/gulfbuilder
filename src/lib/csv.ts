@@ -2,8 +2,7 @@
  * Minimal RFC 4180 CSV reader for the import template: quotes, escaped quotes,
  * embedded commas/newlines, CRLF and a leading BOM. Headers are lowercased.
  */
-export function parseCsv(text: string): Record<string, string>[] {
-  const clean = text.replace(/^\uFEFF/, "");
+export function parseCsv(text: string): Record<string, string>[] {  const clean = text.replace(/^\uFEFF/, "");
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
@@ -52,4 +51,18 @@ export function parseCsv(text: string): Record<string, string>[] {
   return body
     .filter((values) => values.some((value) => value.trim() !== ""))
     .map((values) => Object.fromEntries(keys.map((key, index) => [key, (values[index] ?? "").trim()])));
+}
+
+/** RFC 4180 writer for the data export (SPEC §8 A5). */
+export function toCsv(rows: Record<string, unknown>[]): string {
+  if (rows.length === 0) return "";
+  const headers = Object.keys(rows[0]!);
+  const escape = (value: unknown) => {
+    const text = value === null || value === undefined ? "" : String(value);
+    return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  return [
+    headers.join(","),
+    ...rows.map((row) => headers.map((header) => escape(row[header])).join(",")),
+  ].join("\n");
 }
