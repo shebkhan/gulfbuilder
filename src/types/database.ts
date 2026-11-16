@@ -365,6 +365,7 @@ export type Database = {
           bank_account_id: string | null
           bank_name: string | null
           bounce_reason: string | null
+          charge_id: string | null
           cheque_date: string
           cheque_no: string
           cleared_at: string | null
@@ -387,6 +388,7 @@ export type Database = {
           bank_account_id?: string | null
           bank_name?: string | null
           bounce_reason?: string | null
+          charge_id?: string | null
           cheque_date: string
           cheque_no: string
           cleared_at?: string | null
@@ -409,6 +411,7 @@ export type Database = {
           bank_account_id?: string | null
           bank_name?: string | null
           bounce_reason?: string | null
+          charge_id?: string | null
           cheque_date?: string
           cheque_no?: string
           cleared_at?: string | null
@@ -432,6 +435,13 @@ export type Database = {
             columns: ["bank_account_id"]
             isOneToOne: false
             referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cheques_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "charges"
             referencedColumns: ["id"]
           },
           {
@@ -499,6 +509,7 @@ export type Database = {
       deposit_transactions: {
         Row: {
           amount_minor: number
+          approved_by: string | null
           charge_id: string | null
           created_at: string
           created_by: string | null
@@ -511,6 +522,7 @@ export type Database = {
         }
         Insert: {
           amount_minor: number
+          approved_by?: string | null
           charge_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -523,6 +535,7 @@ export type Database = {
         }
         Update: {
           amount_minor?: number
+          approved_by?: string | null
           charge_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -3155,6 +3168,17 @@ export type Database = {
       _table_privs: { Args: never; Returns: unknown[] }
       _temptypes: { Args: { "": string }; Returns: string }
       _todo: { Args: never; Returns: string }
+      acceptance_cleanup: { Args: never; Returns: undefined }
+      acceptance_fixture: { Args: never; Returns: undefined }
+      acceptance_probes: {
+        Args: never
+        Returns: {
+          criterion: number
+          detail: string
+          name: string
+          ok: boolean
+        }[]
+      }
       activate_lease: { Args: { p_lease: string }; Returns: undefined }
       apply_deposit_deduction: {
         Args: {
@@ -3250,6 +3274,7 @@ export type Database = {
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       decrypt_id: { Args: { p_ciphertext: string }; Returns: string }
+      demo_reset_ledger: { Args: { p_org: string }; Returns: undefined }
       deposit_cheque: {
         Args: { p_bank_account_id?: string; p_cheque_id: string }
         Returns: undefined
@@ -3320,6 +3345,10 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
+      issue_owner_statement: {
+        Args: { p_statement_id: string }
+        Returns: string
+      }
       lease_building_id: { Args: { p_lease: string }; Returns: string }
       lease_capacity: { Args: { p_lease: string }; Returns: number }
       leases_expiring: {
@@ -3333,6 +3362,7 @@ export type Database = {
         }[]
       }
       lives_ok: { Args: { "": string }; Returns: string }
+      mark_overdue_and_late_fees: { Args: never; Returns: number }
       next_receipt_number: {
         Args: { p_org: string; p_year?: number }
         Returns: number
@@ -3413,19 +3443,34 @@ export type Database = {
         Args: { p_amount: number; p_deposit_id: string; p_reason?: string }
         Returns: undefined
       }
-      register_cheque: {
-        Args: {
-          p_amount: number
-          p_bank_name: string
-          p_cheque_date: string
-          p_cheque_no: string
-          p_currency?: string
-          p_lease_id: string
-          p_notes?: string
-          p_tenant_id: string
-        }
-        Returns: string
-      }
+      register_cheque:
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_lease_id: string
+              p_notes?: string
+              p_tenant_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_charge_id?: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_lease_id: string
+              p_notes?: string
+              p_tenant_id: string
+            }
+            Returns: string
+          }
       renew_lease: { Args: { p_lease: string; p_terms: Json }; Returns: string }
       reopen_period: {
         Args: { p_month: string; p_reason?: string }
@@ -3443,6 +3488,10 @@ export type Database = {
         }
         Returns: string
       }
+      resolve_org_by_host: {
+        Args: { p_app_host?: string; p_host: string }
+        Returns: Json
+      }
       reverse_journal: {
         Args: { p_journal_id: string; p_reason?: string }
         Returns: string
@@ -3458,6 +3507,8 @@ export type Database = {
       tenant_id_number: { Args: { p_tenant: string }; Returns: string }
       tenant_ids: { Args: never; Returns: string[] }
       tenant_lease_ids: { Args: never; Returns: string[] }
+      tenant_room_ids: { Args: never; Returns: string[] }
+      tenant_unit_ids: { Args: never; Returns: string[] }
       terminate_lease: {
         Args: { p_date: string; p_lease: string; p_reason: string }
         Returns: undefined
