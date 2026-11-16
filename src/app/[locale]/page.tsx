@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { AppShell } from "@/components/domain/app-shell";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -6,23 +7,26 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("common");
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-margin-mobile lg:p-margin">
-      <div className="w-full max-w-md rounded-frame border border-outline-variant bg-surface-container-lowest p-space-xl shadow-canvas">
-        <p className="font-section-kicker text-section-kicker uppercase text-on-surface-variant">
+    <AppShell
+      orgName={t("appName")}
+      currency={t("currency")}
+      role="org_admin"
+      userName={t("appName")}
+      active="/dashboard"
+    >
+      <div className="flex flex-col gap-2 pt-2">
+        <span className="font-section-kicker text-section-kicker font-bold uppercase tracking-wider text-on-surface-variant">
           {t("appTagline")}
-        </p>
-        <h1 className="mt-space-sm font-headline-lg text-headline-lg text-on-surface">
-          {t("appName")}
+        </span>
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">
+          {locale === "ar" ? "لوحة التحكم" : "Dashboard"}
         </h1>
-        <p className="mt-space-md font-body-md text-body-md text-on-surface-variant">
+        <p className="font-body-md text-body-md text-on-surface-variant">
           {locale === "ar"
-            ? "تم إعداد التطبيق. لوحة التحكم قادمة في المرحلة التالية."
-            : "Scaffold is running. The authenticated shell lands in M0 step 5."}
-        </p>
-        <p className="tabular mt-space-lg font-metric-num text-metric-num text-primary">
-          {t("currency")} 1,240,000
+            ? "هيكل التطبيق جاهز. المصادقة وإعداد المؤسسة في الخطوة التالية."
+            : "Shell is live. Authentication and organization setup land next."}
         </p>
       </div>
-    </main>
+    </AppShell>
   );
 }
