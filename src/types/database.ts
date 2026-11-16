@@ -1913,6 +1913,64 @@ export type Database = {
           },
         ]
       }
+      owner_expense_approvals: {
+        Row: {
+          decided_at: string | null
+          decided_by: string | null
+          expense_id: string
+          id: string
+          note: string | null
+          org_id: string
+          owner_id: string
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          decided_at?: string | null
+          decided_by?: string | null
+          expense_id: string
+          id?: string
+          note?: string | null
+          org_id: string
+          owner_id: string
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          decided_at?: string | null
+          decided_by?: string | null
+          expense_id?: string
+          id?: string
+          note?: string | null
+          org_id?: string
+          owner_id?: string
+          requested_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_expense_approvals_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_expense_approvals_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_expense_approvals_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       owner_ledger_entries: {
         Row: {
           amount_minor: number
@@ -1970,6 +2028,162 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_payouts: {
+        Row: {
+          amount_minor: number
+          bank_account_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          journal_id: string | null
+          method: string
+          org_id: string
+          owner_id: string
+          paid_on: string
+          reference: string | null
+          statement_id: string | null
+        }
+        Insert: {
+          amount_minor: number
+          bank_account_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          journal_id?: string | null
+          method?: string
+          org_id: string
+          owner_id: string
+          paid_on?: string
+          reference?: string | null
+          statement_id?: string | null
+        }
+        Update: {
+          amount_minor?: number
+          bank_account_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          journal_id?: string | null
+          method?: string
+          org_id?: string
+          owner_id?: string
+          paid_on?: string
+          reference?: string | null
+          statement_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_payouts_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_payouts_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "journals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_payouts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_payouts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_payouts_statement_id_fkey"
+            columns: ["statement_id"]
+            isOneToOne: false
+            referencedRelation: "owner_statements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_statements: {
+        Row: {
+          closing_minor: number
+          created_at: string
+          currency: string
+          id: string
+          issued_at: string | null
+          issued_by: string | null
+          lines: Json
+          opening_minor: number
+          org_id: string
+          owner_id: string
+          pdf_path: string | null
+          period_end: string
+          period_start: string
+          status: string
+          totals: Json
+          updated_at: string
+        }
+        Insert: {
+          closing_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          issued_at?: string | null
+          issued_by?: string | null
+          lines?: Json
+          opening_minor?: number
+          org_id: string
+          owner_id: string
+          pdf_path?: string | null
+          period_end: string
+          period_start: string
+          status?: string
+          totals?: Json
+          updated_at?: string
+        }
+        Update: {
+          closing_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          issued_at?: string | null
+          issued_by?: string | null
+          lines?: Json
+          opening_minor?: number
+          org_id?: string
+          owner_id?: string
+          pdf_path?: string | null
+          period_end?: string
+          period_start?: string
+          status?: string
+          totals?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_statements_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
             referencedColumns: ["id"]
           },
         ]
@@ -2243,6 +2457,88 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "receipt_sequences_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_definitions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          org_id: string
+          owner_user_id: string | null
+          params: Json
+          report_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          org_id: string
+          owner_user_id?: string | null
+          params?: Json
+          report_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          org_id?: string
+          owner_user_id?: string | null
+          params?: Json
+          report_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_definitions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          params: Json | null
+          payload: Json | null
+          pdf_path: string | null
+          period_end: string | null
+          period_start: string | null
+          report_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          params?: Json | null
+          payload?: Json | null
+          pdf_path?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          params?: Json | null
+          payload?: Json | null
+          pdf_path?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_snapshots_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -2853,6 +3149,15 @@ export type Database = {
         Returns: number
       }
       generate_lease_charges: { Args: { p_lease: string }; Returns: number }
+      generate_owner_statement: {
+        Args: {
+          p_currency?: string
+          p_owner_id: string
+          p_period_end: string
+          p_period_start: string
+        }
+        Returns: string
+      }
       generate_units: {
         Args: {
           p_area_sqm?: number
@@ -2866,6 +3171,7 @@ export type Database = {
         }
         Returns: number
       }
+      get_portfolio_kpis: { Args: never; Returns: Json }
       has_unique: { Args: { "": string }; Returns: string }
       import_property_rows: {
         Args: { p_dry_run?: boolean; p_rows: Json }
@@ -2925,6 +3231,19 @@ export type Database = {
           p_notes?: string
           p_unit_id?: string
           p_vendor_id?: string
+        }
+        Returns: string
+      }
+      record_owner_payout: {
+        Args: {
+          p_amount: number
+          p_bank_account_id?: string
+          p_currency?: string
+          p_method?: string
+          p_owner_id: string
+          p_paid_on?: string
+          p_reference?: string
+          p_statement_id?: string
         }
         Returns: string
       }
