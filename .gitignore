@@ -13,3 +13,8 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 supabase/.branches/
 supabase/.temp/
+
+# e2e fixture state
+e2e/.state.json
+
+.next-dev/

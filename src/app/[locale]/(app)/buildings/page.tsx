@@ -29,7 +29,7 @@ export default async function BuildingsPage({
         .order("code"),
       ctx.supabase.from("owners").select("id, name").is("deleted_at", null).order("name"),
       ctx.supabase.from("floors").select("building_id"),
-      ctx.supabase.from("units").select("building_id"),
+      ctx.supabase.from("units").select("building_id, status"),
     ]);
 
   const countBy = (rows: { building_id: string }[] | null) =>
@@ -39,6 +39,16 @@ export default async function BuildingsPage({
     }, {});
   const floorCount = countBy(floors);
   const unitCount = countBy(units);
+
+  // Occupancy per building: occupied units against every unit that is not occupied.
+  const occupancyBy = (units ?? []).reduce<
+    Record<string, { occupied: number; vacant: number }>
+  >((acc, unit) => {
+    const entry = (acc[unit.building_id] ??= { occupied: 0, vacant: 0 });
+    if (unit.status === "occupied") entry.occupied += 1;
+    else entry.vacant += 1;
+    return acc;
+  }, {});
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -82,44 +92,73 @@ export default async function BuildingsPage({
 
       {buildings && buildings.length > 0 ? (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {buildings.map((building) => (
-            <Link
-              key={building.id}
-              href={`/buildings/${building.id}`}
-              className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-lowest p-5 shadow-card transition-shadow hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex flex-col">
-                  <span className="font-headline-sm text-headline-sm text-on-surface">
-                    {building.name}
-                  </span>
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-                    {building.code}
-                    {building.city ? ` · ${building.city}` : ""}
-                  </span>
+          {buildings.map((building) => {
+            const occupancy = occupancyBy[building.id] ?? { occupied: 0, vacant: 0 };
+            const totalUnits = occupancy.occupied + occupancy.vacant;
+            const occupiedPct = totalUnits ? (occupancy.occupied / totalUnits) * 100 : 0;
+            return (
+              <Link
+                key={building.id}
+                href={`/buildings/${building.id}`}
+                className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-lowest p-5 shadow-card transition-shadow hover:shadow-md"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col">
+                    <span className="font-headline-sm text-headline-sm text-on-surface">
+                      {building.name}
+                    </span>
+                    <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+                      {building.code}
+                      {building.city ? ` · ${building.city}` : ""}
+                    </span>
+                  </div>
+                  <Building2 className="size-5 text-on-surface-variant" aria-hidden />
                 </div>
-                <Building2 className="size-5 text-on-surface-variant" aria-hidden />
-              </div>
-              <div className="mt-2 flex gap-6">
-                <div className="flex flex-col">
-                  <span className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
-                    {t("floors")}
-                  </span>
-                  <span className="font-metric-num text-metric-num text-on-surface">
-                    {floorCount[building.id] ?? 0}
-                  </span>
+                <div className="mt-2 flex gap-6">
+                  <div className="flex flex-col">
+                    <span className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
+                      {t("floors")}
+                    </span>
+                    <span className="font-metric-num text-metric-num text-on-surface">
+                      {floorCount[building.id] ?? 0}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
+                      {t("units")}
+                    </span>
+                    <span className="font-metric-num text-metric-num text-on-surface">
+                      {unitCount[building.id] ?? 0}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
-                    {t("units")}
-                  </span>
-                  <span className="font-metric-num text-metric-num text-on-surface">
-                    {unitCount[building.id] ?? 0}
-                  </span>
+
+                {/* Occupancy bar: occupied units against the vacant ones. */}
+                <div className="mt-3 flex flex-col gap-1.5">
+                  <div
+                    className="flex h-2 w-full overflow-hidden rounded-full bg-surface-container-high"
+                    role="img"
+                    aria-label={`${t("occupied")}: ${occupancy.occupied}, ${t("vacant")}: ${occupancy.vacant}`}
+                  >
+                    <div
+                      className="h-full bg-secondary"
+                      style={{ width: `${occupiedPct}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 font-body-sm text-body-sm text-on-surface-variant">
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-secondary" aria-hidden />
+                      {t("occupied")} {occupancy.occupied}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-surface-container-high" aria-hidden />
+                      {t("vacant")} {occupancy.vacant}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>

@@ -349,7 +349,9 @@
       "missing_file": "Choose a CSV file.",
       "bad_header": "The CSV header does not match the template.",
       "failed": "The change could not be saved."
-    }
+    },
+    "occupied": "Occupied",
+    "vacant": "Vacant"
   },
   "tenants": {
     "title": "Tenants",

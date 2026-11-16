@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Inter, Manrope, Noto_Sans_Arabic } from "next/font/google";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { ServiceWorkerRegistrar } from "@/components/domain/service-worker-registrar";
+import { applyTerminology, decodeBrand } from "@/lib/white-label";
 import "../globals.css";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
@@ -29,6 +32,8 @@ export async function generateMetadata({
   return {
     title: `${t("appName")} — ${t("appTagline")}`,
     description: t("appName"),
+    manifest: "/manifest.webmanifest",
+    icons: { icon: "/icons/icon.svg" },
   };
 }
 
@@ -42,17 +47,33 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const messages = await getMessages();
+
+  // White-label branding (SPEC §10): the middleware resolved the organization from the
+  // request host and passed its branding along in the `x-brand` header.
+  const brand = decodeBrand((await headers()).get("x-brand"));
+  const messages = applyTerminology(await getMessages(), brand?.terminology);
+
+  const brandStyle = brand
+    ? ({
+        "--brand-primary": brand.primaryColor ?? undefined,
+        "--brand-secondary": brand.secondaryColor ?? undefined,
+        "--brand-font": brand.fontFamily ?? undefined,
+      } as React.CSSProperties)
+    : undefined;
 
   return (
     <html
       lang={locale}
       dir={locale === "ar" ? "rtl" : "ltr"}
       className={`${manrope.variable} ${inter.variable} ${arabic.variable}`}
+      style={brandStyle}
       suppressHydrationWarning
     >
       <body>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ServiceWorkerRegistrar />
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

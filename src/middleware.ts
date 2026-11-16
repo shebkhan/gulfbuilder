@@ -2,6 +2,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
 import { updateSession } from "@/lib/supabase/middleware";
+import { encodeBrand, resolveBrand } from "@/lib/white-label";
 
 const intl = createIntlMiddleware(routing);
 
@@ -22,6 +23,7 @@ const PROTECTED = [
   "/maintenance",
   "/reports",
   "/documents",
+  "/meters",
   "/settings",
   "/portal",
   "/owner",
@@ -39,6 +41,14 @@ function splitLocale(pathname: string) {
 export default async function middleware(request: NextRequest) {
   const response = intl(request);
   const { user } = await updateSession(request, response);
+
+  // White-label: the host decides the organization (SPEC §10).
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+  const brand = await resolveBrand(host);
+  if (brand) {
+    response.headers.set("x-middleware-request-x-brand", encodeBrand(brand));
+    response.headers.set("x-middleware-request-x-org-id", brand.orgId);
+  }
 
   const { locale, path } = splitLocale(request.nextUrl.pathname);
   const isProtected = PROTECTED.some((p) => path === p || path.startsWith(`${p}/`));

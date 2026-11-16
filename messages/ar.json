@@ -349,7 +349,9 @@
       "missing_file": "اختر ملف CSV.",
       "bad_header": "رأس ملف CSV لا يطابق القالب.",
       "failed": "تعذّر حفظ التغيير."
-    }
+    },
+    "occupied": "مشغول",
+    "vacant": "شاغر"
   },
   "tenants": {
     "title": "المستأجرون",

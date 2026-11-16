@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Gulf Property">
+  <rect width="512" height="512" rx="96" fill="#795919" />
+  <path
+    d="M112 232 256 112l144 120v168a24 24 0 0 1-24 24H136a24 24 0 0 1-24-24V232Z"
+    fill="#fcf9f5"
+  />
+  <rect x="216" y="256" width="80" height="168" fill="#795919" />
+  <rect x="160" y="264" width="40" height="40" fill="#795919" />
+  <rect x="312" y="264" width="40" height="40" fill="#795919" />
+</svg>
