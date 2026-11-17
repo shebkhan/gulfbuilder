@@ -48,4 +48,13 @@ describe("form modal migration", () => {
       expect(source, name).not.toContain("fixed inset-0");
     }
   });
+
+  it("leaves the building/tenant picker as the only domain dialog", () => {
+    for (const file of tsxFiles(DOMAIN)) {
+      if (file.endsWith("building-tenant-picker.tsx")) continue;
+      const source = readFileSync(file, "utf8");
+      expect(source, file).not.toContain("@/components/ui/dialog");
+      expect(source, file).not.toContain("fixed inset-0");
+    }
+  });
 });
