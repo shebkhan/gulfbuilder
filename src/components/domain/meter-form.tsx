@@ -6,14 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -92,7 +85,7 @@ export function MeterForms({
             name="kind"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("kind")}</FormLabel>
+                <FormLabel description={help.kind}>{t("kind")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -107,7 +100,6 @@ export function MeterForms({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.kind}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -118,7 +110,7 @@ export function MeterForms({
             name="buildingId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("building")}</FormLabel>
+                <FormLabel description={help.building}>{t("building")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -133,7 +125,6 @@ export function MeterForms({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.building}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -144,11 +135,10 @@ export function MeterForms({
             name="meterNo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("meterNo")}</FormLabel>
+                <FormLabel description={help.meterNo}>{t("meterNo")}</FormLabel>
                 <FormControl>
                   <Input {...field} value={field.value ?? ""} maxLength={60} dir="ltr" />
                 </FormControl>
-                <FormDescription>{help.meterNo}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -190,7 +180,7 @@ export function MeterForms({
             name="meterId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("meter")}</FormLabel>
+                <FormLabel description={help.meter}>{t("meter")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -205,7 +195,6 @@ export function MeterForms({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.meter}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -216,11 +205,10 @@ export function MeterForms({
             name="readOn"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("readOn")}</FormLabel>
+                <FormLabel description={help.readOn}>{t("readOn")}</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} dir="ltr" />
                 </FormControl>
-                <FormDescription>{help.readOn}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -231,11 +219,10 @@ export function MeterForms({
             name="value"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("value")}</FormLabel>
+                <FormLabel description={help.value}>{t("value")}</FormLabel>
                 <FormControl>
                   <Input type="number" step="0.001" min="0" {...field} dir="ltr" />
                 </FormControl>
-                <FormDescription>{help.value}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}

@@ -9,14 +9,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
@@ -252,11 +245,10 @@ export function DepositCard({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("amount")}</FormLabel>
+                      <FormLabel description={help.deductAmount}>{t("amount")}</FormLabel>
                       <FormControl>
                         <Input type="number" step="any" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.deductAmount}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -266,15 +258,10 @@ export function DepositCard({
                   name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("reason")}</FormLabel>
+                      <FormLabel description={help.deductReason}>{t("reason")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          rows={2}
-                          {...field}
-                          placeholder={t("deductReasonPlaceholder")}
-                        />
+                        <Textarea rows={2} {...field} placeholder={t("deductReasonPlaceholder")} />
                       </FormControl>
-                      <FormDescription>{help.deductReason}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -290,11 +277,7 @@ export function DepositCard({
                 ) : null}
 
                 <div className="flex items-center justify-end gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setDeductTarget(null)}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => setDeductTarget(null)}>
                     {tCommon("cancel")}
                   </Button>
                   <Button type="submit" variant="destructive" disabled={deductPending}>
@@ -329,11 +312,10 @@ export function DepositCard({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("amount")}</FormLabel>
+                      <FormLabel description={help.refundAmount}>{t("amount")}</FormLabel>
                       <FormControl>
                         <Input type="number" step="any" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.refundAmount}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -343,7 +325,7 @@ export function DepositCard({
                   name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("reason")}</FormLabel>
+                      <FormLabel description={help.refundReason}>{t("reason")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -351,7 +333,6 @@ export function DepositCard({
                           placeholder={t("refundReasonPlaceholder")}
                         />
                       </FormControl>
-                      <FormDescription>{help.refundReason}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -367,11 +348,7 @@ export function DepositCard({
                 ) : null}
 
                 <div className="flex items-center justify-end gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setRefundTarget(null)}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => setRefundTarget(null)}>
                     {tCommon("cancel")}
                   </Button>
                   <Button type="submit" disabled={refundPending}>

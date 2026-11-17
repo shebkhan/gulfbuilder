@@ -6,14 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -93,11 +86,10 @@ export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: P
           name="slug"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.slug}</FormLabel>
+              <FormLabel description={to("slugHint")}>{labels.slug}</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="doha-towers" dir="ltr" />
               </FormControl>
-              <FormDescription>{to("slugHint")}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -134,7 +126,7 @@ export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: P
             name="baseCurrency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.currency}</FormLabel>
+                <FormLabel description={to("currencyHint")}>{labels.currency}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -149,7 +141,6 @@ export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: P
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{to("currencyHint")}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}

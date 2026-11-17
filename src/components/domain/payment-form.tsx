@@ -15,14 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -155,13 +148,12 @@ export function PaymentForm({
               name="tenantId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("tenant")}</FormLabel>
+                  <FormLabel description={help.tenant}>{t("tenant")}</FormLabel>
                   <BuildingTenantPicker
                     buildings={buildings}
                     value={field.value}
                     onChange={(tenantId) => handleTenantChange(tenantId)}
                   />
-                  <FormDescription>{help.tenant}</FormDescription>
                   <LocalizedFormMessage />
                 </FormItem>
               )}
@@ -173,7 +165,7 @@ export function PaymentForm({
                 name="leaseId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("lease")}</FormLabel>
+                    <FormLabel description={help.lease}>{t("lease")}</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -188,7 +180,6 @@ export function PaymentForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.lease}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -201,11 +192,12 @@ export function PaymentForm({
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                    <FormLabel description={help.amount}>
+                      {t("amount")} ({tCommon("currency")})
+                    </FormLabel>
                     <FormControl>
                       <Input type="number" step="any" {...field} dir="ltr" />
                     </FormControl>
-                    <FormDescription>{help.amount}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -216,7 +208,7 @@ export function PaymentForm({
                 name="method"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("method")}</FormLabel>
+                    <FormLabel description={help.method}>{t("method")}</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -233,7 +225,6 @@ export function PaymentForm({
                         )}
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.method}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -246,11 +237,10 @@ export function PaymentForm({
                 name="receivedAt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("date")}</FormLabel>
+                    <FormLabel description={help.date}>{t("date")}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} dir="ltr" />
                     </FormControl>
-                    <FormDescription>{help.date}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -261,11 +251,10 @@ export function PaymentForm({
                 name="reference"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("reference")}</FormLabel>
+                    <FormLabel description={help.reference}>{t("reference")}</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ""} dir="ltr" />
                     </FormControl>
-                    <FormDescription>{help.reference}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -338,11 +327,10 @@ export function PaymentForm({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("notes")}</FormLabel>
+                  <FormLabel description={help.notes}>{t("notes")}</FormLabel>
                   <FormControl>
                     <Textarea rows={2} {...field} value={field.value ?? ""} />
                   </FormControl>
-                  <FormDescription>{help.notes}</FormDescription>
                   <LocalizedFormMessage />
                 </FormItem>
               )}

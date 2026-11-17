@@ -9,14 +9,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -283,7 +276,7 @@ export function ExpenseForm({
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("category")}</FormLabel>
+                      <FormLabel description={help.category}>{t("category")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
@@ -291,16 +284,22 @@ export function ExpenseForm({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(["maintenance", "utilities", "insurance", "cleaning", "management_fee", "other"] as const).map(
-                            (key) => (
-                              <SelectItem key={key} value={key}>
-                                {t(`categories.${key}`)}
-                              </SelectItem>
-                            ),
-                          )}
+                          {(
+                            [
+                              "maintenance",
+                              "utilities",
+                              "insurance",
+                              "cleaning",
+                              "management_fee",
+                              "other",
+                            ] as const
+                          ).map((key) => (
+                            <SelectItem key={key} value={key}>
+                              {t(`categories.${key}`)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.category}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -311,11 +310,10 @@ export function ExpenseForm({
                   name="expenseDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("date")}</FormLabel>
+                      <FormLabel description={help.date}>{t("date")}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.date}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -327,11 +325,10 @@ export function ExpenseForm({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("description")}</FormLabel>
+                    <FormLabel description={help.description}>{t("description")}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder={t("descriptionPlaceholder")} />
                     </FormControl>
-                    <FormDescription>{help.description}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -343,11 +340,12 @@ export function ExpenseForm({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                      <FormLabel description={help.amount}>
+                        {t("amount")} ({tCommon("currency")})
+                      </FormLabel>
                       <FormControl>
                         <Input type="number" step="any" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.amount}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -358,7 +356,7 @@ export function ExpenseForm({
                   name="buildingId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("property")}</FormLabel>
+                      <FormLabel description={help.property}>{t("property")}</FormLabel>
                       <Select value={field.value ?? ""} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
@@ -373,7 +371,6 @@ export function ExpenseForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.property}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -385,7 +382,7 @@ export function ExpenseForm({
                 name="vendorId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("vendor")}</FormLabel>
+                    <FormLabel description={help.vendor}>{t("vendor")}</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -400,7 +397,6 @@ export function ExpenseForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.vendor}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}

@@ -7,14 +7,7 @@ import type { z } from "zod";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -57,14 +50,20 @@ type Labels = {
 function Result({ state, labels }: { state: PropertyState; labels: Labels }) {
   if (state.error) {
     return (
-      <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+      <p
+        role="alert"
+        className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+      >
         {labels.errors[state.error] ?? labels.errors.failed}
       </p>
     );
   }
   if (state.ok) {
     return (
-      <p role="status" className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container">
+      <p
+        role="status"
+        className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+      >
         {labels.result.replace("{count}", state.ok)}
       </p>
     );
@@ -72,13 +71,7 @@ function Result({ state, labels }: { state: PropertyState; labels: Labels }) {
   return null;
 }
 
-export function FloorsForm({
-  buildingId,
-  labels,
-}: {
-  buildingId: string;
-  labels: Labels;
-}) {
+export function FloorsForm({ buildingId, labels }: { buildingId: string; labels: Labels }) {
   const form = useForm<FloorValues>({
     resolver: zodResolver(floorsSchema),
     defaultValues: { buildingId, from: 0, to: 4 },
@@ -106,11 +99,10 @@ export function FloorsForm({
                 name="from"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.from}</FormLabel>
+                    <FormLabel description={labels.help.from}>{labels.from}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormDescription>{labels.help.from}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -120,11 +112,10 @@ export function FloorsForm({
                 name="to"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.to}</FormLabel>
+                    <FormLabel description={labels.help.to}>{labels.to}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormDescription>{labels.help.to}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -208,11 +199,10 @@ export function UnitsForm({
                 name="prefix"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.prefix}</FormLabel>
+                    <FormLabel description={labels.help.prefix}>{labels.prefix}</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ""} dir="ltr" maxLength={10} />
                     </FormControl>
-                    <FormDescription>{labels.help.prefix}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -222,11 +212,10 @@ export function UnitsForm({
                 name="count"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.count}</FormLabel>
+                    <FormLabel description={labels.help.count}>{labels.count}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormDescription>{labels.help.count}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -236,11 +225,10 @@ export function UnitsForm({
                 name="start"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.start}</FormLabel>
+                    <FormLabel description={labels.help.start}>{labels.start}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormDescription>{labels.help.start}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -250,11 +238,10 @@ export function UnitsForm({
                 name="pad"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.pad}</FormLabel>
+                    <FormLabel description={labels.help.pad}>{labels.pad}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormDescription>{labels.help.pad}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -264,11 +251,10 @@ export function UnitsForm({
                 name="unitType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.type}</FormLabel>
+                    <FormLabel description={labels.help.unitType}>{labels.type}</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ""} dir="ltr" maxLength={30} />
                     </FormControl>
-                    <FormDescription>{labels.help.unitType}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -278,11 +264,10 @@ export function UnitsForm({
                 name="areaSqm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.area}</FormLabel>
+                    <FormLabel description={labels.help.areaSqm}>{labels.area}</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
                     </FormControl>
-                    <FormDescription>{labels.help.areaSqm}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -293,11 +278,10 @@ export function UnitsForm({
               name="rent"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{labels.rent}</FormLabel>
+                  <FormLabel description={labels.help.rent}>{labels.rent}</FormLabel>
                   <FormControl>
                     <Input {...field} value={field.value ?? ""} inputMode="decimal" dir="ltr" />
                   </FormControl>
-                  <FormDescription>{labels.help.rent}</FormDescription>
                   <LocalizedFormMessage />
                 </FormItem>
               )}

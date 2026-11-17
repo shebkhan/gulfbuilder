@@ -6,14 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -115,7 +108,7 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
             name="baseCurrency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("baseCurrency")}</FormLabel>
+                <FormLabel description={t("baseCurrencyHint")}>{t("baseCurrency")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -130,7 +123,6 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{t("baseCurrencyHint")}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}

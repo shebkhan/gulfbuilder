@@ -10,14 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -137,14 +130,11 @@ export function InspectionForm({
   const [completeState, completeDispatch, completePending] = useActionState<
     InspectionState,
     FormData
-  >(
-    async (prev, formData) => {
-      const res = await completeInspectionAction(prev, formData);
-      if (res.ok) setCompleteTarget(null);
-      return res;
-    },
-    {},
-  );
+  >(async (prev, formData) => {
+    const res = await completeInspectionAction(prev, formData);
+    if (res.ok) setCompleteTarget(null);
+    return res;
+  }, {});
 
   const openComplete = (insp: InspectionItem) => {
     setChecklist(DEFAULT_CHECKLIST);
@@ -269,7 +259,7 @@ export function InspectionForm({
                 name="leaseId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("lease")}</FormLabel>
+                    <FormLabel description={help.lease}>{t("lease")}</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -284,7 +274,6 @@ export function InspectionForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.lease}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -295,7 +284,7 @@ export function InspectionForm({
                 name="kind"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("kind")}</FormLabel>
+                    <FormLabel description={help.kind}>{t("kind")}</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -307,7 +296,6 @@ export function InspectionForm({
                         <SelectItem value="move_out">{t("moveOut")}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.kind}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -318,11 +306,10 @@ export function InspectionForm({
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("notes")}</FormLabel>
+                    <FormLabel description={help.notes}>{t("notes")}</FormLabel>
                     <FormControl>
                       <Textarea rows={2} {...field} value={field.value ?? ""} />
                     </FormControl>
-                    <FormDescription>{help.notes}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -398,7 +385,7 @@ export function InspectionForm({
                 </div>
 
                 {completeTarget.kind === "move_out" ? (
-                  <div className="flex flex-col gap-3 rounded-xl border border-warning/40 bg-warning-container/20 p-3">
+                  <div className="border-warning/40 bg-warning-container/20 flex flex-col gap-3 rounded-xl border p-3">
                     <span className="font-label-sm text-label-sm font-semibold text-on-surface">
                       {t("deductDeposit")} {t("optional")}
                     </span>
@@ -407,7 +394,7 @@ export function InspectionForm({
                       name="deductAmount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("deductAmount")}</FormLabel>
+                          <FormLabel description={help.deductAmount}>{t("deductAmount")}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -419,7 +406,6 @@ export function InspectionForm({
                               dir="ltr"
                             />
                           </FormControl>
-                          <FormDescription>{help.deductAmount}</FormDescription>
                           <LocalizedFormMessage />
                         </FormItem>
                       )}
@@ -431,7 +417,9 @@ export function InspectionForm({
                         name="deductReason"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("deductReason")}</FormLabel>
+                            <FormLabel description={help.deductReason}>
+                              {t("deductReason")}
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
@@ -439,7 +427,6 @@ export function InspectionForm({
                                 placeholder={t("deductReasonPlaceholder")}
                               />
                             </FormControl>
-                            <FormDescription>{help.deductReason}</FormDescription>
                             <LocalizedFormMessage />
                           </FormItem>
                         )}

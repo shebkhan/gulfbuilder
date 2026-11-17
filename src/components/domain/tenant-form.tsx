@@ -5,14 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -76,10 +69,7 @@ export function TenantForm({ labels }: Props) {
       employer: "",
     },
   });
-  const [state, dispatch, pending] = useActionState<TenantState, FormData>(
-    createTenantAction,
-    {},
-  );
+  const [state, dispatch, pending] = useActionState<TenantState, FormData>(createTenantAction, {});
 
   return (
     <Form {...form}>
@@ -93,11 +83,10 @@ export function TenantForm({ labels }: Props) {
           name="fullName"
           render={({ field }) => (
             <FormItem className="sm:col-span-2">
-              <FormLabel>{labels.fullName}</FormLabel>
+              <FormLabel description={labels.help.fullName}>{labels.fullName}</FormLabel>
               <FormControl>
                 <Input {...field} maxLength={120} />
               </FormControl>
-              <FormDescription>{labels.help.fullName}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -108,7 +97,7 @@ export function TenantForm({ labels }: Props) {
           name="kind"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.kind}</FormLabel>
+              <FormLabel description={labels.help.kind}>{labels.kind}</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
@@ -120,7 +109,6 @@ export function TenantForm({ labels }: Props) {
                   <SelectItem value="company">{labels.company}</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>{labels.help.kind}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -131,7 +119,7 @@ export function TenantForm({ labels }: Props) {
           name="language"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.language}</FormLabel>
+              <FormLabel description={labels.help.language}>{labels.language}</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
@@ -143,7 +131,6 @@ export function TenantForm({ labels }: Props) {
                   <SelectItem value="en">{labels.english}</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>{labels.help.language}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -154,11 +141,16 @@ export function TenantForm({ labels }: Props) {
           name="idNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.idNumber}</FormLabel>
+              <FormLabel description={labels.help.idNumber}>{labels.idNumber}</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ""} dir="ltr" placeholder={labels.idNumberPlaceholder} maxLength={30} />
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
+                  dir="ltr"
+                  placeholder={labels.idNumberPlaceholder}
+                  maxLength={30}
+                />
               </FormControl>
-              <FormDescription>{labels.help.idNumber}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -169,11 +161,10 @@ export function TenantForm({ labels }: Props) {
           name="nationality"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.nationality}</FormLabel>
+              <FormLabel description={labels.help.nationality}>{labels.nationality}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} maxLength={60} />
               </FormControl>
-              <FormDescription>{labels.help.nationality}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -184,11 +175,10 @@ export function TenantForm({ labels }: Props) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.phone}</FormLabel>
+              <FormLabel description={labels.help.phone}>{labels.phone}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} type="tel" dir="ltr" maxLength={30} />
               </FormControl>
-              <FormDescription>{labels.help.phone}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -199,11 +189,10 @@ export function TenantForm({ labels }: Props) {
           name="whatsapp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.whatsapp}</FormLabel>
+              <FormLabel description={labels.help.whatsapp}>{labels.whatsapp}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} type="tel" dir="ltr" maxLength={30} />
               </FormControl>
-              <FormDescription>{labels.help.whatsapp}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -214,11 +203,10 @@ export function TenantForm({ labels }: Props) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.email}</FormLabel>
+              <FormLabel description={labels.help.email}>{labels.email}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} type="email" dir="ltr" maxLength={80} />
               </FormControl>
-              <FormDescription>{labels.help.email}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -229,11 +217,10 @@ export function TenantForm({ labels }: Props) {
           name="employer"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.employer}</FormLabel>
+              <FormLabel description={labels.help.employer}>{labels.employer}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} maxLength={120} />
               </FormControl>
-              <FormDescription>{labels.help.employer}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}

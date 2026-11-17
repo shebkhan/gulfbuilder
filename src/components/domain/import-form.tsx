@@ -6,14 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toFormData } from "@/lib/form-data";
 import { importPropertiesAction, type PropertyState } from "@/server/actions/property";
@@ -70,7 +63,7 @@ export function ImportForm({ labels }: Props) {
             name="file"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.file}</FormLabel>
+                <FormLabel description={labels.help.file}>{labels.file}</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
@@ -82,14 +75,16 @@ export function ImportForm({ labels }: Props) {
                     className="h-auto py-2.5 file:me-3 file:rounded-full file:border-0 file:bg-surface-container-high file:px-4 file:py-1.5 file:font-label-md file:text-label-md"
                   />
                 </FormControl>
-                <FormDescription>{labels.help.file}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
           />
 
           {state.error ? (
-            <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+            <p
+              role="alert"
+              className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+            >
               {labels.errors[state.error] ?? labels.errors.failed}
             </p>
           ) : null}
@@ -128,7 +123,7 @@ export function ImportForm({ labels }: Props) {
               <tbody>
                 {report.errors.map((error, index) => (
                   <tr key={`${error.row}-${index}`} className="border-t border-hairline">
-                    <td className="py-1 tabular">{error.row}</td>
+                    <td className="tabular py-1">{error.row}</td>
                     <td className="py-1">{error.message}</td>
                   </tr>
                 ))}

@@ -7,14 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -81,7 +74,7 @@ export function DocumentUploadForm({
             name="entityType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("entityType")}</FormLabel>
+                <FormLabel description={help.entityType}>{t("entityType")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -98,7 +91,6 @@ export function DocumentUploadForm({
                     )}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.entityType}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -109,7 +101,7 @@ export function DocumentUploadForm({
             name="entityId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("entity")}</FormLabel>
+                <FormLabel description={help.entity}>{t("entity")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -124,7 +116,6 @@ export function DocumentUploadForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.entity}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -137,7 +128,7 @@ export function DocumentUploadForm({
             name="kind"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("kind")}</FormLabel>
+                <FormLabel description={help.kind}>{t("kind")}</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
@@ -161,7 +152,6 @@ export function DocumentUploadForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>{help.kind}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -172,11 +162,10 @@ export function DocumentUploadForm({
             name="expiresOn"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("expiresOn")}</FormLabel>
+                <FormLabel description={help.expiresOn}>{t("expiresOn")}</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} value={field.value ?? ""} dir="ltr" />
                 </FormControl>
-                <FormDescription>{help.expiresOn}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -188,7 +177,7 @@ export function DocumentUploadForm({
           name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("file")}</FormLabel>
+              <FormLabel description={help.file}>{t("file")}</FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -197,7 +186,6 @@ export function DocumentUploadForm({
                   onChange={(event) => field.onChange(event.target.files?.[0] ?? null)}
                 />
               </FormControl>
-              <FormDescription>{help.file}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}

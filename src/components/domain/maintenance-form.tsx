@@ -9,14 +9,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -58,7 +51,14 @@ type VendorOption = { id: string; name: string };
 
 const NONE = "__none__";
 
-const CATEGORY_KEYS = ["plumbing", "electrical", "hvac", "carpentry", "painting", "general"] as const;
+const CATEGORY_KEYS = [
+  "plumbing",
+  "electrical",
+  "hvac",
+  "carpentry",
+  "painting",
+  "general",
+] as const;
 const PRIORITY_KEYS = ["low", "normal", "high", "urgent"] as const;
 const STATUS_KEYS = ["open", "in_progress", "waiting_parts", "completed", "cancelled"] as const;
 
@@ -288,7 +288,7 @@ export function MaintenanceForm({
                   name="buildingId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("property")}</FormLabel>
+                      <FormLabel description={help.building}>{t("property")}</FormLabel>
                       <Select
                         value={field.value}
                         onValueChange={(value) => {
@@ -309,7 +309,6 @@ export function MaintenanceForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.building}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -320,7 +319,7 @@ export function MaintenanceForm({
                   name="unitId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("unit")}</FormLabel>
+                      <FormLabel description={help.unit}>{t("unit")}</FormLabel>
                       <Select
                         value={field.value === "" ? NONE : field.value}
                         onValueChange={(value) => field.onChange(value === NONE ? "" : value)}
@@ -339,7 +338,6 @@ export function MaintenanceForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.unit}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -351,11 +349,10 @@ export function MaintenanceForm({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("requestTitle")}</FormLabel>
+                    <FormLabel description={help.title}>{t("requestTitle")}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder={t("titlePlaceholder")} />
                     </FormControl>
-                    <FormDescription>{help.title}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -367,7 +364,7 @@ export function MaintenanceForm({
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("category")}</FormLabel>
+                      <FormLabel description={help.category}>{t("category")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
@@ -382,7 +379,6 @@ export function MaintenanceForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.category}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -393,7 +389,7 @@ export function MaintenanceForm({
                   name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("priority")}</FormLabel>
+                      <FormLabel description={help.priority}>{t("priority")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
@@ -408,7 +404,6 @@ export function MaintenanceForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.priority}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -420,7 +415,7 @@ export function MaintenanceForm({
                 name="vendorId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("assignedVendor")}</FormLabel>
+                    <FormLabel description={help.vendor}>{t("assignedVendor")}</FormLabel>
                     <Select
                       value={field.value === "" ? NONE : field.value}
                       onValueChange={(value) => field.onChange(value === NONE ? "" : value)}
@@ -439,7 +434,6 @@ export function MaintenanceForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>{help.vendor}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -450,11 +444,10 @@ export function MaintenanceForm({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("description")}</FormLabel>
+                    <FormLabel description={help.description}>{t("description")}</FormLabel>
                     <FormControl>
                       <Textarea rows={3} {...field} value={field.value ?? ""} />
                     </FormControl>
-                    <FormDescription>{help.description}</FormDescription>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
@@ -512,7 +505,7 @@ export function MaintenanceForm({
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("status")}</FormLabel>
+                      <FormLabel description={help.status}>{t("status")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
@@ -527,7 +520,6 @@ export function MaintenanceForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>{help.status}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -538,7 +530,9 @@ export function MaintenanceForm({
                   name="cost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("cost")} ({tCommon("currency")})</FormLabel>
+                      <FormLabel description={help.cost}>
+                        {t("cost")} ({tCommon("currency")})
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -550,7 +544,6 @@ export function MaintenanceForm({
                           dir="ltr"
                         />
                       </FormControl>
-                      <FormDescription>{help.cost}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -561,7 +554,7 @@ export function MaintenanceForm({
                   name="note"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("note")}</FormLabel>
+                      <FormLabel description={help.note}>{t("note")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -569,7 +562,6 @@ export function MaintenanceForm({
                           placeholder={t("notePlaceholder")}
                         />
                       </FormControl>
-                      <FormDescription>{help.note}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}

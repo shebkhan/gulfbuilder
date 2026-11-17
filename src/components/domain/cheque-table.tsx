@@ -10,14 +10,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -256,7 +249,10 @@ export function ChequeTable({
               </thead>
               <tbody className="divide-y divide-hairline">
                 {cheques.map((cheque) => (
-                  <tr key={cheque.id} className="transition-colors hover:bg-surface-container-low/50">
+                  <tr
+                    key={cheque.id}
+                    className="transition-colors hover:bg-surface-container-low/50"
+                  >
                     <td className="p-4 font-mono font-semibold text-primary">{cheque.cheque_no}</td>
                     <td className="p-4 text-on-surface">{cheque.bank_name || "—"}</td>
                     <td className="p-4 font-medium text-on-surface">
@@ -418,11 +414,10 @@ export function ChequeTable({
                   name="chequeNo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("chequeNo")}</FormLabel>
+                      <FormLabel description={help.chequeNo}>{t("chequeNo")}</FormLabel>
                       <FormControl>
                         <Input {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.chequeNo}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -432,11 +427,10 @@ export function ChequeTable({
                   name="bankName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("bank")}</FormLabel>
+                      <FormLabel description={help.bank}>{t("bank")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
-                      <FormDescription>{help.bank}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -449,11 +443,12 @@ export function ChequeTable({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                      <FormLabel description={help.amount}>
+                        {t("amount")} ({tCommon("currency")})
+                      </FormLabel>
                       <FormControl>
                         <Input type="number" step="any" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.amount}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -463,11 +458,10 @@ export function ChequeTable({
                   name="chequeDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("dueDate")}</FormLabel>
+                      <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.chequeDate}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -540,9 +534,7 @@ export function ChequeTable({
             </h2>
             <Form {...replaceForm}>
               <form
-                onSubmit={replaceForm.handleSubmit((values) =>
-                  replaceDispatch(toFormData(values)),
-                )}
+                onSubmit={replaceForm.handleSubmit((values) => replaceDispatch(toFormData(values)))}
                 noValidate
                 className="mt-4 flex flex-col gap-4"
               >
@@ -556,11 +548,10 @@ export function ChequeTable({
                   name="chequeNo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("newChequeNo")}</FormLabel>
+                      <FormLabel description={help.newChequeNo}>{t("newChequeNo")}</FormLabel>
                       <FormControl>
                         <Input {...field} dir="ltr" />
                       </FormControl>
-                      <FormDescription>{help.newChequeNo}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -570,11 +561,10 @@ export function ChequeTable({
                   name="bankName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("newBankName")}</FormLabel>
+                      <FormLabel description={help.newBankName}>{t("newBankName")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
-                      <FormDescription>{help.newBankName}</FormDescription>
                       <LocalizedFormMessage />
                     </FormItem>
                   )}
@@ -585,11 +575,12 @@ export function ChequeTable({
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                        <FormLabel description={help.amount}>
+                          {t("amount")} ({tCommon("currency")})
+                        </FormLabel>
                         <FormControl>
                           <Input type="number" step="any" {...field} dir="ltr" />
                         </FormControl>
-                        <FormDescription>{help.amount}</FormDescription>
                         <LocalizedFormMessage />
                       </FormItem>
                     )}
@@ -599,11 +590,10 @@ export function ChequeTable({
                     name="chequeDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("dueDate")}</FormLabel>
+                        <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} dir="ltr" />
                         </FormControl>
-                        <FormDescription>{help.chequeDate}</FormDescription>
                         <LocalizedFormMessage />
                       </FormItem>
                     )}
@@ -620,11 +610,7 @@ export function ChequeTable({
                 ) : null}
 
                 <div className="flex items-center justify-end gap-3">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setReplaceTarget(null)}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => setReplaceTarget(null)}>
                     {tCommon("cancel")}
                   </Button>
                   <Button type="submit" disabled={replacePending}>

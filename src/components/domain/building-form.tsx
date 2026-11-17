@@ -5,14 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -74,11 +67,10 @@ export function BuildingForm({ owners, labels }: Props) {
           name="code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.code}</FormLabel>
+              <FormLabel description={labels.help.code}>{labels.code}</FormLabel>
               <FormControl>
                 <Input {...field} dir="ltr" maxLength={40} />
               </FormControl>
-              <FormDescription>{labels.help.code}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -89,11 +81,10 @@ export function BuildingForm({ owners, labels }: Props) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.name}</FormLabel>
+              <FormLabel description={labels.help.name}>{labels.name}</FormLabel>
               <FormControl>
                 <Input {...field} maxLength={120} />
               </FormControl>
-              <FormDescription>{labels.help.name}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -104,7 +95,7 @@ export function BuildingForm({ owners, labels }: Props) {
           name="ownerId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.owner}</FormLabel>
+              <FormLabel description={labels.help.owner}>{labels.owner}</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
@@ -119,7 +110,6 @@ export function BuildingForm({ owners, labels }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>{labels.help.owner}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}
@@ -130,11 +120,10 @@ export function BuildingForm({ owners, labels }: Props) {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.city}</FormLabel>
+              <FormLabel description={labels.help.city}>{labels.city}</FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} maxLength={80} />
               </FormControl>
-              <FormDescription>{labels.help.city}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}

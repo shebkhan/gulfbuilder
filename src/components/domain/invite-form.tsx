@@ -6,14 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -53,10 +46,7 @@ export function InviteForm({ locale, labels, roles }: Props) {
     defaultValues: { email: "", role: "manager", locale: locale as Values["locale"] },
   });
 
-  const [state, dispatch, pending] = useActionState<InviteState, FormData>(
-    inviteMemberAction,
-    {},
-  );
+  const [state, dispatch, pending] = useActionState<InviteState, FormData>(inviteMemberAction, {});
 
   return (
     <Form {...form}>
@@ -84,7 +74,7 @@ export function InviteForm({ locale, labels, roles }: Props) {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{labels.role}</FormLabel>
+              <FormLabel description={t("roleHint")}>{labels.role}</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
@@ -99,7 +89,6 @@ export function InviteForm({ locale, labels, roles }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>{t("roleHint")}</FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}

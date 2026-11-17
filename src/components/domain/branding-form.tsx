@@ -6,14 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toFormData } from "@/lib/form-data";
@@ -169,16 +162,19 @@ export function BrandingForm({ values }: { values: BrandingValues }) {
           name="customDomain"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("customDomain")}</FormLabel>
+              <FormLabel
+                description={
+                  t("customDomainHint") +
+                  (values.customDomainStatus && values.customDomainStatus !== "none"
+                    ? ` (${t(`domainStatus.${values.customDomainStatus}` as never)})`
+                    : "")
+                }
+              >
+                {t("customDomain")}
+              </FormLabel>
               <FormControl>
                 <Input {...field} placeholder="property.example.com" dir="ltr" />
               </FormControl>
-              <FormDescription>
-                {t("customDomainHint")}
-                {values.customDomainStatus && values.customDomainStatus !== "none"
-                  ? ` (${t(`domainStatus.${values.customDomainStatus}` as never)})`
-                  : ""}
-              </FormDescription>
               <LocalizedFormMessage />
             </FormItem>
           )}

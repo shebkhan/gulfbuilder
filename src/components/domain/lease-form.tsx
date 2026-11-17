@@ -7,14 +7,7 @@ import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -236,17 +229,22 @@ export function LeaseForm({
             name="leaseNo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.leaseNo}</FormLabel>
+                <FormLabel description={labels.leaseNoHint}>{labels.leaseNo}</FormLabel>
                 <FormControl>
-                  <Input {...field} value={field.value ?? ""} placeholder={labels.autoLeaseNo} dir="ltr" maxLength={50} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                    placeholder={labels.autoLeaseNo}
+                    dir="ltr"
+                    maxLength={50}
+                  />
                 </FormControl>
-                <FormDescription>{labels.leaseNoHint}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
           />
 
-          <div className="sm:col-span-2 flex items-center gap-4">
+          <div className="flex items-center gap-4 sm:col-span-2">
             <RadioGroup
               value={targetType}
               onValueChange={(value) => {
@@ -256,12 +254,18 @@ export function LeaseForm({
               }}
               className="flex flex-wrap items-center gap-4"
             >
-              <Label htmlFor="target-unit" className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface">
+              <Label
+                htmlFor="target-unit"
+                className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface"
+              >
                 <RadioGroupItem value="unit" id="target-unit" />
                 {labels.unit}
               </Label>
               {rooms.length > 0 ? (
-                <Label htmlFor="target-room" className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface">
+                <Label
+                  htmlFor="target-room"
+                  className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface"
+                >
                   <RadioGroupItem value="room" id="target-room" />
                   {labels.room}
                 </Label>
@@ -310,7 +314,8 @@ export function LeaseForm({
                     <SelectContent>
                       {rooms.map((r) => (
                         <SelectItem key={r.id} value={r.id}>
-                          {r.building_name} · {labels.unit} {r.unit_no} · {labels.room} {r.room_number}
+                          {r.building_name} · {labels.unit} {r.unit_no} · {labels.room}{" "}
+                          {r.room_number}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -354,11 +359,10 @@ export function LeaseForm({
             name="rent"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.rent}</FormLabel>
+                <FormLabel description={labels.rentHint}>{labels.rent}</FormLabel>
                 <FormControl>
                   <Input type="number" step="any" {...field} dir="ltr" />
                 </FormControl>
-                <FormDescription>{labels.rentHint}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -422,11 +426,10 @@ export function LeaseForm({
             name="dueDay"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.dueDay}</FormLabel>
+                <FormLabel description={labels.dueDayHint}>{labels.dueDay}</FormLabel>
                 <FormControl>
                   <Input type="number" min={1} max={28} {...field} dir="ltr" />
                 </FormControl>
-                <FormDescription>{labels.dueDayHint}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -437,11 +440,10 @@ export function LeaseForm({
             name="deposit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.deposit}</FormLabel>
+                <FormLabel description={labels.depositHint}>{labels.deposit}</FormLabel>
                 <FormControl>
                   <Input type="number" step="any" {...field} value={field.value ?? ""} dir="ltr" />
                 </FormControl>
-                <FormDescription>{labels.depositHint}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -452,11 +454,10 @@ export function LeaseForm({
             name="noticeDays"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{labels.noticeDays}</FormLabel>
+                <FormLabel description={labels.noticeDaysHint}>{labels.noticeDays}</FormLabel>
                 <FormControl>
                   <Input type="number" min={0} {...field} dir="ltr" />
                 </FormControl>
-                <FormDescription>{labels.noticeDaysHint}</FormDescription>
                 <LocalizedFormMessage />
               </FormItem>
             )}
@@ -476,7 +477,7 @@ export function LeaseForm({
           />
 
           {values.isSublet ? (
-            <div className="sm:col-span-2 flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4">
+            <div className="flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4 sm:col-span-2">
               <FormField
                 control={form.control}
                 name="parentLeaseId"
@@ -504,7 +505,8 @@ export function LeaseForm({
 
               {selectedParent ? (
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  {labels.mainTenant}: <strong className="text-on-surface">{selectedParent.tenant_name}</strong>.{" "}
+                  {labels.mainTenant}:{" "}
+                  <strong className="text-on-surface">{selectedParent.tenant_name}</strong>.{" "}
                   {labels.subletExplanation}
                 </p>
               ) : null}

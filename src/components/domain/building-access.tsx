@@ -6,14 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -49,12 +42,7 @@ type Props = {
   };
 };
 
-export function BuildingAccess({
-  buildingId,
-  staff,
-  access,
-  labels,
-}: Props) {
+export function BuildingAccess({ buildingId, staff, access, labels }: Props) {
   const assigned = new Set(access.map((entry) => entry.userId));
   const available = staff.filter((member) => !assigned.has(member.id));
 
@@ -116,7 +104,7 @@ export function BuildingAccess({
               name="userId"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>{labels.staff}</FormLabel>
+                  <FormLabel description={labels.help.staff}>{labels.staff}</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -131,7 +119,6 @@ export function BuildingAccess({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>{labels.help.staff}</FormDescription>
                   <LocalizedFormMessage />
                 </FormItem>
               )}
@@ -144,7 +131,10 @@ export function BuildingAccess({
       ) : null}
 
       {state.error ? (
-        <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+        <p
+          role="alert"
+          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+        >
           {labels.errors[state.error] ?? labels.errors.failed}
         </p>
       ) : null}
