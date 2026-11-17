@@ -1,11 +1,10 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { retryAt } from "./backoff";
 import { notifierFor, type Outbound } from "./notifier";
 import { resolveOutbound } from "./recipient";
+import { linkTelegramCodes } from "./telegram-link";
 
-// Task 4 replaces this stub with real Telegram contact-linking.
-export async function linkTelegramCodes(_admin: SupabaseClient): Promise<void> {}
+export { linkTelegramCodes };
 
 export type DispatchCounts = { claimed: number; sent: number; failed: number; skipped: number };
 

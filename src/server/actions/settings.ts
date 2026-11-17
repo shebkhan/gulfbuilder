@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { randomBytes } from "node:crypto";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
@@ -238,6 +239,48 @@ export async function updateNotificationTemplateAction(
 
   revalidatePath("/settings/notifications");
   return { ok: "saved" };
+}
+
+export async function generateTelegramLinkCodeAction(
+  _prev: SettingsState,
+  _formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  // Six digits, one per random byte mod 10.
+  const code = Array.from(randomBytes(6), (byte) => String(byte % 10)).join("");
+  const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+  const { error } = await ctx.supabase
+    .from("profiles")
+    .update({ telegram_link_code: code, telegram_link_expires_at: expires })
+    .eq("id", ctx.userId);
+  if (error) return fail("failed");
+
+  revalidatePath("/settings/notifications");
+  return { ok: "code_generated" };
+}
+
+export async function unlinkTelegramAction(
+  _prev: SettingsState,
+  _formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  const { error } = await ctx.supabase
+    .from("profiles")
+    .update({
+      telegram_chat_id: null,
+      telegram_link_code: null,
+      telegram_link_expires_at: null,
+    })
+    .eq("id", ctx.userId);
+  if (error) return fail("failed");
+
+  revalidatePath("/settings/notifications");
+  return { ok: "unlinked" };
 }
 
 export async function closePeriodAction(

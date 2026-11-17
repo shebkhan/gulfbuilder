@@ -245,12 +245,21 @@
       "save": "Save template",
       "saving": "Saving…",
       "saved": "Template saved.",
+      "telegramTitle": "Telegram",
+      "telegramSubtitle": "Link your Telegram account to receive notifications in your chat.",
+      "generateCode": "Generate code",
+      "codeHint": "Open Telegram and send this command to the bot from your account.",
+      "linked": "Telegram is linked.",
+      "unlink": "Unlink",
+      "codeGenerated": "Code generated. It expires in 10 minutes.",
+      "unlinked": "Telegram unlinked.",
       "channels": {
         "email": "Email",
         "whatsapp": "WhatsApp",
         "sms": "SMS",
         "in_app": "In-app",
-        "web_push": "Push"
+        "web_push": "Push",
+        "telegram": "Telegram"
       },
       "errors": {
         "not_authorised": "Only organization admins can edit templates.",

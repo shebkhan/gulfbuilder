@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { NotificationTemplateForm } from "@/components/domain/notification-template-form";
 import { SettingsNav } from "@/components/domain/settings-nav";
+import { TelegramLinkCard } from "@/components/domain/telegram-link-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { can, isRole } from "@/lib/rbac";
@@ -34,7 +35,7 @@ export default async function NotificationSettingsPage({
 
   const t = await getTranslations("settings.notifications");
 
-  const [{ data: templates }, { data: outbox }] = await Promise.all([
+  const [{ data: templates }, { data: outbox }, { data: profile }] = await Promise.all([
     supabase
       .from("notification_templates")
       .select("id, event, channel, locale, subject, body")
@@ -45,7 +46,19 @@ export default async function NotificationSettingsPage({
       .select("id, event, channel, recipient, locale, status, attempts, created_at, sent_at")
       .order("created_at", { ascending: false })
       .limit(50),
+    supabase
+      .from("profiles")
+      .select("telegram_chat_id, telegram_link_code, telegram_link_expires_at")
+      .eq("id", user.id)
+      .maybeSingle(),
   ]);
+
+  const telegramCode =
+    profile?.telegram_link_code &&
+    profile.telegram_link_expires_at &&
+    new Date(profile.telegram_link_expires_at) > new Date()
+      ? profile.telegram_link_code
+      : null;
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -55,6 +68,8 @@ export default async function NotificationSettingsPage({
       </div>
 
       <SettingsNav />
+
+      <TelegramLinkCard linked={Boolean(profile?.telegram_chat_id)} code={telegramCode} />
 
       <NotificationTemplateForm />
 
