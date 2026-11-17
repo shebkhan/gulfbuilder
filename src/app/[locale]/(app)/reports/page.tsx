@@ -33,17 +33,11 @@ export default async function ReportsPage({
   defaultReportFilters({ from, to, building });
   const t = await getTranslations("reports");
 
-  const [kpis, rentRoll, agedReceivables, { data: rawOwners }, { data: rawBankAccounts }] =
-    await Promise.all([
-      fetchPortfolioKpis(),
-      fetchRentRoll(),
-      fetchAgedReceivables(),
-      ctx.supabase.from("owners").select("id, name").order("name"),
-      ctx.supabase.from("bank_accounts").select("id, name").order("name"),
-    ]);
-
-  const ownerOptions = (rawOwners || []).map((o) => ({ id: o.id, name: o.name }));
-  const bankOptions = (rawBankAccounts || []).map((b) => ({ id: b.id, name: b.name }));
+  const [kpis, rentRoll, agedReceivables] = await Promise.all([
+    fetchPortfolioKpis(),
+    fetchRentRoll(),
+    fetchAgedReceivables(),
+  ]);
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -53,8 +47,6 @@ export default async function ReportsPage({
         title={t("title")}
         subtitle={t("subtitle")}
         kpis={kpis}
-        ownerOptions={ownerOptions}
-        bankOptions={bankOptions}
         showStatementGenerator={true}
       />
 

@@ -41,4 +41,11 @@ describe("form modal migration", () => {
     expect(source).not.toContain("@/components/ui/dialog");
     expect(source).not.toContain("fixed inset-0");
   });
+
+  it("renders deposit and statement forms outside an overlay", () => {
+    for (const name of ["deposit-card.tsx", "statement-generator.tsx"]) {
+      const source = readFileSync(join(DOMAIN, name), "utf8");
+      expect(source, name).not.toContain("fixed inset-0");
+    }
+  });
 });

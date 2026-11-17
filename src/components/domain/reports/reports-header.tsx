@@ -12,8 +12,6 @@ type ReportsHeaderProps = {
   title: string;
   subtitle: string;
   kpis?: PortfolioKpis | null;
-  ownerOptions?: { id: string; name: string }[];
-  bankOptions?: { id: string; name: string }[];
   showStatementGenerator?: boolean;
 };
 
@@ -23,8 +21,6 @@ export async function ReportsHeader({
   title,
   subtitle,
   kpis,
-  ownerOptions = [],
-  bankOptions = [],
   showStatementGenerator = false,
 }: ReportsHeaderProps) {
   const t = await getTranslations("reports");
@@ -38,9 +34,7 @@ export async function ReportsHeader({
           <p className="font-body-md text-body-md text-on-surface-variant">{subtitle}</p>
         </div>
 
-        {showStatementGenerator && (
-          <StatementGenerator owners={ownerOptions} bankAccounts={bankOptions} writable={writable} />
-        )}
+        {showStatementGenerator && <StatementGenerator writable={writable} />}
       </div>
 
       {kpis && (

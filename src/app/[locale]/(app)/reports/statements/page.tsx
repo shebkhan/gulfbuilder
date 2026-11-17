@@ -19,29 +19,21 @@ export default async function StatementsReportPage({
 
   const t = await getTranslations("reports");
 
-  const [{ data: rawStatements }, { data: rawOwners }, { data: rawBankAccounts }] =
-    await Promise.all([
-      ctx.supabase
-        .from("owner_statements")
-        .select(
-          `
-          id,
-          period_start,
-          period_end,
-          currency,
-          status,
-          closing_minor,
-          totals,
-          owners ( id, name )
-        `,
-        )
-        .order("period_start", { ascending: false }),
-      ctx.supabase.from("owners").select("id, name").order("name"),
-      ctx.supabase.from("bank_accounts").select("id, name").order("name"),
-    ]);
-
-  const ownerOptions = (rawOwners || []).map((o) => ({ id: o.id, name: o.name }));
-  const bankOptions = (rawBankAccounts || []).map((b) => ({ id: b.id, name: b.name }));
+  const { data: rawStatements } = await ctx.supabase
+    .from("owner_statements")
+    .select(
+      `
+      id,
+      period_start,
+      period_end,
+      currency,
+      status,
+      closing_minor,
+      totals,
+      owners ( id, name )
+    `,
+    )
+    .order("period_start", { ascending: false });
 
   const labels = {
     emptyStatements: t("emptyStatements"),
@@ -73,8 +65,6 @@ export default async function StatementsReportPage({
         role={ctx.role}
         title={t("statements")}
         subtitle={t("statementsSubtitle")}
-        ownerOptions={ownerOptions}
-        bankOptions={bankOptions}
         showStatementGenerator={true}
       />
 
