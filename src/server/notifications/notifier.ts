@@ -21,6 +21,11 @@ export function isDryRun(): boolean {
   return process.env.NOTIFICATION_DRY_RUN === "1";
 }
 
+// Title fallback is a body prefix so no hard-coded English text reaches users (i18n constraint).
+export function outboundTitle(message: Outbound): string {
+  return message.subject || message.body.slice(0, 64);
+}
+
 // Dry-run short-circuit: log channel and recipient only, never tokens or bodies.
 export function dryRunSend(channel: Channel, recipient: string): SendResult {
   console.log(`[notifications] dry-run channel=${channel} recipient=${recipient}`);
@@ -35,5 +40,5 @@ const NOTIFIERS: Record<Channel, Notifier> = {
 };
 
 export function notifierFor(channel: Channel): Notifier | null {
-  return NOTIFIERS[channel as Channel] ?? null;
+  return NOTIFIERS[channel] ?? null;
 }

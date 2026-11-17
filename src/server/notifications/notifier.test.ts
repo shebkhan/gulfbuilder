@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { isDryRun, notifierFor } from "./notifier";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { isDryRun, notifierFor, outboundTitle } from "./notifier";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("notifierFor", () => {
   it("routes each channel to an adapter with a send function", () => {
@@ -17,7 +21,20 @@ describe("notifierFor", () => {
 
 describe("isDryRun", () => {
   it("is true when NOTIFICATION_DRY_RUN=1", () => {
-    process.env.NOTIFICATION_DRY_RUN = "1";
+    vi.stubEnv("NOTIFICATION_DRY_RUN", "1");
     expect(isDryRun()).toBe(true);
+  });
+});
+
+describe("outboundTitle", () => {
+  const message = { channel: "email", recipient: "a@b.c", body: "" } as const;
+
+  it("prefers the subject and falls back to a body prefix", () => {
+    expect(outboundTitle({ ...message, subject: "Rent due", body: "Pay by Friday" })).toBe(
+      "Rent due",
+    );
+    expect(outboundTitle({ ...message, subject: null, body: "Pay by Friday" })).toBe(
+      "Pay by Friday",
+    );
   });
 });
