@@ -42,11 +42,19 @@
 - **Storage:** the private `documents` bucket holds `{org_id}/{entity}/{id}/{file}`.
   A backup must include both the database and this bucket.
 
+## Notification dispatch
+
+`POST /api/notifications/dispatch` drains queued `notification_outbox` rows across
+email, WhatsApp, SMS, Telegram and web push. It requires
+`Authorization: Bearer $NOTIFICATION_CRON_SECRET` (set `NOTIFICATION_CRON_SECRET`
+in the environment); unauthenticated calls get 401. The recommended cadence is
+every minute. The cron caller is supplied by the owner — no Edge Function, pg_cron
+or scheduler is configured here. For local testing, set `NOTIFICATION_DRY_RUN=1`
+to exercise the dispatch path without delivering messages.
+
 ## Known gaps (v1 scope)
 
 - No Vitest, pgTAP, Playwright, CI or load/restore suites are run as release gates.
-- No scheduled jobs: `notification_outbox` rows are written and left queued; no Edge
-  Function sends email, WhatsApp, SMS or web push (D-017).
 - No bank reconciliation: bank accounts exist, but CSV bank import and matching are
   phase-2 work.
 - Reporting snapshots are generated on demand; materialized views and scheduled report
