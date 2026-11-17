@@ -9,7 +9,6 @@ import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { NumberField } from "@/components/ui/number-field";
@@ -74,81 +73,18 @@ type ReplaceValues = {
 
 export function ChequeTable({
   cheques,
-  buildings,
-  leases,
   writable = false,
   locale = "en",
 }: {
   cheques: ChequeItem[];
-  buildings: BuildingOption[];
-  leases: LeaseOption[];
   writable?: boolean;
   locale?: string;
 }) {
   const t = useTranslations("cheques");
-  const tCommon = useTranslations("common");
   const errors = t.raw("errors") as Record<string, string>;
-  const help = t.raw("help") as Record<string, string>;
 
   const [isPending, startTransition] = useTransition();
   const [statusState, setStatusState] = useState<ChequeState>({});
-  const [openRegister, setOpenRegister] = useState(false);
-  const [bounceTarget, setBounceTarget] = useState<ChequeItem | null>(null);
-  const [bounceReason, setBounceReason] = useState("");
-  const [replaceTarget, setReplaceTarget] = useState<ChequeItem | null>(null);
-
-  const registerForm = useForm<RegisterValues>({
-    resolver: zodResolver(registerChequeSchema),
-    defaultValues: {
-      tenantId: "",
-      leaseId: "",
-      chequeNo: "",
-      bankName: "",
-      amount: "",
-      currency: "QAR",
-      chequeDate: new Date().toISOString().slice(0, 10),
-      notes: "",
-    },
-  });
-
-  const [registerState, registerDispatch, registerPending] = useActionState<ChequeState, FormData>(
-    async (prev, formData) => {
-      const res = await registerChequeAction(prev, formData);
-      if (res.ok) {
-        setOpenRegister(false);
-        registerForm.reset();
-      }
-      return res;
-    },
-    {},
-  );
-
-  const replaceForm = useForm<ReplaceValues>({
-    resolver: zodResolver(replaceChequeSchema),
-    defaultValues: {
-      oldChequeId: "",
-      chequeNo: "",
-      bankName: "",
-      amount: "",
-      currency: "QAR",
-      chequeDate: new Date().toISOString().slice(0, 10),
-      notes: "",
-    },
-  });
-
-  const [replaceState, replaceDispatch, replacePending] = useActionState<ChequeState, FormData>(
-    async (prev, formData) => {
-      const res = await replaceChequeAction(prev, formData);
-      if (res.ok) setReplaceTarget(null);
-      return res;
-    },
-    {},
-  );
-
-  const selectedTenant = registerForm.watch("tenantId");
-  const filteredLeases = selectedTenant
-    ? leases.filter((l) => l.tenant_id === selectedTenant)
-    : leases;
 
   const handleDeposit = (chequeId: string) => {
     setStatusState({});
@@ -162,36 +98,6 @@ export function ChequeTable({
     const formData = new FormData();
     formData.set("chequeId", chequeId);
     startTransition(async () => setStatusState(await clearChequeAction({}, formData)));
-  };
-
-  const handleBounceSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!bounceTarget) return;
-    setStatusState({});
-    const formData = new FormData();
-    formData.set("chequeId", bounceTarget.id);
-    if (bounceReason) formData.set("reason", bounceReason);
-    startTransition(async () => {
-      const res = await bounceChequeAction({}, formData);
-      setStatusState(res);
-      if (res.ok) {
-        setBounceTarget(null);
-        setBounceReason("");
-      }
-    });
-  };
-
-  const openReplace = (cheque: ChequeItem) => {
-    replaceForm.reset({
-      oldChequeId: cheque.id,
-      chequeNo: "",
-      bankName: cheque.bank_name ?? "",
-      amount: (cheque.amount_minor / 100).toFixed(2),
-      currency: "QAR",
-      chequeDate: new Date().toISOString().slice(0, 10),
-      notes: "",
-    });
-    setReplaceTarget(cheque);
   };
 
   const getStatusBadgeVariant = (status: string) => {
@@ -221,9 +127,11 @@ export function ChequeTable({
           </p>
         ) : null}
         {writable ? (
-          <Button onClick={() => setOpenRegister(true)} className="flex items-center gap-2">
-            <Plus className="size-4" />
-            {t("registerCheque")}
+          <Button asChild className="flex items-center gap-2">
+            <Link href="/cheques/new">
+              <Plus className="size-4" />
+              {t("registerCheque")}
+            </Link>
           </Button>
         ) : null}
       </div>
@@ -318,28 +226,17 @@ export function ChequeTable({
                               >
                                 {t("clear")}
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => {
-                                  setBounceTarget(cheque);
-                                  setBounceReason("");
-                                }}
-                                disabled={isPending}
-                              >
-                                {t("bounce")}
+                              <Button size="sm" variant="destructive" asChild>
+                                <Link href={`/cheques/${cheque.id}/bounce`}>{t("bounce")}</Link>
                               </Button>
                             </>
                           ) : null}
                           {cheque.status === "bounced" ? (
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => openReplace(cheque)}
-                              disabled={isPending}
-                            >
-                              <ArrowRightLeft className="me-1 size-3.5" />
-                              {t("replace")}
+                            <Button size="sm" variant="secondary" asChild>
+                              <Link href={`/cheques/${cheque.id}/replace`}>
+                                <ArrowRightLeft className="me-1 size-3.5" />
+                                {t("replace")}
+                              </Link>
                             </Button>
                           ) : null}
                         </div>
@@ -352,278 +249,346 @@ export function ChequeTable({
           </div>
         )}
       </div>
-
-      {/* Register modal */}
-      <Dialog open={openRegister} onOpenChange={setOpenRegister}>
-        <DialogContent className="max-w-[38.4rem]">
-          <DialogHeader>
-            <DialogTitle>{t("register")}</DialogTitle>
-          </DialogHeader>
-
-          <Form {...registerForm}>
-            <form
-              onSubmit={registerForm.handleSubmit((values) => registerDispatch(toFormData(values)))}
-              noValidate
-              className="mt-4 flex flex-col gap-6"
-            >
-              <FormField
-                control={registerForm.control}
-                name="tenantId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("tenant")}</FormLabel>
-                    <BuildingTenantPicker
-                      buildings={buildings}
-                      value={field.value}
-                      onChange={(tenantId) => {
-                        field.onChange(tenantId);
-                        registerForm.setValue("leaseId", "");
-                      }}
-                    />
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="leaseId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("lease")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("selectLease")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {filteredLeases.map((lease) => (
-                          <SelectItem key={lease.id} value={lease.id}>
-                            {lease.lease_no}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <FormField
-                  control={registerForm.control}
-                  name="chequeNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.chequeNo}>{t("chequeNo")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="bankName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.bank}>{t("bank")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <FormField
-                  control={registerForm.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.amount}>
-                        {t("amount")} ({tCommon("currency")})
-                      </FormLabel>
-                      <FormControl>
-                        <NumberField step="any" {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="chequeDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
-                      <FormControl>
-                        <DatePicker {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {registerState.error ? (
-                <p
-                  role="alert"
-                  className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-                >
-                  {errors[registerState.error] ?? registerState.error}
-                </p>
-              ) : null}
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={() => setOpenRegister(false)}>
-                  {tCommon("cancel")}
-                </Button>
-                <Button type="submit" disabled={registerPending}>
-                  {t("registerCheque")}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Bounce reason modal */}
-      {bounceTarget ? (
-        <Dialog open onOpenChange={(next) => !next && setBounceTarget(null)}>
-          <DialogContent className="max-w-[33.6rem]">
-            <DialogHeader>
-              <DialogTitle>{t("bounceTitle", { no: bounceTarget.cheque_no })}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-6">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="bounce-reason">{t("bounceReason")}</Label>
-                <Input
-                  id="bounce-reason"
-                  value={bounceReason}
-                  onChange={(event) => setBounceReason(event.target.value)}
-                  placeholder={t("bounceReasonPlaceholder")}
-                />
-              </div>
-              <div className="flex items-center justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setBounceTarget(null)}
-                  disabled={isPending}
-                >
-                  {tCommon("cancel")}
-                </Button>
-                <Button type="submit" variant="destructive" disabled={isPending}>
-                  {t("confirmBounce")}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      ) : null}
-
-      {/* Replace modal */}
-      {replaceTarget ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <h2 className="font-headline-sm text-headline-sm text-on-surface">
-              {t("replaceTitle", { no: replaceTarget.cheque_no })}
-            </h2>
-            <Form {...replaceForm}>
-              <form
-                onSubmit={replaceForm.handleSubmit((values) => replaceDispatch(toFormData(values)))}
-                noValidate
-                className="mt-4 flex flex-col gap-6"
-              >
-                <FormField
-                  control={replaceForm.control}
-                  name="oldChequeId"
-                  render={({ field }) => <input type="hidden" {...field} />}
-                />
-                <FormField
-                  control={replaceForm.control}
-                  name="chequeNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.newChequeNo}>{t("newChequeNo")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={replaceForm.control}
-                  name="bankName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.newBankName}>{t("newBankName")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                  <FormField
-                    control={replaceForm.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel description={help.amount}>
-                          {t("amount")} ({tCommon("currency")})
-                        </FormLabel>
-                        <FormControl>
-                          <NumberField step="any" {...field} dir="ltr" />
-                        </FormControl>
-                        <LocalizedFormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={replaceForm.control}
-                    name="chequeDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
-                        <FormControl>
-                          <DatePicker {...field} dir="ltr" />
-                        </FormControl>
-                        <LocalizedFormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {replaceState.error ? (
-                  <p
-                    role="alert"
-                    className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-                  >
-                    {errors[replaceState.error] ?? replaceState.error}
-                  </p>
-                ) : null}
-
-                <div className="flex items-center justify-end gap-3">
-                  <Button type="button" variant="secondary" onClick={() => setReplaceTarget(null)}>
-                    {tCommon("cancel")}
-                  </Button>
-                  <Button type="submit" disabled={replacePending}>
-                    {t("createReplacement")}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
-        </div>
-      ) : null}
     </>
+  );
+}
+
+export function ChequeRegisterForm({
+  buildings,
+  leases,
+}: {
+  buildings: BuildingOption[];
+  leases: LeaseOption[];
+}) {
+  const t = useTranslations("cheques");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
+
+  const registerForm = useForm<RegisterValues>({
+    resolver: zodResolver(registerChequeSchema),
+    defaultValues: {
+      tenantId: "",
+      leaseId: "",
+      chequeNo: "",
+      bankName: "",
+      amount: "",
+      currency: "QAR",
+      chequeDate: new Date().toISOString().slice(0, 10),
+      notes: "",
+    },
+  });
+
+  const [registerState, registerDispatch, registerPending] = useActionState<ChequeState, FormData>(
+    async (prev, formData) => {
+      const res = await registerChequeAction(prev, formData);
+      if (res.ok) registerForm.reset();
+      return res;
+    },
+    {},
+  );
+
+  const selectedTenant = registerForm.watch("tenantId");
+  const filteredLeases = selectedTenant
+    ? leases.filter((l) => l.tenant_id === selectedTenant)
+    : leases;
+
+  return (
+    <Form {...registerForm}>
+      <form
+        onSubmit={registerForm.handleSubmit((values) => registerDispatch(toFormData(values)))}
+        noValidate
+        className="flex flex-col gap-6"
+      >
+        <FormField
+          control={registerForm.control}
+          name="tenantId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("tenant")}</FormLabel>
+              <BuildingTenantPicker
+                buildings={buildings}
+                value={field.value}
+                onChange={(tenantId) => {
+                  field.onChange(tenantId);
+                  registerForm.setValue("leaseId", "");
+                }}
+              />
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={registerForm.control}
+          name="leaseId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("lease")}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectLease")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {filteredLeases.map((lease) => (
+                    <SelectItem key={lease.id} value={lease.id}>
+                      {lease.lease_no}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <FormField
+            control={registerForm.control}
+            name="chequeNo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.chequeNo}>{t("chequeNo")}</FormLabel>
+                <FormControl>
+                  <Input {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={registerForm.control}
+            name="bankName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.bank}>{t("bank")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <FormField
+            control={registerForm.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.amount}>
+                  {t("amount")} ({tCommon("currency")})
+                </FormLabel>
+                <FormControl>
+                  <NumberField step="any" {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={registerForm.control}
+            name="chequeDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
+                <FormControl>
+                  <DatePicker {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {registerState.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[registerState.error] ?? registerState.error}
+          </p>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/cheques">{tCommon("cancel")}</Link>
+          </Button>
+          <Button type="submit" disabled={registerPending}>
+            {t("registerCheque")}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+export function ChequeBounceForm({ chequeId }: { chequeId: string }) {
+  const t = useTranslations("cheques");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+
+  const [isPending, startTransition] = useTransition();
+  const [state, setState] = useState<ChequeState>({});
+  const [reason, setReason] = useState("");
+
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setState({});
+    const formData = new FormData();
+    formData.set("chequeId", chequeId);
+    if (reason) formData.set("reason", reason);
+    startTransition(async () => setState(await bounceChequeAction({}, formData)));
+  };
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+      {state.error ? (
+        <p
+          role="alert"
+          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+        >
+          {errors[state.error] ?? state.error}
+        </p>
+      ) : null}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="bounce-reason">{t("bounceReason")}</Label>
+        <Input
+          id="bounce-reason"
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          placeholder={t("bounceReasonPlaceholder")}
+        />
+      </div>
+      <div className="flex items-center justify-end gap-3">
+        <Button type="button" variant="secondary" asChild>
+          <Link href="/cheques">{tCommon("cancel")}</Link>
+        </Button>
+        <Button type="submit" variant="destructive" disabled={isPending}>
+          {t("confirmBounce")}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+export function ChequeReplaceForm({ cheque }: { cheque: ChequeItem }) {
+  const t = useTranslations("cheques");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
+
+  const replaceForm = useForm<ReplaceValues>({
+    resolver: zodResolver(replaceChequeSchema),
+    defaultValues: {
+      oldChequeId: cheque.id,
+      chequeNo: "",
+      bankName: cheque.bank_name ?? "",
+      amount: (cheque.amount_minor / 100).toFixed(2),
+      currency: "QAR",
+      chequeDate: new Date().toISOString().slice(0, 10),
+      notes: "",
+    },
+  });
+
+  const [replaceState, replaceDispatch, replacePending] = useActionState<ChequeState, FormData>(
+    async (prev, formData) => {
+      const res = await replaceChequeAction(prev, formData);
+      return res;
+    },
+    {},
+  );
+
+  return (
+    <Form {...replaceForm}>
+      <form
+        onSubmit={replaceForm.handleSubmit((values) => replaceDispatch(toFormData(values)))}
+        noValidate
+        className="flex flex-col gap-6"
+      >
+        <FormField
+          control={replaceForm.control}
+          name="oldChequeId"
+          render={({ field }) => <input type="hidden" {...field} />}
+        />
+        <FormField
+          control={replaceForm.control}
+          name="chequeNo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.newChequeNo}>{t("newChequeNo")}</FormLabel>
+              <FormControl>
+                <Input {...field} dir="ltr" />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={replaceForm.control}
+          name="bankName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.newBankName}>{t("newBankName")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <FormField
+            control={replaceForm.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.amount}>
+                  {t("amount")} ({tCommon("currency")})
+                </FormLabel>
+                <FormControl>
+                  <NumberField step="any" {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={replaceForm.control}
+            name="chequeDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
+                <FormControl>
+                  <DatePicker {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {replaceState.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[replaceState.error] ?? replaceState.error}
+          </p>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-3">
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/cheques">{tCommon("cancel")}</Link>
+          </Button>
+          <Button type="submit" disabled={replacePending}>
+            {t("createReplacement")}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

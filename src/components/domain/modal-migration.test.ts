@@ -35,4 +35,10 @@ describe("form modal migration", () => {
       expect(source, name).not.toContain("fixed inset-0");
     }
   });
+
+  it("renders cheque forms outside a dialog or overlay", () => {
+    const source = readFileSync(join(DOMAIN, "cheque-table.tsx"), "utf8");
+    expect(source).not.toContain("@/components/ui/dialog");
+    expect(source).not.toContain("fixed inset-0");
+  });
 });
