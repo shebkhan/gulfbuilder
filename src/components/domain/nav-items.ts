@@ -3,6 +3,7 @@ import {
   BarChart3,
   Building2,
   ClipboardCheck,
+  ClipboardList,
   CreditCard,
   FileSignature,
   FileText,
@@ -27,6 +28,7 @@ export type NavItem = {
 /** Order follows the SPEC repository layout route groups. */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard, capability: "reports.read" },
+  { href: "/today", labelKey: "today", icon: ClipboardList, capability: "dailyTasks.read" },
   { href: "/buildings", labelKey: "properties", icon: Building2, capability: "properties.read" },
   { href: "/tenants", labelKey: "tenants", icon: Users, capability: "properties.read" },
   { href: "/leases", labelKey: "leases", icon: FileSignature, capability: "leases.write" },

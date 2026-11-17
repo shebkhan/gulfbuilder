@@ -32,6 +32,7 @@ type Capability =
   | "reports.read"
   | "statements.write"
   | "settings.write"
+  | "dailyTasks.read"
   | "platform.admin";
 
 const MATRIX: Record<Capability, readonly Role[]> = {
@@ -52,6 +53,7 @@ const MATRIX: Record<Capability, readonly Role[]> = {
   "reports.read": ["org_admin", "manager", "accountant", "owner"],
   "statements.write": ["org_admin", "accountant"],
   "settings.write": ["org_admin"],
+  "dailyTasks.read": ["manager", "caretaker"],
   "platform.admin": ["platform_admin"],
 };
 

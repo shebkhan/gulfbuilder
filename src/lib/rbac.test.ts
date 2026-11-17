@@ -17,6 +17,16 @@ describe("rbac", () => {
     expect(can(null, "reports.read")).toBe(false);
   });
 
+  it("grants dailyTasks.read only to managers and caretakers", () => {
+    expect(can("manager", "dailyTasks.read")).toBe(true);
+    expect(can("caretaker", "dailyTasks.read")).toBe(true);
+    expect(can("org_admin", "dailyTasks.read")).toBe(false);
+    expect(can("accountant", "dailyTasks.read")).toBe(false);
+    expect(can("owner", "dailyTasks.read")).toBe(false);
+    expect(can("tenant", "dailyTasks.read")).toBe(false);
+    expect(can("platform_admin", "dailyTasks.read")).toBe(false);
+  });
+
   it("narrows unknown role strings", () => {
     expect(isRole("manager")).toBe(true);
     expect(isRole("superuser")).toBe(false);
