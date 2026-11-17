@@ -35,7 +35,8 @@
     "daysLeft": "{count, plural, one {# day left} other {# days left}}",
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
     "daysLeftHeader": "Days left",
-    "relatedSections": "Related sections"
+    "relatedSections": "Related sections",
+    "cancel": "Cancel"
   },
   "validation": {
     "required": "This field is required",
@@ -591,7 +592,28 @@
       "cheque": "Cheque",
       "card": "Card",
       "online": "Online"
-    }
+    },
+    "help": {
+      "tenant": "Tenant this payment is received from.",
+      "lease": "Optional; links the receipt to a specific lease.",
+      "amount": "Amount received, in QAR.",
+      "method": "How the payment was received.",
+      "date": "Date the payment was received.",
+      "reference": "Transaction or cheque number, if any.",
+      "notes": "Optional internal note.",
+      "allocations": "Optionally split this payment across outstanding charges.",
+      "allocationAmount": "Amount to apply to this charge."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot record payments.",
+      "invalid_input": "Check the payment details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "invalid_allocations": "The allocation amounts are invalid.",
+      "payment_failed": "The payment could not be recorded."
+    },
+    "remaining": "Remaining: {amount}",
+    "dueOn": "Due: {date}"
   },
   "cheques": {
     "title": "Cheque Register",
@@ -621,6 +643,36 @@
       "bounced": "Bounced",
       "returned": "Returned",
       "replaced": "Replaced"
+    },
+    "actions": "Actions",
+    "selectTenant": "Select tenant",
+    "selectLease": "Select lease",
+    "bounceTitle": "Mark cheque #{no} as bounced",
+    "bounceReason": "Bounce reason",
+    "bounceReasonPlaceholder": "Insufficient funds / Signature mismatch",
+    "confirmBounce": "Confirm bounce",
+    "replaceTitle": "Replace bounced cheque #{no}",
+    "newChequeNo": "New cheque #",
+    "newBankName": "New bank name",
+    "createReplacement": "Create replacement",
+    "help": {
+      "chequeNo": "Cheque number as printed on the cheque.",
+      "bank": "Bank that issued the cheque.",
+      "amount": "Cheque value, in QAR.",
+      "chequeDate": "Post-dated cheques can be registered for a future date.",
+      "newChequeNo": "Number printed on the replacement cheque.",
+      "newBankName": "Bank that issued the replacement cheque."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage cheques.",
+      "invalid_input": "Check the cheque details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "cheque_registration_failed": "The cheque could not be registered.",
+      "deposit_failed": "The cheque could not be deposited.",
+      "clear_failed": "The cheque could not be cleared.",
+      "bounce_failed": "The cheque could not be marked as bounced.",
+      "replacement_failed": "The replacement cheque could not be created."
     }
   },
   "deposits": {
@@ -641,7 +693,26 @@
     "tenant": "Tenant",
     "lease": "Lease",
     "empty": "No security deposits on file.",
-    "transactions": "Deposit transactions"
+    "transactions": "Deposit transactions",
+    "activeEscrow": "Active escrow",
+    "settled": "Settled",
+    "tenantLine": "Tenant: {tenant} ({lease})",
+    "deductReasonPlaceholder": "Damage repairs / unpaid utility bills",
+    "refundReasonPlaceholder": "Lease concluded with full clearance",
+    "help": {
+      "deductAmount": "Amount to deduct from the held balance.",
+      "deductReason": "Why this amount is being deducted.",
+      "refundAmount": "Amount to return to the tenant; defaults to the full balance.",
+      "refundReason": "Optional note for the refund transaction."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage deposits.",
+      "invalid_input": "Check the deposit details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "deduction_failed": "The deduction could not be applied.",
+      "refund_failed": "The refund could not be processed."
+    }
   },
   "expenses": {
     "title": "Operating Expenses",
@@ -676,6 +747,27 @@
       "approved": "Approved",
       "paid": "Paid",
       "rejected": "Rejected"
+    },
+    "actions": "Actions",
+    "generalExpense": "General property expense",
+    "selectVendor": "Select vendor (optional)",
+    "descriptionPlaceholder": "AC Maintenance / Elevator Inspection",
+    "help": {
+      "category": "Expense category for reporting.",
+      "date": "Date on the invoice or receipt.",
+      "description": "Short description of what was purchased.",
+      "amount": "Expense amount, in QAR.",
+      "property": "Optional; leave blank for a general expense.",
+      "vendor": "Optional supplier for this expense."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot record expenses.",
+      "invalid_input": "Check the expense details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "expense_creation_failed": "The expense could not be recorded.",
+      "approval_failed": "The expense could not be approved.",
+      "payment_failed": "The expense could not be paid."
     }
   },
   "maintenance": {
@@ -1217,10 +1309,19 @@
     "otherLanguage": "النسخة العربية",
     "appName": "Gulf Property",
     "footer": "Generated by Gulf Property. Figures are in minor units converted at print time.",
-    "receipt": { "title": "Payment receipt" },
-    "statement": { "title": "Tenant statement" },
-    "ownerStatement": { "title": "Owner statement" },
-    "contract": { "title": "Lease contract", "landlord": "Landlord" },
+    "receipt": {
+      "title": "Payment receipt"
+    },
+    "statement": {
+      "title": "Tenant statement"
+    },
+    "ownerStatement": {
+      "title": "Owner statement"
+    },
+    "contract": {
+      "title": "Lease contract",
+      "landlord": "Landlord"
+    },
     "receiptNo": "Receipt no.",
     "pendingReceipt": "Pending confirmation",
     "tenant": "Tenant",

@@ -2,12 +2,33 @@
 
 import { ArrowRightLeft, Landmark, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useActionState, useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
+import { toFormData } from "@/lib/form-data";
 import { formatMoney } from "@/lib/money";
+import { registerChequeSchema, replaceChequeSchema } from "@/schemas/cheques";
 import {
   bounceChequeAction,
   clearChequeAction,
@@ -33,6 +54,27 @@ export type ChequeItem = {
 type TenantOption = { id: string; name: string };
 type LeaseOption = { id: string; lease_no: string; tenant_id: string };
 
+type RegisterValues = {
+  tenantId: string;
+  leaseId: string;
+  chequeNo: string;
+  bankName: string;
+  amount: string;
+  currency: string;
+  chequeDate: string;
+  notes?: string;
+};
+
+type ReplaceValues = {
+  oldChequeId: string;
+  chequeNo: string;
+  bankName: string;
+  amount: string;
+  currency: string;
+  chequeDate: string;
+  notes?: string;
+};
+
 export function ChequeTable({
   cheques,
   tenants,
@@ -47,88 +89,94 @@ export function ChequeTable({
   locale?: string;
 }) {
   const t = useTranslations("cheques");
-  const [isPending, startTransition] = useTransition();
-  const [state, setState] = useState<ChequeState>({});
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
 
-  // Modals
+  const [isPending, startTransition] = useTransition();
+  const [statusState, setStatusState] = useState<ChequeState>({});
   const [openRegister, setOpenRegister] = useState(false);
-  const [replaceTarget, setReplaceTarget] = useState<ChequeItem | null>(null);
   const [bounceTarget, setBounceTarget] = useState<ChequeItem | null>(null);
   const [bounceReason, setBounceReason] = useState("");
+  const [replaceTarget, setReplaceTarget] = useState<ChequeItem | null>(null);
 
-  // Register form state
-  const [selectedTenant, setSelectedTenant] = useState("");
-  const [selectedLease, setSelectedLease] = useState("");
-  const [chequeNo, setChequeNo] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [chequeDate, setChequeDate] = useState(new Date().toISOString().slice(0, 10));
-  const [notes, setNotes] = useState("");
+  const registerForm = useForm<RegisterValues>({
+    resolver: zodResolver(registerChequeSchema),
+    defaultValues: {
+      tenantId: "",
+      leaseId: "",
+      chequeNo: "",
+      bankName: "",
+      amount: "",
+      currency: "QAR",
+      chequeDate: new Date().toISOString().slice(0, 10),
+      notes: "",
+    },
+  });
 
-  // Replace form state
-  const [newChequeNo, setNewChequeNo] = useState("");
-  const [newBankName, setNewBankName] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [newChequeDate, setNewChequeDate] = useState(new Date().toISOString().slice(0, 10));
-
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    setState({});
-    const formData = new FormData();
-    formData.set("tenantId", selectedTenant);
-    formData.set("leaseId", selectedLease);
-    formData.set("chequeNo", chequeNo);
-    formData.set("bankName", bankName);
-    formData.set("amount", amount);
-    formData.set("chequeDate", chequeDate);
-    if (notes) formData.set("notes", notes);
-
-    startTransition(async () => {
-      const res = await registerChequeAction({}, formData);
-      setState(res);
+  const [registerState, registerDispatch, registerPending] = useActionState<ChequeState, FormData>(
+    async (prev, formData) => {
+      const res = await registerChequeAction(prev, formData);
       if (res.ok) {
         setOpenRegister(false);
-        setChequeNo("");
-        setBankName("");
-        setAmount("");
-        setNotes("");
+        registerForm.reset();
       }
-    });
-  };
+      return res;
+    },
+    {},
+  );
+
+  const replaceForm = useForm<ReplaceValues>({
+    resolver: zodResolver(replaceChequeSchema),
+    defaultValues: {
+      oldChequeId: "",
+      chequeNo: "",
+      bankName: "",
+      amount: "",
+      currency: "QAR",
+      chequeDate: new Date().toISOString().slice(0, 10),
+      notes: "",
+    },
+  });
+
+  const [replaceState, replaceDispatch, replacePending] = useActionState<ChequeState, FormData>(
+    async (prev, formData) => {
+      const res = await replaceChequeAction(prev, formData);
+      if (res.ok) setReplaceTarget(null);
+      return res;
+    },
+    {},
+  );
+
+  const selectedTenant = registerForm.watch("tenantId");
+  const filteredLeases = selectedTenant
+    ? leases.filter((l) => l.tenant_id === selectedTenant)
+    : leases;
 
   const handleDeposit = (chequeId: string) => {
-    setState({});
+    setStatusState({});
     const formData = new FormData();
     formData.set("chequeId", chequeId);
-
-    startTransition(async () => {
-      const res = await depositChequeAction({}, formData);
-      setState(res);
-    });
+    startTransition(async () => setStatusState(await depositChequeAction({}, formData)));
   };
 
   const handleClear = (chequeId: string) => {
-    setState({});
+    setStatusState({});
     const formData = new FormData();
     formData.set("chequeId", chequeId);
-
-    startTransition(async () => {
-      const res = await clearChequeAction({}, formData);
-      setState(res);
-    });
+    startTransition(async () => setStatusState(await clearChequeAction({}, formData)));
   };
 
-  const handleBounceSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBounceSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (!bounceTarget) return;
-    setState({});
+    setStatusState({});
     const formData = new FormData();
     formData.set("chequeId", bounceTarget.id);
     if (bounceReason) formData.set("reason", bounceReason);
-
     startTransition(async () => {
       const res = await bounceChequeAction({}, formData);
-      setState(res);
+      setStatusState(res);
       if (res.ok) {
         setBounceTarget(null);
         setBounceReason("");
@@ -136,32 +184,18 @@ export function ChequeTable({
     });
   };
 
-  const handleReplaceSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!replaceTarget) return;
-    setState({});
-    const formData = new FormData();
-    formData.set("oldChequeId", replaceTarget.id);
-    formData.set("chequeNo", newChequeNo);
-    formData.set("bankName", newBankName);
-    formData.set("amount", newAmount);
-    formData.set("chequeDate", newChequeDate);
-
-    startTransition(async () => {
-      const res = await replaceChequeAction({}, formData);
-      setState(res);
-      if (res.ok) {
-        setReplaceTarget(null);
-        setNewChequeNo("");
-        setNewBankName("");
-        setNewAmount("");
-      }
+  const openReplace = (cheque: ChequeItem) => {
+    replaceForm.reset({
+      oldChequeId: cheque.id,
+      chequeNo: "",
+      bankName: cheque.bank_name ?? "",
+      amount: (cheque.amount_minor / 100).toFixed(2),
+      currency: "QAR",
+      chequeDate: new Date().toISOString().slice(0, 10),
+      notes: "",
     });
+    setReplaceTarget(cheque);
   };
-
-  const filteredLeases = selectedTenant
-    ? leases.filter((l) => l.tenant_id === selectedTenant)
-    : leases;
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -181,18 +215,20 @@ export function ChequeTable({
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {state.error && (
-          <div className="w-full rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container">
-            {state.error}
-          </div>
-        )}
-        <div />
-        {writable && (
+        {statusState.error ? (
+          <p
+            role="alert"
+            className="w-full rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[statusState.error] ?? statusState.error}
+          </p>
+        ) : null}
+        {writable ? (
           <Button onClick={() => setOpenRegister(true)} className="flex items-center gap-2">
             <Plus className="size-4" />
             {t("registerCheque")}
           </Button>
-        )}
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
@@ -213,69 +249,71 @@ export function ChequeTable({
                   <th className="p-4 text-start">{t("dueDate")}</th>
                   <th className="p-4 text-start">{t("status")}</th>
                   <th className="p-4 text-end">{t("amount")}</th>
-                  {writable && <th className="p-4 text-center">Actions</th>}
+                  {writable ? <th className="p-4 text-center">{t("actions")}</th> : null}
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
-                {cheques.map((c) => (
-                  <tr key={c.id} className="transition-colors hover:bg-surface-container-low/50">
-                    <td className="p-4 font-mono font-semibold text-primary">{c.cheque_no}</td>
-                    <td className="p-4 text-on-surface">{c.bank_name || "—"}</td>
+                {cheques.map((cheque) => (
+                  <tr key={cheque.id} className="transition-colors hover:bg-surface-container-low/50">
+                    <td className="p-4 font-mono font-semibold text-primary">{cheque.cheque_no}</td>
+                    <td className="p-4 text-on-surface">{cheque.bank_name || "—"}</td>
                     <td className="p-4 font-medium text-on-surface">
-                      {c.tenant ? (
+                      {cheque.tenant ? (
                         <Link
-                          href={`/tenants/${c.tenant.id}`}
+                          href={`/tenants/${cheque.tenant.id}`}
                           className="hover:text-primary hover:underline"
                         >
-                          {c.tenant.full_name}
+                          {cheque.tenant.full_name}
                         </Link>
                       ) : (
                         "—"
                       )}
                     </td>
                     <td className="p-4 text-on-surface-variant">
-                      {c.lease ? (
+                      {cheque.lease ? (
                         <Link
-                          href={`/leases/${c.lease.id}`}
+                          href={`/leases/${cheque.lease.id}`}
                           className="font-mono hover:text-primary hover:underline"
                         >
-                          {c.lease.lease_no}
+                          {cheque.lease.lease_no}
                         </Link>
                       ) : (
                         "—"
                       )}
                     </td>
-                    <td className="p-4 text-on-surface-variant">{c.cheque_date}</td>
+                    <td className="p-4 text-on-surface-variant" dir="ltr">
+                      {cheque.cheque_date}
+                    </td>
                     <td className="p-4">
-                      <Badge variant={getStatusBadgeVariant(c.status)}>
-                        {t(`statuses.${c.status}` as never)}
+                      <Badge variant={getStatusBadgeVariant(cheque.status)}>
+                        {t(`statuses.${cheque.status}` as never)}
                       </Badge>
-                      {c.bounce_reason && (
-                        <p className="mt-0.5 text-[11px] text-error">{c.bounce_reason}</p>
-                      )}
+                      {cheque.bounce_reason ? (
+                        <p className="mt-0.5 text-[11px] text-error">{cheque.bounce_reason}</p>
+                      ) : null}
                     </td>
                     <td className="p-4 text-end font-semibold text-on-surface">
-                      {formatMoney(BigInt(c.amount_minor), c.currency, locale)}
+                      {formatMoney(BigInt(cheque.amount_minor), cheque.currency, locale)}
                     </td>
-                    {writable && (
+                    {writable ? (
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          {c.status === "received" && (
+                          {cheque.status === "received" ? (
                             <Button
                               size="sm"
                               variant="secondary"
-                              onClick={() => handleDeposit(c.id)}
+                              onClick={() => handleDeposit(cheque.id)}
                               disabled={isPending}
                             >
                               {t("deposit")}
                             </Button>
-                          )}
-                          {c.status === "deposited" && (
+                          ) : null}
+                          {cheque.status === "deposited" ? (
                             <>
                               <Button
                                 size="sm"
                                 variant="primary"
-                                onClick={() => handleClear(c.id)}
+                                onClick={() => handleClear(cheque.id)}
                                 disabled={isPending}
                               >
                                 {t("clear")}
@@ -284,7 +322,7 @@ export function ChequeTable({
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => {
-                                  setBounceTarget(c);
+                                  setBounceTarget(cheque);
                                   setBounceReason("");
                                 }}
                                 disabled={isPending}
@@ -292,25 +330,21 @@ export function ChequeTable({
                                 {t("bounce")}
                               </Button>
                             </>
-                          )}
-                          {c.status === "bounced" && (
+                          ) : null}
+                          {cheque.status === "bounced" ? (
                             <Button
                               size="sm"
                               variant="secondary"
-                              onClick={() => {
-                                setReplaceTarget(c);
-                                setNewBankName(c.bank_name || "");
-                                setNewAmount((c.amount_minor / 100).toFixed(2));
-                              }}
+                              onClick={() => openReplace(cheque)}
                               disabled={isPending}
                             >
                               <ArrowRightLeft className="me-1 size-3.5" />
                               {t("replace")}
                             </Button>
-                          )}
+                          ) : null}
                         </div>
                       </td>
-                    )}
+                    ) : null}
                   </tr>
                 ))}
               </tbody>
@@ -319,154 +353,175 @@ export function ChequeTable({
         )}
       </div>
 
-      {/* Register Modal */}
+      {/* Register modal */}
       <Dialog open={openRegister} onOpenChange={setOpenRegister}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{t("register")}</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleRegister} className="mt-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("tenant")} *
-              </label>
-              <select
-                required
-                value={selectedTenant}
-                onChange={(e) => {
-                  setSelectedTenant(e.target.value);
-                  setSelectedLease("");
-                }}
-                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-              >
-                <option value="">Select tenant</option>
-                {tenants.map((ten) => (
-                  <option key={ten.id} value={ten.id}>
-                    {ten.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <Form {...registerForm}>
+            <form
+              onSubmit={registerForm.handleSubmit((values) => registerDispatch(toFormData(values)))}
+              noValidate
+              className="mt-4 flex flex-col gap-4"
+            >
+              <FormField
+                control={registerForm.control}
+                name="tenantId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("tenant")}</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        registerForm.setValue("leaseId", "");
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("selectTenant")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {tenants.map((tenant) => (
+                          <SelectItem key={tenant.id} value={tenant.id}>
+                            {tenant.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("lease")} *
-              </label>
-              <select
-                required
-                value={selectedLease}
-                onChange={(e) => setSelectedLease(e.target.value)}
-                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-              >
-                <option value="">Select lease</option>
-                {filteredLeases.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.lease_no}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <FormField
+                control={registerForm.control}
+                name="leaseId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("lease")}</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("selectLease")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {filteredLeases.map((lease) => (
+                          <SelectItem key={lease.id} value={lease.id}>
+                            {lease.lease_no}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("chequeNo")} *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={chequeNo}
-                  onChange={(e) => setChequeNo(e.target.value)}
-                  placeholder="000123"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={registerForm.control}
+                  name="chequeNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("chequeNo")}</FormLabel>
+                      <FormControl>
+                        <Input {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.chequeNo}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="bankName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("bank")}</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>{help.bank}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("bank")} *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
-                  placeholder="QNB / CBQ / QIB"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amount")} (QAR) *
-                </label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={registerForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.amount}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="chequeDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("dueDate")}</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.chequeDate}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("dueDate")} *
-                </label>
-                <input
-                  required
-                  type="date"
-                  value={chequeDate}
-                  onChange={(e) => setChequeDate(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                />
-              </div>
-            </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setOpenRegister(false)}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {t("registerCheque")}
-              </Button>
-            </div>
-          </form>
+              {registerState.error ? (
+                <p
+                  role="alert"
+                  className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+                >
+                  {errors[registerState.error] ?? registerState.error}
+                </p>
+              ) : null}
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button type="button" variant="secondary" onClick={() => setOpenRegister(false)}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button type="submit" disabled={registerPending}>
+                  {t("registerCheque")}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
-      {/* Bounce Reason Modal */}
-      {bounceTarget && (
-        <Dialog
-          open
-          onOpenChange={(next) => {
-            if (!next) setBounceTarget(null);
-          }}
-        >
+      {/* Bounce reason modal */}
+      {bounceTarget ? (
+        <Dialog open onOpenChange={(next) => !next && setBounceTarget(null)}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Mark Cheque #{bounceTarget.cheque_no} as Bounced</DialogTitle>
+              <DialogTitle>{t("bounceTitle", { no: bounceTarget.cheque_no })}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Bounce Reason
+                  {t("bounceReason")}
                 </label>
-                <input
-                  type="text"
+                <Input
                   value={bounceReason}
-                  onChange={(e) => setBounceReason(e.target.value)}
-                  placeholder="Insufficient funds / Signature mismatch"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                  onChange={(event) => setBounceReason(event.target.value)}
+                  placeholder={t("bounceReasonPlaceholder")}
                 />
               </div>
               <div className="flex items-center justify-end gap-3">
@@ -476,94 +531,122 @@ export function ChequeTable({
                   onClick={() => setBounceTarget(null)}
                   disabled={isPending}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" variant="destructive" disabled={isPending}>
-                  Confirm Bounce
+                  {t("confirmBounce")}
                 </Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
-      )}
+      ) : null}
 
-      {/* Replace Cheque Modal */}
-      {replaceTarget && (
+      {/* Replace modal */}
+      {replaceTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
             <h2 className="font-headline-sm text-headline-sm text-on-surface">
-              Replace Bounced Cheque #{replaceTarget.cheque_no}
+              {t("replaceTitle", { no: replaceTarget.cheque_no })}
             </h2>
-            <form onSubmit={handleReplaceSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  New Cheque # *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={newChequeNo}
-                  onChange={(e) => setNewChequeNo(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+            <Form {...replaceForm}>
+              <form
+                onSubmit={replaceForm.handleSubmit((values) =>
+                  replaceDispatch(toFormData(values)),
+                )}
+                noValidate
+                className="mt-4 flex flex-col gap-4"
+              >
+                <FormField
+                  control={replaceForm.control}
+                  name="oldChequeId"
+                  render={({ field }) => <input type="hidden" {...field} />}
                 />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  New Bank Name *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={newBankName}
-                  onChange={(e) => setNewBankName(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                <FormField
+                  control={replaceForm.control}
+                  name="chequeNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("newChequeNo")}</FormLabel>
+                      <FormControl>
+                        <Input {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.newChequeNo}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    Amount (QAR) *
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={newAmount}
-                    onChange={(e) => setNewAmount(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                <FormField
+                  control={replaceForm.control}
+                  name="bankName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("newBankName")}</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>{help.newBankName}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={replaceForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="any" {...field} dir="ltr" />
+                        </FormControl>
+                        <FormDescription>{help.amount}</FormDescription>
+                        <LocalizedFormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={replaceForm.control}
+                    name="chequeDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("dueDate")}</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} dir="ltr" />
+                        </FormControl>
+                        <FormDescription>{help.chequeDate}</FormDescription>
+                        <LocalizedFormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    Due Date *
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    value={newChequeDate}
-                    onChange={(e) => setNewChequeDate(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
+
+                {replaceState.error ? (
+                  <p
+                    role="alert"
+                    className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+                  >
+                    {errors[replaceState.error] ?? replaceState.error}
+                  </p>
+                ) : null}
+
+                <div className="flex items-center justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setReplaceTarget(null)}
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                  <Button type="submit" disabled={replacePending}>
+                    {t("createReplacement")}
+                  </Button>
                 </div>
-              </div>
-              <div className="flex items-center justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setReplaceTarget(null)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  Create Replacement
-                </Button>
-              </div>
-            </form>
+              </form>
+            </Form>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

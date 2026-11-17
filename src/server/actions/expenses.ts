@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { createExpenseSchema } from "@/schemas/expenses";
 import { getOrgContext } from "@/server/org-context";
 
 export type ExpenseState = {
@@ -11,18 +11,6 @@ export type ExpenseState = {
   ok?: string;
   expenseId?: string;
 };
-
-const createExpenseSchema = z.object({
-  category: z.string().trim().min(1).max(50),
-  description: z.string().trim().min(1).max(300),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  expenseDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  vendorId: z.string().uuid().optional().or(z.literal("")),
-  buildingId: z.string().uuid().optional().or(z.literal("")),
-  unitId: z.string().uuid().optional().or(z.literal("")),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-});
 
 function fail(error: string): ExpenseState {
   return { error };

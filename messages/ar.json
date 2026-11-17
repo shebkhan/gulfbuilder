@@ -35,7 +35,8 @@
     "daysLeft": "{count, plural, zero {اليوم} one {يوم واحد متبقٍ} two {يومان متبقيان} few {# أيام متبقية} many {# يوماً متبقياً} other {# يوم متبقي}}",
     "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
     "daysLeftHeader": "الأيام المتبقية",
-    "relatedSections": "أقسام ذات صلة"
+    "relatedSections": "أقسام ذات صلة",
+    "cancel": "إلغاء"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -591,7 +592,28 @@
       "cheque": "شيك",
       "card": "بطاقة دفع",
       "online": "دفع إلكتروني"
-    }
+    },
+    "help": {
+      "tenant": "المستأجر الذي تم استلام الدفعة منه.",
+      "lease": "اختياري؛ يربط الإيصال بعقد محدد.",
+      "amount": "المبلغ المستلم بالريال القطري.",
+      "method": "طريقة استلام الدفعة.",
+      "date": "تاريخ استلام الدفعة.",
+      "reference": "رقم العملية أو الشيك إن وُجد.",
+      "notes": "ملاحظة داخلية اختيارية.",
+      "allocations": "يمكن توزيع الدفعة على الفواتير المستحقة.",
+      "allocationAmount": "المبلغ المخصص لهذه الفاتورة."
+    },
+    "errors": {
+      "not_authorised": "دورك لا يسمح بتسجيل الدفعات.",
+      "invalid_input": "تحقق من بيانات الدفعة.",
+      "amount_must_be_positive": "يجب أن يكون المبلغ أكبر من صفر.",
+      "invalid_amount": "أدخل مبلغًا صالحًا.",
+      "invalid_allocations": "مبالغ التوزيع غير صالحة.",
+      "payment_failed": "تعذّر تسجيل الدفعة."
+    },
+    "remaining": "المتبقي: {amount}",
+    "dueOn": "الاستحقاق: {date}"
   },
   "cheques": {
     "title": "سجل الشيكات",
@@ -621,6 +643,36 @@
       "bounced": "مرتجع",
       "returned": "مسترجع للمستأجر",
       "replaced": "مستبدل"
+    },
+    "actions": "الإجراءات",
+    "selectTenant": "اختر المستأجر",
+    "selectLease": "اختر العقد",
+    "bounceTitle": "تحديد الشيك رقم {no} كمرتد",
+    "bounceReason": "سبب الارتداد",
+    "bounceReasonPlaceholder": "رصيد غير كافٍ / عدم تطابق التوقيع",
+    "confirmBounce": "تأكيد الارتداد",
+    "replaceTitle": "استبدال الشيك المرتد رقم {no}",
+    "newChequeNo": "رقم الشيك الجديد",
+    "newBankName": "اسم البنك الجديد",
+    "createReplacement": "إنشاء بديل",
+    "help": {
+      "chequeNo": "رقم الشيك كما هو مطبوع عليه.",
+      "bank": "البنك المُصدر للشيك.",
+      "amount": "قيمة الشيك بالريال القطري.",
+      "chequeDate": "يمكن تسجيل الشيكات المؤجلة بتاريخ لاحق.",
+      "newChequeNo": "الرقم المطبوع على الشيك البديل.",
+      "newBankName": "البنك المُصدر للشيك البديل."
+    },
+    "errors": {
+      "not_authorised": "دورك لا يسمح بإدارة الشيكات.",
+      "invalid_input": "تحقق من بيانات الشيك.",
+      "amount_must_be_positive": "يجب أن يكون المبلغ أكبر من صفر.",
+      "invalid_amount": "أدخل مبلغًا صالحًا.",
+      "cheque_registration_failed": "تعذّر تسجيل الشيك.",
+      "deposit_failed": "تعذّر إيداع الشيك.",
+      "clear_failed": "تعذّر تحصيل الشيك.",
+      "bounce_failed": "تعذّر تحديد الشيك كمرتد.",
+      "replacement_failed": "تعذّر إنشاء الشيك البديل."
     }
   },
   "deposits": {
@@ -641,7 +693,26 @@
     "tenant": "المستأجر",
     "lease": "العقد",
     "empty": "لا توجد مبالغ تأمين مسجلة.",
-    "transactions": "حركات التأمين"
+    "transactions": "حركات التأمين",
+    "activeEscrow": "ضمان نشط",
+    "settled": "مسوّى",
+    "tenantLine": "المستأجر: {tenant} ({lease})",
+    "deductReasonPlaceholder": "أعمال إصلاح / فواتير مرافق غير مدفوعة",
+    "refundReasonPlaceholder": "انتهاء العقد مع تسوية كاملة",
+    "help": {
+      "deductAmount": "المبلغ المخصوم من الرصيد المحتجز.",
+      "deductReason": "سبب خصم هذا المبلغ.",
+      "refundAmount": "المبلغ المردود للمستأجر؛ يُستخدم الرصيد الكامل افتراضيًا.",
+      "refundReason": "ملاحظة اختيارية لعملية الرد."
+    },
+    "errors": {
+      "not_authorised": "دورك لا يسمح بإدارة الضمانات.",
+      "invalid_input": "تحقق من بيانات الضمان.",
+      "amount_must_be_positive": "يجب أن يكون المبلغ أكبر من صفر.",
+      "invalid_amount": "أدخل مبلغًا صالحًا.",
+      "deduction_failed": "تعذّر تطبيق الخصم.",
+      "refund_failed": "تعذّر تنفيذ الرد."
+    }
   },
   "expenses": {
     "title": "المصروفات التشغيلية",
@@ -676,6 +747,27 @@
       "approved": "معتمد",
       "paid": "مدفوع",
       "rejected": "مرفوض"
+    },
+    "actions": "الإجراءات",
+    "generalExpense": "مصروف عام للعقار",
+    "selectVendor": "اختر المورد (اختياري)",
+    "descriptionPlaceholder": "صيانة تكييف / فحص مصعد",
+    "help": {
+      "category": "تصنيف المصروف للتقارير.",
+      "date": "التاريخ على الفاتورة أو الإيصال.",
+      "description": "وصف مختصر لما تم شراؤه.",
+      "amount": "قيمة المصروف بالريال القطري.",
+      "property": "اختياري؛ اتركه فارغًا للمصروف العام.",
+      "vendor": "المورد الاختياري لهذا المصروف."
+    },
+    "errors": {
+      "not_authorised": "دورك لا يسمح بتسجيل المصروفات.",
+      "invalid_input": "تحقق من بيانات المصروف.",
+      "amount_must_be_positive": "يجب أن يكون المبلغ أكبر من صفر.",
+      "invalid_amount": "أدخل مبلغًا صالحًا.",
+      "expense_creation_failed": "تعذّر تسجيل المصروف.",
+      "approval_failed": "تعذّر اعتماد المصروف.",
+      "payment_failed": "تعذّر دفع المصروف."
     }
   },
   "maintenance": {
@@ -1217,10 +1309,19 @@
     "otherLanguage": "English version",
     "appName": "عقارات الخليج",
     "footer": "تم إنشاؤه بواسطة عقارات الخليج. المبالغ محوّلة من الوحدات الصغرى وقت الطباعة.",
-    "receipt": { "title": "إيصال دفع" },
-    "statement": { "title": "كشف حساب المستأجر" },
-    "ownerStatement": { "title": "كشف حساب المالك" },
-    "contract": { "title": "عقد الإيجار", "landlord": "المؤجر" },
+    "receipt": {
+      "title": "إيصال دفع"
+    },
+    "statement": {
+      "title": "كشف حساب المستأجر"
+    },
+    "ownerStatement": {
+      "title": "كشف حساب المالك"
+    },
+    "contract": {
+      "title": "عقد الإيجار",
+      "landlord": "المؤجر"
+    },
     "receiptNo": "رقم الإيصال",
     "pendingReceipt": "بانتظار التأكيد",
     "tenant": "المستأجر",
