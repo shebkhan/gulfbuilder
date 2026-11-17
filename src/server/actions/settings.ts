@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { randomBytes } from "node:crypto";
+import { randomInt } from "node:crypto";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
@@ -248,9 +248,25 @@ export async function generateTelegramLinkCodeAction(
   const ctx = await getOrgContext();
   if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
 
-  // Six digits, one per random byte mod 10.
-  const code = Array.from(randomBytes(6), (byte) => String(byte % 10)).join("");
-  const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  // Retry until we draw a code no unexpired profile is already using, so two
+  // people cannot link with the same code inside the 10-minute window.
+  const now = new Date();
+  const expires = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
+  let code: string | null = null;
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const candidate = String(randomInt(0, 1_000_000)).padStart(6, "0");
+    const { data: clash } = await ctx.supabase
+      .from("profiles")
+      .select("id")
+      .eq("telegram_link_code", candidate)
+      .gt("telegram_link_expires_at", now.toISOString())
+      .limit(1);
+    if (!clash?.length) {
+      code = candidate;
+      break;
+    }
+  }
+  if (!code) return fail("failed");
 
   const { error } = await ctx.supabase
     .from("profiles")

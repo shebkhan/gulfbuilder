@@ -48,6 +48,16 @@ export async function linkTelegramCodes(admin: SupabaseClient): Promise<number> 
     const message = update.message;
     const code = message ? parseStartCode(message.text ?? "") : null;
     if (!code || !message) continue;
+    // Pick one candidate: a code must never link more than one profile.
+    const { data: candidates } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("telegram_link_code", code)
+      .gt("telegram_link_expires_at", now)
+      .limit(1);
+    const targetId = candidates?.[0]?.id;
+    if (!targetId) continue;
+    // Re-check code and expiry on update so a concurrent poll cannot re-link it.
     const { data, error } = await admin
       .from("profiles")
       .update({
@@ -55,6 +65,7 @@ export async function linkTelegramCodes(admin: SupabaseClient): Promise<number> 
         telegram_link_code: null,
         telegram_link_expires_at: null,
       })
+      .eq("id", targetId)
       .eq("telegram_link_code", code)
       .gt("telegram_link_expires_at", now)
       .select("id");
