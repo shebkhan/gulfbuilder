@@ -61,6 +61,7 @@ export function SidebarNav({ items }: { items: SidebarItem[] }) {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={true}
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md transition-all",

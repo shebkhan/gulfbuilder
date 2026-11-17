@@ -50,7 +50,14 @@ export default async function LocaleLayout({
 
   // White-label branding (SPEC §10): the middleware resolved the organization from the
   // request host and passed its branding along in the `x-brand` header.
-  const brand = decodeBrand((await headers()).get("x-brand"));
+  // Wrapped safely so static prerendering at build time does not fail when headers are unavailable.
+  let brandHeader: string | null = null;
+  try {
+    brandHeader = (await headers()).get("x-brand");
+  } catch {
+    brandHeader = null;
+  }
+  const brand = decodeBrand(brandHeader);
   const messages = applyTerminology(await getMessages(), brand?.terminology);
 
   const brandStyle = brand

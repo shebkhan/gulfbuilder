@@ -8,6 +8,20 @@ const nextConfig: NextConfig = {
   // `next dev` and `next build` share one output folder, so a build while a dev server is
   // running leaves the dev server with a stale route manifest. NEXT_DIST_DIR keeps them apart.
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "recharts",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-label",
+      "@radix-ui/react-radio-group",
+      "@radix-ui/react-select",
+      "@radix-ui/react-slider",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tabs",
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

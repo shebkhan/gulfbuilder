@@ -7,6 +7,16 @@ export type Paginated<T> = {
   total: number;
 };
 
+/**
+ * Returns zero-indexed [from, to] range boundaries for SQL / Supabase `.range(from, to)`.
+ */
+export function getPaginationRange(page: number, pageSize = PAGE_SIZE): { from: number; to: number } {
+  const current = Math.max(1, Math.trunc(page) || 1);
+  const from = (current - 1) * pageSize;
+  const to = from + pageSize - 1;
+  return { from, to };
+}
+
 /** Slices a list for the requested page. Page numbers are clamped to the list. */
 export function paginate<T>(rows: T[], page: number, pageSize = PAGE_SIZE): Paginated<T> {
   const total = rows.length;

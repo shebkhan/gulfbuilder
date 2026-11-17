@@ -2,16 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -26,6 +17,16 @@ import {
 import { useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/money";
 import { getCashFlowForecast, ForecastInput, ForecastResponse } from "@/server/actions/forecast";
+
+const CashFlowChart = dynamic(
+  () => import("@/components/domain/reports/cash-flow-chart"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-80 w-full animate-pulse rounded-xl bg-surface-container-low" />
+    ),
+  },
+);
 
 export default function CashFlowForecastPage() {
   const t = useTranslations("Reports.CashFlowForecast");
@@ -220,39 +221,12 @@ export default function CashFlowForecastPage() {
           <p className="text-muted-foreground text-sm">{t("chart.description")}</p>
         </CardHeader>
         <CardBody>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="month" stroke="#6b7280" />
-                <YAxis
-                  stroke="#6b7280"
-                  tickFormatter={(value) => `${t("currency.QAR")} ${Number(value) / 100}`}
-                />
-                <Tooltip
-                  formatter={(value) => [
-                    `${t("currency.QAR")} ${Number(value) / 100}`,
-                    t("chart.net"),
-                  ]}
-                  labelFormatter={(label) => `${t("chart.month")}: ${label}`}
-                />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="net"
-                  stroke="#3b82f6"
-                  fill="url(#colorNet)"
-                  name={t("chart.net")}
-                />
-                <defs>
-                  <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <CashFlowChart
+            data={chartData}
+            currencyLabel={t("currency.QAR")}
+            netLabel={t("chart.net")}
+            monthLabel={t("chart.month")}
+          />
         </CardBody>
       </Card>
 

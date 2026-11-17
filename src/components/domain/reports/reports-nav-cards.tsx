@@ -10,6 +10,7 @@ import {
   FileSignature,
   Clock,
   Receipt,
+  TrendingUp,
   ArrowRight,
 } from "lucide-react";
 
@@ -17,6 +18,13 @@ export async function ReportsNavCards() {
   const t = await getTranslations("reports");
 
   const reportsList = [
+    {
+      href: "/reports/cash-flow-forecast",
+      title: t("cashFlowForecast"),
+      description: t("cashFlowForecastDesc"),
+      icon: TrendingUp,
+      color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+    },
     {
       href: "/reports/occupancy",
       title: t("occupancy"),

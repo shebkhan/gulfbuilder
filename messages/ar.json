@@ -1041,7 +1041,9 @@
       "activeAnnualizedPipeline": "مسار نشط سنويًا",
       "collectionsLessExpenses": "التحصيلات مطروحًا منها المصروفات",
       "agedOutstanding": "المستحقات المتأخرة"
-    }
+    },
+    "cashFlowForecast": "توقعات التدفق النقدي",
+    "cashFlowForecastDesc": "التدفقات النقدية المتوقعة، نمذجة السيناريوهات، معدل التجديد وافتراضات مقاصة الشيكات."
   },
   "portal": {
     "nav": {

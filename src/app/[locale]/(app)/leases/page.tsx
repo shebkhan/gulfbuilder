@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, type Paginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -49,7 +49,10 @@ export default async function LeasesPage({
     .is("deleted_at", null)
     .order("code");
 
-  // Fetch leases
+  // Fetch leases with SQL-level pagination
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
   let query = ctx.supabase
     .from("leases")
     .select(
@@ -66,6 +69,7 @@ export default async function LeasesPage({
       tenants!inner ( id, full_name ),
       units ( id, unit_no, building_id, buildings ( id, code, name ) )
     `,
+      { count: "exact" },
     )
     .order("start_date", { ascending: false });
 
@@ -83,9 +87,16 @@ export default async function LeasesPage({
     query = query.eq("status", "active").gte("end_date", today).lte("end_date", in30Days);
   }
 
-  const { data: leases } = await query;
+  const { data: leases, count: totalCount } = await query.range(from, to);
 
-  const paged = paginate(leases ?? [], Number(page ?? 1));
+  const total = totalCount ?? (leases?.length ?? 0);
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const paged: Paginated<NonNullable<typeof leases>[number]> = {
+    rows: leases ?? [],
+    page: currentPage,
+    pages,
+    total,
+  };
 
   const getStatusVariant = (s: string) => {
     switch (s) {

@@ -1041,7 +1041,9 @@
       "activeAnnualizedPipeline": "Active annualized pipeline",
       "collectionsLessExpenses": "Collections less expenses",
       "agedOutstanding": "Aged outstanding"
-    }
+    },
+    "cashFlowForecast": "Cash Flow Forecast",
+    "cashFlowForecastDesc": "Projected net cash flows, scenario modeling, renewal rate, and PDC clearance assumptions."
   },
   "portal": {
     "nav": {
