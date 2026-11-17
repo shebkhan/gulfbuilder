@@ -17,6 +17,14 @@ const STATUS_VARIANT: Record<string, "warning" | "success" | "info" | "danger"> 
   maintenance: "danger",
 };
 
+// Same token pairs as Badge success/warning/info/danger: green, yellow, blue, red.
+const STATUS_CHIP: Record<string, string> = {
+  vacant: "border-primary-fixed bg-primary-fixed/50 text-on-primary-fixed-variant",
+  occupied: "border-secondary-container bg-secondary-container/60 text-on-secondary-container",
+  reserved: "border-tertiary-fixed bg-tertiary-fixed/60 text-on-tertiary-container",
+  maintenance: "border-error-container bg-error-container text-on-error-container",
+};
+
 export default async function BuildingPage({
   params,
 }: {
@@ -181,7 +189,11 @@ export default async function BuildingPage({
                           key={unit.id}
                           href={`/units/${unit.id}`}
                           title={`${unit.unit_no} · ${t(`statuses.${unit.status}`)}`}
-                          className="flex h-7 min-w-9 items-center justify-center rounded-md border border-hairline bg-surface-container-low px-1.5 font-label-sm text-label-sm text-on-surface hover:bg-surface-container-high"
+                          aria-label={`${unit.unit_no} · ${t(`statuses.${unit.status}`)}`}
+                          className={`flex h-7 min-w-9 items-center justify-center rounded-md border px-1.5 font-label-sm text-label-sm hover:brightness-95 ${
+                            STATUS_CHIP[unit.status] ??
+                            "border-hairline bg-surface-container-low text-on-surface"
+                          }`}
                         >
                           {unit.unit_no}
                         </Link>

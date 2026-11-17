@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
@@ -382,11 +383,10 @@ export function InspectionForm({
                       key={item.key}
                       className="flex items-center gap-2 text-sm text-on-surface"
                     >
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={checklist[item.key]}
-                        onChange={(event) =>
-                          setChecklist((prev) => ({ ...prev, [item.key]: event.target.checked }))
+                        onCheckedChange={(checked) =>
+                          setChecklist((prev) => ({ ...prev, [item.key]: checked === true }))
                         }
                       />
                       {t(item.label as never)}

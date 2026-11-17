@@ -72,7 +72,7 @@ export default async function StatementsReportPage({
         locale={locale}
         role={ctx.role}
         title={t("statements")}
-        subtitle="Periodic owner distribution statements, collections, management fees, and net payouts."
+        subtitle={t("statementsSubtitle")}
         ownerOptions={ownerOptions}
         bankOptions={bankOptions}
         showStatementGenerator={true}

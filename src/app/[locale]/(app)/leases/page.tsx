@@ -3,6 +3,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { DateCell, DaysLeft } from "@/components/domain/date-cell";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
@@ -117,31 +124,33 @@ export default async function LeasesPage({
 
       <div className="flex flex-wrap items-center gap-3">
         <form method="get" className="flex flex-wrap items-center gap-2">
-          <select
-            name="status"
-            defaultValue={status ?? "all"}
-            className="h-10 rounded-xl border border-hairline bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface shadow-sm"
-          >
-            <option value="all">{t("allStatuses")}</option>
-            <option value="active">{t("statuses.active")}</option>
-            <option value="draft">{t("statuses.draft")}</option>
-            <option value="terminated">{t("statuses.terminated")}</option>
-            <option value="renewed">{t("statuses.renewed")}</option>
-          </select>
+          <Select name="status" defaultValue={status ?? "all"}>
+            <SelectTrigger className="h-10 w-40 font-body-sm text-body-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("allStatuses")}</SelectItem>
+              <SelectItem value="active">{t("statuses.active")}</SelectItem>
+              <SelectItem value="draft">{t("statuses.draft")}</SelectItem>
+              <SelectItem value="terminated">{t("statuses.terminated")}</SelectItem>
+              <SelectItem value="renewed">{t("statuses.renewed")}</SelectItem>
+            </SelectContent>
+          </Select>
 
           {buildings && buildings.length > 0 ? (
-            <select
-              name="buildingId"
-              defaultValue={buildingId ?? "all"}
-              className="h-10 rounded-xl border border-hairline bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface shadow-sm"
-            >
-              <option value="all">{t("allBuildings")}</option>
-              {buildings.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.code})
-                </option>
-              ))}
-            </select>
+            <Select name="buildingId" defaultValue={buildingId ?? "all"}>
+              <SelectTrigger className="h-10 w-56 font-body-sm text-body-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("allBuildings")}</SelectItem>
+                {buildings.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name} ({b.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           ) : null}
 
           <button

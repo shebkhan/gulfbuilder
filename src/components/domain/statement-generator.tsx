@@ -4,6 +4,14 @@ import { CreditCard, FileSpreadsheet, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   generateOwnerStatementAction,
   recordOwnerPayoutAction,
@@ -30,6 +38,7 @@ export function StatementGenerator({
   writable?: boolean;
 }) {
   const t = useTranslations("reports");
+  const tCommon = useTranslations("common");
   const [openStatement, setOpenStatement] = useState(false);
   const [openPayout, setOpenPayout] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -133,45 +142,42 @@ export function StatementGenerator({
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
                   {t("owner")} *
                 </label>
-                <select
-                  required
-                  value={statementOwner}
-                  onChange={(e) => setStatementOwner(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Select owner</option>
-                  {owners.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.name}
-                    </option>
-                  ))}
-                </select>
+                <Select required value={statementOwner} onValueChange={setStatementOwner}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectOwner")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {owners.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    Period Start *
+                    {t("periodStart")} *
                   </label>
-                  <input
+                  <Input
                     required
                     type="date"
                     value={periodStart}
                     onChange={(e) => setPeriodStart(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    Period End *
+                    {t("periodEnd")} *
                   </label>
-                  <input
+                  <Input
                     required
                     type="date"
                     value={periodEnd}
                     onChange={(e) => setPeriodEnd(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                   />
                 </div>
               </div>
@@ -183,7 +189,7 @@ export function StatementGenerator({
                   onClick={() => setOpenStatement(false)}
                   disabled={isPending}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" disabled={isPending}>
                   {t("generateStatement")}
@@ -216,26 +222,25 @@ export function StatementGenerator({
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
                   {t("owner")} *
                 </label>
-                <select
-                  required
-                  value={payoutOwner}
-                  onChange={(e) => setPayoutOwner(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Select owner</option>
-                  {owners.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.name}
-                    </option>
-                  ))}
-                </select>
+                <Select required value={payoutOwner} onValueChange={setPayoutOwner}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectOwner")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {owners.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Amount (QAR) *
+                  {t("amountQar")} *
                 </label>
-                <input
+                <Input
                   required
                   type="number"
                   step="0.01"
@@ -243,38 +248,36 @@ export function StatementGenerator({
                   value={payoutAmount}
                   onChange={(e) => setPayoutAmount(e.target.value)}
                   placeholder="0.00"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Disbursing Bank Account
+                  {t("disbursingBank")}
                 </label>
-                <select
-                  value={bankAccountId}
-                  onChange={(e) => setBankAccountId(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Default operating account</option>
-                  {bankAccounts.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={bankAccountId} onValueChange={setBankAccountId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("defaultOperatingAccount")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bankAccounts.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Bank Reference
+                  {t("bankReference")}
                 </label>
-                <input
+                <Input
                   type="text"
                   value={payoutRef}
                   onChange={(e) => setPayoutRef(e.target.value)}
-                  placeholder="TRX-DIST-2026-01"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                  placeholder={t("payoutRefPlaceholder")}
                 />
               </div>
 
@@ -285,7 +288,7 @@ export function StatementGenerator({
                   onClick={() => setOpenPayout(false)}
                   disabled={isPending}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" disabled={isPending}>
                   {t("recordPayout")}

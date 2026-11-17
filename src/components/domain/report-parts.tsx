@@ -3,6 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { formatMoney } from "@/lib/money";
@@ -54,19 +61,19 @@ export async function ReportFilters({ action, tab, from, to, building, buildings
         <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="building">
           {t("building")}
         </label>
-        <select
-          id="building"
-          name="building"
-          defaultValue={building}
-          className={`${field} min-w-48`}
-        >
-          <option value="">{t("allBuildings")}</option>
-          {buildings.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.code} — {b.name}
-            </option>
-          ))}
-        </select>
+        <Select name="building" defaultValue={building}>
+          <SelectTrigger id="building" className={`${field} min-w-48`}>
+            <SelectValue placeholder={t("allBuildings")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t("allBuildings")}</SelectItem>
+            {buildings.map((b) => (
+              <SelectItem key={b.id} value={b.id}>
+                {b.code} — {b.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <Button type="submit">{t("apply")}</Button>
     </form>

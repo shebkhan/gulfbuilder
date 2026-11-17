@@ -35,7 +35,6 @@ export async function AppShell({
       href: item.href,
       label: t(`nav.${item.labelKey}`),
       icon: item.labelKey,
-      children: item.children ? toItems(item.children) : undefined,
     }));
 
   const nav = toItems(visibleNav(role, items ?? NAV_ITEMS));
