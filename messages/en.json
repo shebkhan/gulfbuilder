@@ -98,7 +98,9 @@
     "saudi": "Saudi Arabia",
     "kuwait": "Kuwait",
     "bahrain": "Bahrain",
-    "oman": "Oman"
+    "oman": "Oman",
+    "slugHint": "3–40 lowercase letters, numbers or hyphens. This becomes your workspace URL.",
+    "currencyHint": "Used for all amounts in this workspace."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -143,7 +145,8 @@
         "not_authorised": "Only organization admins can invite people.",
         "already_member": "That person is already in this workspace.",
         "invite_failed": "The invite could not be sent."
-      }
+      },
+      "roleHint": "Choose the access level this person will have."
     },
     "sections": {
       "users": "Team",
@@ -187,6 +190,11 @@
         "invalid_input": "Check the details and try again.",
         "invalid_amount": "Enter the late fee like 50.00.",
         "failed": "Could not save. Try again."
+      },
+      "baseCurrencyHint": "Used for all amounts across the workspace.",
+      "languages": {
+        "en": "English",
+        "ar": "العربية"
       }
     },
     "branding": {
@@ -214,7 +222,8 @@
         "invalid_terminology": "Terminology must be a JSON object of key/value pairs.",
         "domain_taken": "That domain is already used by another organization.",
         "failed": "Could not save. Try again."
-      }
+      },
+      "terminologyPlaceholder": "{\"leases\": \"Tenancy contracts\"}"
     },
     "accounting": {
       "title": "Accounting",
@@ -287,6 +296,10 @@
         "invalid_input": "Check the details and try again.",
         "failed": "Could not save. Try again.",
         "no_recipient": "No recipient is linked for this channel."
+      },
+      "languages": {
+        "en": "English",
+        "ar": "العربية"
       }
     },
     "audit": {
@@ -1441,5 +1454,7 @@
     "next": "Next",
     "summary": "Showing {from}–{to} of {total}",
     "page": "Page {page} of {pages}"
-  }
+  },
+  "invalid_slug": "Use 3–40 lowercase letters, numbers or dashes.",
+  "invalid_color": "Enter a 6-digit hex colour, e.g. #795919."
 }

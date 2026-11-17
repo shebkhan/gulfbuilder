@@ -2,16 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { z } from "zod";
-import { emailField } from "@/schemas/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-const inviteSchema = z.object({
-  email: emailField,
-  role: z.enum(["manager", "accountant", "caretaker", "owner", "tenant"]),
-  locale: z.enum(["en", "ar"]),
-});
+import { inviteSchema } from "@/schemas/members";
 
 export type InviteState = { error?: string; invited?: string };
 

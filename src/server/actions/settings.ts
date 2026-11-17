@@ -5,6 +5,7 @@ import { z } from "zod";
 import { randomInt } from "node:crypto";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { brandingSchema, organizationSchema, templateSchema } from "@/schemas/settings";
 import { dispatchPending } from "@/server/notifications/dispatch";
 import { getOrgContext } from "@/server/org-context";
 
@@ -12,51 +13,6 @@ export type SettingsState = {
   error?: string;
   ok?: string;
 };
-
-const organizationSchema = z.object({
-  name: z.string().trim().min(2).max(120),
-  legalName: z.string().trim().max(120).optional().or(z.literal("")),
-  taxId: z.string().trim().max(60).optional().or(z.literal("")),
-  baseCurrency: z.enum(["QAR", "AED", "SAR", "KWD", "BHD", "OMR"]),
-  defaultLocale: z.enum(["en", "ar"]),
-  timezone: z.string().trim().min(1).max(60),
-  graceDays: z.coerce.number().int().min(0).max(90),
-  lateFee: z.string().min(1),
-  lateFeeType: z.enum(["flat", "percent"]),
-  lateFeePercent: z.coerce.number().min(0).max(100),
-  taxRate: z.coerce.number().min(0).max(100),
-  reminderDays: z.coerce.number().int().min(0).max(60),
-  revenueRecognition: z.enum(["on_due", "straight_line_monthly"]),
-});
-
-const brandingSchema = z.object({
-  appName: z.string().trim().max(80).optional().or(z.literal("")),
-  logoUrl: z.string().trim().max(300).optional().or(z.literal("")),
-  faviconUrl: z.string().trim().max(300).optional().or(z.literal("")),
-  primaryColor: z
-    .string()
-    .trim()
-    .regex(/^#[0-9a-fA-F]{6}$/, "invalid_color")
-    .optional()
-    .or(z.literal("")),
-  secondaryColor: z
-    .string()
-    .trim()
-    .regex(/^#[0-9a-fA-F]{6}$/, "invalid_color")
-    .optional()
-    .or(z.literal("")),
-  fontFamily: z.string().trim().max(80).optional().or(z.literal("")),
-  terminology: z.string().optional().or(z.literal("")),
-  customDomain: z.string().trim().max(200).optional().or(z.literal("")),
-});
-
-const templateSchema = z.object({
-  event: z.string().trim().min(2).max(60),
-  channel: z.enum(["email", "sms", "telegram", "push"]),
-  locale: z.enum(["en", "ar"]),
-  subject: z.string().trim().max(160).optional().or(z.literal("")),
-  body: z.string().trim().min(1).max(4000),
-});
 
 const pushSubscriptionSchema = z.object({
   endpoint: z.string(),
