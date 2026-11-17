@@ -5,7 +5,7 @@ export const resendNotifier: Notifier = {
   async send(message: Outbound): Promise<SendResult> {
     if (isDryRun()) return dryRunSend("email", message.recipient);
     const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.NOTIFICATION_FROM_EMAIL;
+    const from = message.from ?? process.env.NOTIFICATION_FROM_EMAIL;
     if (!apiKey || !from) return { ok: false, error: "not_configured" };
     try {
       const response = await fetch("https://api.resend.com/emails", {

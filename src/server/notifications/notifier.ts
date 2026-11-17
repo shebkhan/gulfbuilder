@@ -10,6 +10,7 @@ export type Outbound = {
   recipient: string;
   subject?: string | null;
   body: string;
+  from?: string;
   subscription?: { endpoint: string; p256dh: string; auth: string };
 };
 export type SendResult = { ok: true } | { ok: false; error: string };
