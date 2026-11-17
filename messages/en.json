@@ -21,6 +21,11 @@
     "approvals": "Approvals",
     "documents": "Documents",
     "meters": "Meters",
+    "occupancy": "Occupancy",
+    "expiry": "Lease Expiry",
+    "collections": "Collections",
+    "agedReceivables": "Aged Receivables",
+    "cashFlowForecast": "Cash Flow Forecast",
     "platform": "Platform",
     "marketPacks": "Market packs"
   },

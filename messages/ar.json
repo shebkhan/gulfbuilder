@@ -21,6 +21,11 @@
     "approvals": "الموافقات",
     "documents": "المستندات",
     "meters": "العدادات",
+    "occupancy": "نسب الإشغال",
+    "expiry": "انتهاء العقود",
+    "collections": "التحصيلات",
+    "agedReceivables": "أعمار الديون",
+    "cashFlowForecast": "توقعات التدفق النقدي",
     "platform": "المنصة",
     "marketPacks": "حزم الأسواق"
   },

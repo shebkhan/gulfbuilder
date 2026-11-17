@@ -31,7 +31,12 @@ export async function AppShell({
   const t = await getTranslations();
 
   const toItems = (nav: NavItem[]): SidebarItem[] =>
-    nav.map((item) => ({ href: item.href, label: t(`nav.${item.labelKey}`), icon: item.labelKey }));
+    nav.map((item) => ({
+      href: item.href,
+      label: t(`nav.${item.labelKey}`),
+      icon: item.labelKey,
+      children: item.children ? toItems(item.children) : undefined,
+    }));
 
   const nav = toItems(visibleNav(role, items ?? NAV_ITEMS));
   const footer = toItems(visibleNav(role, footerItems ?? FOOTER_NAV));

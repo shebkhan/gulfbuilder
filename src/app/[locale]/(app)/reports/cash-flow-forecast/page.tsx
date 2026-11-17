@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -24,12 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@radix-ui/react-slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/money";
 import { getCashFlowForecast, ForecastInput, ForecastResponse } from "@/server/actions/forecast";
-import { DownloadIcon } from "lucide-react";
 
 export default function CashFlowForecastPage() {
   const t = useTranslations("Reports.CashFlowForecast");
@@ -283,19 +279,27 @@ export default function CashFlowForecastPage() {
                     <td className="py-2 ps-2">{t("summary.monthLabel", { month: item.month })}</td>
                     <td className="py-2 pe-2 text-right">
                       {formatMoney(
-                        (forecast.inflows[i]?.charges ?? 0n) + (forecast.inflows[i]?.cheques ?? 0n),
+                        BigInt(
+                          Math.round(
+                            (forecast.inflows[i]?.charges ?? 0) + (forecast.inflows[i]?.cheques ?? 0),
+                          ),
+                        ),
                         "QAR",
                       )}
                     </td>
                     <td className="py-2 pe-2 text-right">
                       {formatMoney(
-                        (forecast.outflows[i]?.expenses ?? 0n) +
-                          (forecast.outflows[i]?.payouts ?? 0n),
+                        BigInt(
+                          Math.round(
+                            (forecast.outflows[i]?.expenses ?? 0) +
+                              (forecast.outflows[i]?.payouts ?? 0),
+                          ),
+                        ),
                         "QAR",
                       )}
                     </td>
                     <td className="py-2 pe-2 text-right font-medium">
-                      {formatMoney(item.amount_minor, "QAR")}
+                      {formatMoney(BigInt(Math.round(item.amount_minor)), "QAR")}
                     </td>
                   </tr>
                 ))}

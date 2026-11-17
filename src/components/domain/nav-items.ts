@@ -2,15 +2,19 @@ import {
   Banknote,
   BarChart3,
   Building2,
+  CalendarDays,
   ClipboardCheck,
   CreditCard,
   FileSignature,
+  FileSpreadsheet,
   FileText,
   Gauge,
+  Hourglass,
   LayoutDashboard,
   PiggyBank,
   Receipt,
   Settings,
+  TrendingUp,
   Users,
   Wrench,
   type LucideIcon,
@@ -22,6 +26,7 @@ export type NavItem = {
   labelKey: string;
   icon: LucideIcon;
   capability: Capability;
+  children?: NavItem[];
 };
 
 /** Order follows the SPEC repository layout route groups. */
@@ -41,7 +46,22 @@ export const NAV_ITEMS: NavItem[] = [
     icon: ClipboardCheck,
     capability: "maintenance.write",
   },
-  { href: "/reports", labelKey: "reports", icon: BarChart3, capability: "reports.read" },
+  {
+    href: "/reports",
+    labelKey: "reports",
+    icon: BarChart3,
+    capability: "reports.read",
+    children: [
+      { href: "/reports/occupancy", labelKey: "occupancy", icon: Building2, capability: "reports.read" },
+      { href: "/reports/expiry", labelKey: "expiry", icon: CalendarDays, capability: "reports.read" },
+      { href: "/reports/collections", labelKey: "collections", icon: CreditCard, capability: "reports.read" },
+      { href: "/reports/cheques", labelKey: "cheques", icon: Banknote, capability: "reports.read" },
+      { href: "/reports/rent-roll", labelKey: "rentRoll", icon: FileSignature, capability: "reports.read" },
+      { href: "/reports/aged-receivables", labelKey: "agedReceivables", icon: Hourglass, capability: "reports.read" },
+      { href: "/reports/statements", labelKey: "statements", icon: FileSpreadsheet, capability: "reports.read" },
+      { href: "/reports/cash-flow-forecast", labelKey: "cashFlowForecast", icon: TrendingUp, capability: "reports.read" },
+    ],
+  },
   { href: "/documents", labelKey: "documents", icon: FileText, capability: "properties.read" },
   { href: "/meters", labelKey: "meters", icon: Gauge, capability: "maintenance.write" },
 ];
@@ -90,5 +110,10 @@ export const PLATFORM_NAV: NavItem[] = [
 ];
 
 export function visibleNav(role: Role | null, items: NavItem[] = NAV_ITEMS): NavItem[] {
-  return items.filter((item) => can(role, item.capability));
+  return items
+    .filter((item) => can(role, item.capability))
+    .map((item) => ({
+      ...item,
+      children: item.children ? visibleNav(role, item.children) : undefined,
+    }));
 }
