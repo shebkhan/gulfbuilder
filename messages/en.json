@@ -34,7 +34,8 @@
     "today": "Today",
     "daysLeft": "{count, plural, one {# day left} other {# days left}}",
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
-    "daysLeftHeader": "Days left"
+    "daysLeftHeader": "Days left",
+    "relatedSections": "Related sections"
   },
   "validation": {
     "required": "This field is required",

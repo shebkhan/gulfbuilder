@@ -11,6 +11,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PageHeader } from "@/components/domain/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -102,14 +103,13 @@ export default async function DashboardPage({
 
   return (
     <div className="flex flex-col gap-6 pt-2">
-      {/* Header & Quick Action Buttons */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        section="dashboard"
+        role={ctx.role}
+        title={t("title")}
+        description={t("empty")}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
           {canFinance && (
             <Link
               href="/payments"
@@ -143,8 +143,9 @@ export default async function DashboardPage({
           >
             <span>{t("viewReports")}</span>
           </Link>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

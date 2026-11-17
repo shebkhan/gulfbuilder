@@ -34,7 +34,8 @@
     "today": "اليوم",
     "daysLeft": "{count, plural, zero {اليوم} one {يوم واحد متبقٍ} two {يومان متبقيان} few {# أيام متبقية} many {# يوماً متبقياً} other {# يوم متبقي}}",
     "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
-    "daysLeftHeader": "الأيام المتبقية"
+    "daysLeftHeader": "الأيام المتبقية",
+    "relatedSections": "أقسام ذات صلة"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

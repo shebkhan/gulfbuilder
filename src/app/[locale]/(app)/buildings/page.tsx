@@ -2,6 +2,7 @@ import { Building2 } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BuildingForm } from "@/components/domain/building-form";
 import { FormDialog } from "@/components/domain/form-dialog";
+import { PageHeader } from "@/components/domain/page-header";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
@@ -62,12 +63,13 @@ export default async function BuildingsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
+      <PageHeader
+        section="buildings"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
           {writable ? (
             <Link
               href="/buildings/import"
@@ -93,8 +95,9 @@ export default async function BuildingsPage({
               />
             </FormDialog>
           ) : null}
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {buildings && buildings.length > 0 ? (
         <>
