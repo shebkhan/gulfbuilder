@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { can } from "@/lib/rbac";
+import { uploadSchema } from "@/schemas/documents";
 import { getOrgContext } from "@/server/org-context";
 
 export type DocumentState = {
@@ -13,18 +13,6 @@ export type DocumentState = {
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
-
-const uploadSchema = z.object({
-  entityType: z.enum(["lease", "tenant", "building", "unit", "vendor", "inspection"]),
-  entityId: z.string().uuid(),
-  kind: z.enum(["contract", "id_card", "trade_license", "title_deed", "photo", "receipt"]),
-  expiresOn: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional()
-    .or(z.literal("")),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-});
 
 function fail(error: string): DocumentState {
   return { error };

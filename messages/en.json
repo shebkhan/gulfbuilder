@@ -801,6 +801,41 @@
       "waiting_parts": "Waiting for parts",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    },
+    "actions": "Actions",
+    "selectBuilding": "Select building",
+    "commonArea": "Common area",
+    "unitOption": "Unit {no}",
+    "titlePlaceholder": "Water leakage in master bathroom",
+    "unassigned": "Unassigned",
+    "note": "Note",
+    "notePlaceholder": "Parts replaced, pressure tested",
+    "categories": {
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "hvac": "HVAC / Air Conditioning",
+      "carpentry": "Carpentry",
+      "painting": "Painting",
+      "general": "General"
+    },
+    "help": {
+      "building": "The building this request belongs to.",
+      "unit": "Choose \"Common area\" if the issue is not in a specific unit.",
+      "title": "A short summary of the problem (at least 3 characters).",
+      "category": "Category used for reporting.",
+      "priority": "Used to order requests by urgency.",
+      "vendor": "Optional vendor assigned to this request.",
+      "description": "Optional details about the issue.",
+      "status": "The current status of the request.",
+      "cost": "Repair cost, in QAR.",
+      "note": "Optional note about this status change."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage maintenance requests.",
+      "invalid_input": "Check the request details.",
+      "request_creation_failed": "The request could not be created.",
+      "status_update_failed": "The status could not be updated.",
+      "invalid_amount": "Enter a valid cost."
     }
   },
   "inspections": {
@@ -815,7 +850,40 @@
     "empty": "No inspection surveys on file.",
     "deductDeposit": "Apply deposit deduction",
     "deductReason": "Deduction reason",
-    "deductAmount": "Damage cost to deduct (QAR)"
+    "deductAmount": "Damage cost to deduct (QAR)",
+    "lease": "Lease",
+    "tenant": "Tenant",
+    "status": "Status",
+    "completedDate": "Completed date",
+    "notes": "Notes",
+    "actions": "Actions",
+    "completedLabel": "Completed",
+    "pending": "Pending survey",
+    "selectLease": "Select lease",
+    "optional": "(Optional)",
+    "checklistTitle": "Survey checklist",
+    "deductReasonPlaceholder": "Broken kitchen cabinet door / Repaint needed",
+    "checklist": {
+      "keys": "All keys and access cards handed over",
+      "walls": "Walls, paint, and fixtures in acceptable condition",
+      "appliances": "Appliances and AC units tested and working",
+      "meters": "Final utility meter readings logged"
+    },
+    "help": {
+      "lease": "The lease this survey is attached to.",
+      "kind": "Move-in or move-out survey.",
+      "notes": "Optional notes for the survey.",
+      "checklist": "Tick each item you have verified.",
+      "deductAmount": "Damage cost to deduct from the deposit, in QAR.",
+      "deductReason": "Reason for the deduction (required when an amount is entered)."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage inspections.",
+      "invalid_input": "Check the inspection details.",
+      "inspection_creation_failed": "The inspection could not be created.",
+      "complete_failed": "The inspection could not be completed.",
+      "invalid_amount": "Enter a valid amount."
+    }
   },
   "reports": {
     "title": "Reports & Financial Analytics",
@@ -1202,6 +1270,13 @@
       "unsupported_file_type": "Only images and PDF files are accepted.",
       "upload_failed": "The file could not be uploaded. Try again.",
       "failed": "The document could not be saved. Try again."
+    },
+    "help": {
+      "entityType": "The type of record this document is attached to.",
+      "entity": "The specific record this document is attached to.",
+      "kind": "Category of the document.",
+      "expiresOn": "Expiry date, if applicable.",
+      "file": "An image or PDF up to 10 MB."
     }
   },
   "meters": {
@@ -1235,6 +1310,15 @@
       "invalid_input": "Check the details and try again.",
       "invalid_value": "Enter the meter value as a number.",
       "failed": "Could not save. Try again."
+    },
+    "created": "Meter created.",
+    "help": {
+      "kind": "The utility this meter measures.",
+      "building": "The building the meter belongs to.",
+      "meterNo": "Meter number as printed on the device.",
+      "meter": "The meter this reading belongs to.",
+      "readOn": "The date the reading was taken.",
+      "value": "The reading value shown on the meter."
     }
   },
   "platform": {
