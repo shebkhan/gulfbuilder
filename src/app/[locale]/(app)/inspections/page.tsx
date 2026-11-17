@@ -1,6 +1,6 @@
 import { ClipboardCheck, Clock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { InspectionForm, type InspectionItem } from "@/components/domain/inspection-form";
+import { InspectionList, type InspectionItem } from "@/components/domain/inspection-form";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -56,22 +56,6 @@ export default async function InspectionsPage({
   }
 
   const { data: inspections } = await query;
-
-  // Fetch leases for inspection picker
-  const { data: rawLeases } = await ctx.supabase
-    .from("leases")
-    .select("id, lease_no, tenants ( full_name )")
-    .in("status", ["active", "draft", "terminated"])
-    .order("lease_no");
-
-  const leaseOptions = (rawLeases || []).map((l) => {
-    const tenant = l.tenants as unknown as { full_name: string } | null;
-    return {
-      id: l.id,
-      lease_no: l.lease_no,
-      tenant_name: tenant?.full_name || tCommon("unknown"),
-    };
-  });
 
   const allInspections = inspections || [];
 
@@ -186,11 +170,7 @@ export default async function InspectionsPage({
         })}
       </div>
 
-      <InspectionForm
-        inspections={paged.rows}
-        leases={leaseOptions}
-        writable={writable}
-      />
+      <InspectionList inspections={paged.rows} writable={writable} />
 
       <ListPagination
         page={paged.page}

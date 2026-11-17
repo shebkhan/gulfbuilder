@@ -1,7 +1,7 @@
 import { AlertTriangle, Clock, Wrench } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { MaintenanceForm, type MaintenanceItem } from "@/components/domain/maintenance-form";
+import { MaintenanceList, type MaintenanceItem } from "@/components/domain/maintenance-form";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
@@ -63,35 +63,6 @@ export default async function MaintenancePage({
   }
 
   const { data: requests } = await query;
-
-  // Options
-  const { data: rawBuildings } = await ctx.supabase
-    .from("buildings")
-    .select("id, name, code")
-    .is("deleted_at", null)
-    .order("code");
-
-  const { data: rawUnits } = await ctx.supabase
-    .from("units")
-    .select("id, unit_no, building_id")
-    .order("unit_no");
-
-  const { data: rawVendors } = await ctx.supabase
-    .from("vendors")
-    .select("id, name")
-    .order("name");
-
-  const buildingOptions = (rawBuildings || []).map((b) => ({
-    id: b.id,
-    name: b.name,
-    code: b.code,
-  }));
-  const unitOptions = (rawUnits || []).map((u) => ({
-    id: u.id,
-    unit_no: u.unit_no,
-    building_id: u.building_id,
-  }));
-  const vendorOptions = (rawVendors || []).map((v) => ({ id: v.id, name: v.name }));
 
   const allRequests = requests || [];
 
@@ -202,14 +173,7 @@ export default async function MaintenancePage({
         })}
       </div>
 
-      <MaintenanceForm
-        requests={paged.rows}
-        buildings={buildingOptions}
-        units={unitOptions}
-        vendors={vendorOptions}
-        writable={writable}
-        locale={locale}
-      />
+      <MaintenanceList requests={paged.rows} writable={writable} locale={locale} />
 
       <ListPagination
         page={paged.page}

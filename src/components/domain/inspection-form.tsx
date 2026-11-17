@@ -9,7 +9,6 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { NumberField } from "@/components/ui/number-field";
@@ -88,82 +87,24 @@ type CompleteValues = {
   deductReason?: string;
 };
 
-export function InspectionForm({
+export function InspectionList({
   inspections,
-  leases,
   writable = false,
 }: {
   inspections: InspectionItem[];
-  leases: LeaseOption[];
   writable?: boolean;
 }) {
   const t = useTranslations("inspections");
-  const tCommon = useTranslations("common");
-  const errors = t.raw("errors") as Record<string, string>;
-  const help = t.raw("help") as Record<string, string>;
-
-  const [openCreate, setOpenCreate] = useState(false);
-  const [completeTarget, setCompleteTarget] = useState<InspectionItem | null>(null);
-  const [checklist, setChecklist] = useState<Checklist>(DEFAULT_CHECKLIST);
-
-  const createForm = useForm<CreateValues>({
-    resolver: zodResolver(createInspectionSchema),
-    defaultValues: { leaseId: "", kind: "move_in", notes: "" },
-  });
-
-  const [createState, createDispatch, createPending] = useActionState<InspectionState, FormData>(
-    async (prev, formData) => {
-      const res = await createInspectionAction(prev, formData);
-      if (res.ok) {
-        setOpenCreate(false);
-        createForm.reset();
-      }
-      return res;
-    },
-    {},
-  );
-
-  const completeForm = useForm<CompleteValues>({
-    resolver: zodResolver(completeInspectionSchema),
-    defaultValues: { inspectionId: "", checklistData: "{}", deductAmount: "", deductReason: "" },
-  });
-
-  const [completeState, completeDispatch, completePending] = useActionState<
-    InspectionState,
-    FormData
-  >(async (prev, formData) => {
-    const res = await completeInspectionAction(prev, formData);
-    if (res.ok) setCompleteTarget(null);
-    return res;
-  }, {});
-
-  const openComplete = (insp: InspectionItem) => {
-    setChecklist(DEFAULT_CHECKLIST);
-    completeForm.reset({
-      inspectionId: insp.id,
-      checklistData: "{}",
-      deductAmount: "",
-      deductReason: "",
-    });
-    setCompleteTarget(insp);
-  };
-
-  const onCompleteSubmit = completeForm.handleSubmit((values) => {
-    const formData = toFormData(values);
-    formData.set("checklistData", JSON.stringify(checklist));
-    completeDispatch(formData);
-  });
-
-  const deductAmount = completeForm.watch("deductAmount");
-  const showDeductReason = Number(deductAmount) > 0;
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         {writable ? (
-          <Button onClick={() => setOpenCreate(true)} className="flex items-center gap-2">
-            <Plus className="size-4" />
-            {t("newInspection")}
+          <Button asChild className="flex items-center gap-2">
+            <Link href="/inspections/new">
+              <Plus className="size-4" />
+              {t("newInspection")}
+            </Link>
           </Button>
         ) : null}
       </div>
@@ -221,15 +162,11 @@ export function InspectionForm({
                     {writable ? (
                       <td className="p-4 text-center">
                         {!insp.completed_at ? (
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => openComplete(insp)}
-                            disabled={completePending}
-                            className="flex items-center gap-1.5"
-                          >
-                            <CheckCircle2 className="size-3.5" />
-                            {t("complete")}
+                          <Button size="sm" variant="primary" asChild className="flex items-center gap-1.5">
+                            <Link href={`/inspections/${insp.id}/complete`}>
+                              <CheckCircle2 className="size-3.5" />
+                              {t("complete")}
+                            </Link>
                           </Button>
                         ) : null}
                       </td>
@@ -241,227 +178,242 @@ export function InspectionForm({
           </div>
         )}
       </div>
+    </>
+  );
+}
 
-      {/* Create Inspection Modal */}
-      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="max-w-[33.6rem]">
-          <DialogHeader>
-            <DialogTitle>{t("newInspection")}</DialogTitle>
-          </DialogHeader>
+export function InspectionCreateForm({ leases }: { leases: LeaseOption[] }) {
+  const t = useTranslations("inspections");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
 
-          <Form {...createForm}>
-            <form
-              onSubmit={createForm.handleSubmit((values) => createDispatch(toFormData(values)))}
-              noValidate
-              className="mt-4 flex flex-col gap-6"
+  const createForm = useForm<CreateValues>({
+    resolver: zodResolver(createInspectionSchema),
+    defaultValues: { leaseId: "", kind: "move_in", notes: "" },
+  });
+
+  const [createState, createDispatch, createPending] = useActionState<InspectionState, FormData>(
+    async (prev, formData) => {
+      const res = await createInspectionAction(prev, formData);
+      if (res.ok) createForm.reset();
+      return res;
+    },
+    {},
+  );
+
+  return (
+    <Form {...createForm}>
+      <form
+        onSubmit={createForm.handleSubmit((values) => createDispatch(toFormData(values)))}
+        noValidate
+        className="flex flex-col gap-6"
+      >
+        <FormField
+          control={createForm.control}
+          name="leaseId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.lease}>{t("lease")}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectLease")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {leases.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>
+                      {l.lease_no} — {l.tenant_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={createForm.control}
+          name="kind"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.kind}>{t("kind")}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="move_in">{t("moveIn")}</SelectItem>
+                  <SelectItem value="move_out">{t("moveOut")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={createForm.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.notes}>{t("notes")}</FormLabel>
+              <FormControl>
+                <Textarea rows={2} {...field} value={field.value ?? ""} />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        {createState.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[createState.error] ?? createState.error}
+          </p>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/inspections">{tCommon("cancel")}</Link>
+          </Button>
+          <Button type="submit" disabled={createPending}>
+            {t("newInspection")}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+export function InspectionCompleteForm({ inspection }: { inspection: InspectionItem }) {
+  const t = useTranslations("inspections");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
+
+  const [checklist, setChecklist] = useState<Checklist>(DEFAULT_CHECKLIST);
+
+  const completeForm = useForm<CompleteValues>({
+    resolver: zodResolver(completeInspectionSchema),
+    defaultValues: { inspectionId: inspection.id, checklistData: "{}", deductAmount: "", deductReason: "" },
+  });
+
+  const [completeState, completeDispatch, completePending] = useActionState<
+    InspectionState,
+    FormData
+  >(async (prev, formData) => {
+    const res = await completeInspectionAction(prev, formData);
+    return res;
+  }, {});
+
+  const onCompleteSubmit = completeForm.handleSubmit((values) => {
+    const formData = toFormData(values);
+    formData.set("checklistData", JSON.stringify(checklist));
+    completeDispatch(formData);
+  });
+
+  const deductAmount = completeForm.watch("deductAmount");
+  const showDeductReason = Number(deductAmount) > 0;
+
+  return (
+    <Form {...completeForm}>
+      <form onSubmit={onCompleteSubmit} noValidate className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2 rounded-xl bg-surface-container-low p-3">
+          <span className="font-label-sm text-label-sm font-semibold text-on-surface">
+            {t("checklistTitle")}
+          </span>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">{help.checklist}</p>
+          {CHECKLIST_ITEMS.map((item) => (
+            <Label
+              key={item.key}
+              htmlFor={`check-${item.key}`}
+              className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface"
             >
-              <FormField
-                control={createForm.control}
-                name="leaseId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel description={help.lease}>{t("lease")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("selectLease")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {leases.map((l) => (
-                          <SelectItem key={l.id} value={l.id}>
-                            {l.lease_no} — {l.tenant_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
+              <Checkbox
+                id={`check-${item.key}`}
+                checked={checklist[item.key]}
+                onCheckedChange={(checked) =>
+                  setChecklist((prev) => ({ ...prev, [item.key]: checked === true }))
+                }
               />
+              {t(item.label as never)}
+            </Label>
+          ))}
+        </div>
 
+        {inspection.kind === "move_out" ? (
+          <div className="border-warning/40 bg-warning-container/20 flex flex-col gap-3 rounded-xl border p-3">
+            <span className="font-label-sm text-label-sm font-semibold text-on-surface">
+              {t("deductDeposit")} {t("optional")}
+            </span>
+            <FormField
+              control={completeForm.control}
+              name="deductAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel description={help.deductAmount}>{t("deductAmount")}</FormLabel>
+                  <FormControl>
+                    <NumberField
+                      step="0.01"
+                      min="0"
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="0.00"
+                      dir="ltr"
+                    />
+                  </FormControl>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+
+            {showDeductReason ? (
               <FormField
-                control={createForm.control}
-                name="kind"
+                control={completeForm.control}
+                name="deductReason"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel description={help.kind}>{t("kind")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="move_in">{t("moveIn")}</SelectItem>
-                        <SelectItem value="move_out">{t("moveOut")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={createForm.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel description={help.notes}>{t("notes")}</FormLabel>
+                    <FormLabel description={help.deductReason}>{t("deductReason")}</FormLabel>
                     <FormControl>
-                      <Textarea rows={2} {...field} value={field.value ?? ""} />
+                      <Input
+                        {...field}
+                        value={field.value ?? ""}
+                        placeholder={t("deductReasonPlaceholder")}
+                      />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
                 )}
               />
+            ) : null}
+          </div>
+        ) : null}
 
-              {createState.error ? (
-                <p
-                  role="alert"
-                  className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-                >
-                  {errors[createState.error] ?? createState.error}
-                </p>
-              ) : null}
+        {completeState.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[completeState.error] ?? completeState.error}
+          </p>
+        ) : null}
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setOpenCreate(false)}
-                  disabled={createPending}
-                >
-                  {tCommon("cancel")}
-                </Button>
-                <Button type="submit" disabled={createPending}>
-                  {t("newInspection")}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Complete Inspection Modal */}
-      {completeTarget ? (
-        <Dialog
-          open
-          onOpenChange={(next) => {
-            if (!next) setCompleteTarget(null);
-          }}
-        >
-          <DialogContent className="max-w-[38.4rem]">
-            <DialogHeader>
-              <DialogTitle>
-                {t("complete")}: {completeTarget.lease?.lease_no} ({completeTarget.kind})
-              </DialogTitle>
-            </DialogHeader>
-
-            <Form {...completeForm}>
-              <form onSubmit={onCompleteSubmit} noValidate className="mt-4 flex flex-col gap-6">
-                <div className="flex flex-col gap-2 rounded-xl bg-surface-container-low p-3">
-                  <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("checklistTitle")}
-                  </span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {help.checklist}
-                  </p>
-                  {CHECKLIST_ITEMS.map((item) => (
-                    <Label
-                      key={item.key}
-                      htmlFor={`check-${item.key}`}
-                      className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface"
-                    >
-                      <Checkbox
-                        id={`check-${item.key}`}
-                        checked={checklist[item.key]}
-                        onCheckedChange={(checked) =>
-                          setChecklist((prev) => ({ ...prev, [item.key]: checked === true }))
-                        }
-                      />
-                      {t(item.label as never)}
-                    </Label>
-                  ))}
-                </div>
-
-                {completeTarget.kind === "move_out" ? (
-                  <div className="border-warning/40 bg-warning-container/20 flex flex-col gap-3 rounded-xl border p-3">
-                    <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-                      {t("deductDeposit")} {t("optional")}
-                    </span>
-                    <FormField
-                      control={completeForm.control}
-                      name="deductAmount"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel description={help.deductAmount}>{t("deductAmount")}</FormLabel>
-                          <FormControl>
-                            <NumberField
-                              step="0.01"
-                              min="0"
-                              {...field}
-                              value={field.value ?? ""}
-                              placeholder="0.00"
-                              dir="ltr"
-                            />
-                          </FormControl>
-                          <LocalizedFormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {showDeductReason ? (
-                      <FormField
-                        control={completeForm.control}
-                        name="deductReason"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel description={help.deductReason}>
-                              {t("deductReason")}
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                value={field.value ?? ""}
-                                placeholder={t("deductReasonPlaceholder")}
-                              />
-                            </FormControl>
-                            <LocalizedFormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {completeState.error ? (
-                  <p
-                    role="alert"
-                    className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-                  >
-                    {errors[completeState.error] ?? completeState.error}
-                  </p>
-                ) : null}
-
-                <div className="flex items-center justify-end gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setCompleteTarget(null)}
-                    disabled={completePending}
-                  >
-                    {tCommon("cancel")}
-                  </Button>
-                  <Button type="submit" disabled={completePending}>
-                    {t("complete")}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      ) : null}
-    </>
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/inspections">{tCommon("cancel")}</Link>
+          </Button>
+          <Button type="submit" disabled={completePending}>
+            {t("complete")}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
