@@ -55,11 +55,11 @@ export default async function ChequesPage({
 
   const { data: cheques } = await query;
 
-  // Options for register
-  const { data: rawTenants } = await ctx.supabase
-    .from("tenants")
-    .select("id, full_name")
-    .order("full_name");
+  // Options for register (tenants load on demand per building)
+  const { data: rawBuildings } = await ctx.supabase
+    .from("buildings")
+    .select("id, code, name")
+    .order("code");
 
   const { data: rawLeases } = await ctx.supabase
     .from("leases")
@@ -67,7 +67,7 @@ export default async function ChequesPage({
     .in("status", ["active", "draft"])
     .order("lease_no");
 
-  const tenantOptions = (rawTenants || []).map((t) => ({ id: t.id, name: t.full_name }));
+  const buildingOptions = (rawBuildings || []).map((b) => ({ id: b.id, code: b.code, name: b.name }));
   const leaseOptions = (rawLeases || []).map((l) => ({
     id: l.id,
     lease_no: l.lease_no,
@@ -185,7 +185,7 @@ export default async function ChequesPage({
 
       <ChequeTable
         cheques={paged.rows}
-        tenants={tenantOptions}
+        buildings={buildingOptions}
         leases={leaseOptions}
         writable={writable}
         locale={locale}

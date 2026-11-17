@@ -5,6 +5,7 @@ import { can } from "@/lib/rbac";
 import { tenantSchema } from "@/schemas/tenants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getOrgContext } from "@/server/org-context";
+import { mergeTenantGroups, type PickerTenant } from "@/lib/tenant-picker";
 
 export type TenantState = {
   error?: string;
@@ -205,6 +206,51 @@ export async function revealTenantIdAction(tenantId: string): Promise<TenantStat
 
   if (error || !data) return fail("not_found");
   return { ok: "revealed", plaintextId: data };
+}
+
+/** Tenants with an active lease in a building, for the building/tenant picker. */
+export async function getTenantsForBuilding(buildingId: string): Promise<PickerTenant[]> {
+  const ctx = await getOrgContext();
+  if (!ctx) return [];
+
+  const tenantFields = "id, full_name, nationality, deleted_at";
+
+  const [{ data: unitLeases }, { data: buildingRooms }] = await Promise.all([
+    ctx.supabase
+      .from("leases")
+      .select(`tenants!inner(${tenantFields}), units!inner(building_id)`)
+      .eq("status", "active")
+      .eq("units.building_id", buildingId)
+      .is("tenants.deleted_at", null),
+    ctx.supabase
+      .from("rooms")
+      .select("id, units!inner(building_id)")
+      .eq("units.building_id", buildingId),
+  ]);
+
+  const roomIds = (buildingRooms ?? []).map((room) => room.id);
+  const { data: roomLeases } = roomIds.length
+    ? await ctx.supabase
+        .from("leases")
+        .select(`tenants!inner(${tenantFields})`)
+        .eq("status", "active")
+        .in("room_id", roomIds)
+        .is("tenants.deleted_at", null)
+    : { data: [] };
+
+  const toTenants = (rows: unknown): Omit<PickerTenant, "id_number">[] =>
+    (rows as Array<{ tenants: Omit<PickerTenant, "id_number"> }>).map((row) => row.tenants);
+
+  const merged = mergeTenantGroups(toTenants(unitLeases), toTenants(roomLeases));
+  // ID numbers are encrypted at rest; only the tenant_id_number RPC can reveal them.
+  return Promise.all(
+    merged.map(async (tenant) => {
+      const { data: idNumber } = await ctx.supabase.rpc("tenant_id_number", {
+        p_tenant: tenant.id,
+      });
+      return { ...tenant, id_number: idNumber ?? null };
+    }),
+  );
 }
 
 /** Give an existing tenant a portal login (SPEC §8 T1). */

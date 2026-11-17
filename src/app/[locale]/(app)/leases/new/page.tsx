@@ -4,6 +4,7 @@ import { LeaseForm } from "@/components/domain/lease-form";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { can } from "@/lib/rbac";
+import type { PickerTenant } from "@/lib/tenant-picker";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
@@ -79,14 +80,69 @@ export default async function NewLeasePage({
     };
   });
 
-  // 3. Fetch tenants
-  const { data: rawTenants } = await ctx.supabase
-    .from("tenant_directory")
-    .select("id, full_name, phone")
-    .is("deleted_at", null)
-    .order("full_name");
+  // 3. Fetch buildings for the tenant picker (tenants load on demand per building)
+  const { data: rawBuildings } = await ctx.supabase
+    .from("buildings")
+    .select("id, code, name")
+    .order("code");
+  const buildings = rawBuildings ?? [];
 
-  const tenants = rawTenants ?? [];
+  // Resolve a ?tenantId= deep link to the tenant's building so the picker starts selected.
+  const { data: linkedTenant } = tenantId
+    ? await ctx.supabase
+        .from("tenant_directory")
+        .select("id, full_name, nationality")
+        .eq("id", tenantId)
+        .is("deleted_at", null)
+        .maybeSingle()
+    : { data: null };
+
+  let initialTenant: (PickerTenant & { buildingId: string }) | undefined;
+  if (linkedTenant && tenantId) {
+    const { data: activeLeases } = await ctx.supabase
+      .from("leases")
+      .select("unit_id, room_id")
+      .eq("tenant_id", tenantId)
+      .eq("status", "active")
+      .limit(1);
+
+    let linkedLease = activeLeases?.[0];
+    if (!linkedLease) {
+      // A tenant with no active lease (the usual deep-link case) still needs a building.
+      const { data: anyLeases } = await ctx.supabase
+        .from("leases")
+        .select("unit_id, room_id")
+        .eq("tenant_id", tenantId)
+        .limit(1);
+      linkedLease = anyLeases?.[0];
+    }
+
+    let unitId = linkedLease?.unit_id ?? null;
+    if (!unitId && linkedLease?.room_id) {
+      const { data: room } = await ctx.supabase
+        .from("rooms")
+        .select("unit_id")
+        .eq("id", linkedLease.room_id)
+        .maybeSingle();
+      unitId = room?.unit_id ?? null;
+    }
+    const { data: unit } = unitId
+      ? await ctx.supabase.from("units").select("building_id").eq("id", unitId).maybeSingle()
+      : { data: null };
+
+    if (unit?.building_id) {
+      const { data: plainId } = await ctx.supabase.rpc("tenant_id_number", {
+        p_tenant: linkedTenant.id,
+      });
+      initialTenant = {
+        id: linkedTenant.id,
+        full_name: linkedTenant.full_name,
+        id_number: plainId ?? null,
+        nationality: linkedTenant.nationality,
+        buildingId: unit.building_id,
+      };
+    }
+  }
 
   // 4. Fetch active parent leases for sub-let mode
   const { data: rawParentLeases } = await ctx.supabase
@@ -132,9 +188,9 @@ export default async function NewLeasePage({
           <LeaseForm
             units={units}
             rooms={rooms}
-            tenants={tenants}
+            buildings={buildings}
             activeParentLeases={activeParentLeases}
-            defaultTenantId={tenantId}
+            initialTenant={initialTenant}
             defaultUnitId={unitId}
             labels={{
               leaseNo: t("leaseNo"),

@@ -3,6 +3,7 @@
 import { useActionState, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "@/i18n/navigation";
+import type { BuildingOption, PickerTenant } from "@/lib/tenant-picker";
 import { planLeaseCharges, type PlannedCharge } from "@/lib/lease-schedule";
 import { formatMoney, toMinor } from "@/lib/money";
 import { toFormData } from "@/lib/form-data";
@@ -63,12 +65,6 @@ type RoomOption = {
   building_name: string;
 };
 
-type TenantOption = {
-  id: string;
-  full_name: string;
-  phone: string | null;
-};
-
 type ParentLeaseOption = {
   id: string;
   lease_no: string;
@@ -79,9 +75,9 @@ type ParentLeaseOption = {
 type Props = {
   units: UnitOption[];
   rooms: RoomOption[];
-  tenants: TenantOption[];
+  buildings: BuildingOption[];
   activeParentLeases: ParentLeaseOption[];
-  defaultTenantId?: string;
+  initialTenant?: (PickerTenant & { buildingId: string }) | null;
   defaultUnitId?: string;
   labels: {
     leaseNo: string;
@@ -126,9 +122,9 @@ type Props = {
 export function LeaseForm({
   units,
   rooms,
-  tenants,
+  buildings,
   activeParentLeases,
-  defaultTenantId,
+  initialTenant,
   defaultUnitId,
   labels,
 }: Props) {
@@ -144,7 +140,7 @@ export function LeaseForm({
     defaultValues: {
       unitId: defaultUnitId || units[0]?.id || "",
       roomId: "",
-      tenantId: defaultTenantId || tenants[0]?.id || "",
+      tenantId: initialTenant?.id ?? "",
       startDate: today,
       endDate: endDate.toISOString().slice(0, 10),
       rent: "10000",
@@ -224,20 +220,12 @@ export function LeaseForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{labels.tenant}</FormLabel>
-                <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={labels.selectTenant} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {tenants.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.full_name} {t.phone ? `(${t.phone})` : ""}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <BuildingTenantPicker
+                  buildings={buildings}
+                  value={field.value ?? ""}
+                  initialTenant={initialTenant}
+                  onChange={(tenantId) => field.onChange(tenantId)}
+                />
                 <LocalizedFormMessage />
               </FormItem>
             )}

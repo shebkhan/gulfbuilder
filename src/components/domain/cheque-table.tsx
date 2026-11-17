@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { toFormData } from "@/lib/form-data";
+import type { BuildingOption } from "@/lib/tenant-picker";
 import { formatMoney } from "@/lib/money";
 import { registerChequeSchema, replaceChequeSchema } from "@/schemas/cheques";
 import {
@@ -52,7 +54,6 @@ export type ChequeItem = {
   lease: { id: string; lease_no: string } | null;
 };
 
-type TenantOption = { id: string; name: string };
 type LeaseOption = { id: string; lease_no: string; tenant_id: string };
 
 type RegisterValues = {
@@ -78,13 +79,13 @@ type ReplaceValues = {
 
 export function ChequeTable({
   cheques,
-  tenants,
+  buildings,
   leases,
   writable = false,
   locale = "en",
 }: {
   cheques: ChequeItem[];
-  tenants: TenantOption[];
+  buildings: BuildingOption[];
   leases: LeaseOption[];
   writable?: boolean;
   locale?: string;
@@ -373,26 +374,14 @@ export function ChequeTable({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("tenant")}</FormLabel>
-                    <Select
+                    <BuildingTenantPicker
+                      buildings={buildings}
                       value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
+                      onChange={(tenantId) => {
+                        field.onChange(tenantId);
                         registerForm.setValue("leaseId", "");
                       }}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("selectTenant")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {tenants.map((tenant) => (
-                          <SelectItem key={tenant.id} value={tenant.id}>
-                            {tenant.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    />
                     <LocalizedFormMessage />
                   </FormItem>
                 )}

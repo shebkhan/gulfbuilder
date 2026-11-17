@@ -48,6 +48,16 @@
     "all": "All",
     "unknown": "Unknown"
   },
+  "tenantPicker": {
+    "title": "Select a tenant",
+    "building": "Building",
+    "selectBuilding": "Select building",
+    "tenant": "Tenant",
+    "selectTenant": "Select tenant",
+    "chooseBuilding": "Choose a building to see its tenants",
+    "empty": "No tenants with an active lease in this building",
+    "error": "Could not load tenants. Please try again."
+  },
   "validation": {
     "required": "This field is required",
     "invalidEmail": "Enter a valid email address",

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toFormData } from "@/lib/form-data";
+import type { BuildingOption } from "@/lib/tenant-picker";
 import { formatMoney } from "@/lib/money";
 import { recordPaymentSchema } from "@/schemas/payments";
 import {
@@ -41,7 +43,6 @@ import {
   type UnallocatedCharge,
 } from "@/server/actions/payments";
 
-type TenantOption = { id: string; name: string };
 type LeaseOption = { id: string; lease_no: string; tenant_id: string };
 
 type Values = {
@@ -57,11 +58,11 @@ type Values = {
 };
 
 export function PaymentForm({
-  tenants,
+  buildings,
   leases,
   locale = "en",
 }: {
-  tenants: TenantOption[];
+  buildings: BuildingOption[];
   leases: LeaseOption[];
   locale?: string;
 }) {
@@ -155,20 +156,11 @@ export function PaymentForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("tenant")}</FormLabel>
-                  <Select value={field.value} onValueChange={handleTenantChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("selectTenant")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {tenants.map((tenant) => (
-                        <SelectItem key={tenant.id} value={tenant.id}>
-                          {tenant.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <BuildingTenantPicker
+                    buildings={buildings}
+                    value={field.value}
+                    onChange={(tenantId) => handleTenantChange(tenantId)}
+                  />
                   <FormDescription>{help.tenant}</FormDescription>
                   <LocalizedFormMessage />
                 </FormItem>

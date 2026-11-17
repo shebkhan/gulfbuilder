@@ -1,7 +1,8 @@
 export type PickerTenant = {
   id: string;
   full_name: string;
-  phone: string | null;
+  id_number: string | null;
+  nationality: string | null;
 };
 
 export type BuildingOption = {
@@ -10,8 +11,10 @@ export type BuildingOption = {
   name: string;
 };
 
-export function mergeTenantGroups(...groups: PickerTenant[][]): PickerTenant[] {
-  const byId = new Map<string, PickerTenant>();
+export function mergeTenantGroups<T extends { id: string; full_name: string }>(
+  ...groups: T[][]
+): T[] {
+  const byId = new Map<string, T>();
   for (const group of groups) {
     for (const tenant of group) byId.set(tenant.id, tenant);
   }
