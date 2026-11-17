@@ -5,6 +5,34 @@ section it departs from and why.
 
 ## 2026-11-16
 
+**D-017 · No sender for `notification_outbox` while automation is excluded.**
+SPEC §9 enqueues notifications and an Edge Function sends them on a schedule. The owner
+excluded scheduled jobs and Edge Function senders from v1, so business events still write
+outbox rows and the staff notification screen can display them, but nothing delivers them.
+Adding a sender later needs no schema change — only the worker and its retries.
+
+**D-016 · Tenant and owner self-scope policies.**
+Migration 0022 rewrote the select policies on finance, ledger, ops and reporting tables so
+tenant members see only rows on leases whose tenant has their `user_id`, and owners only
+rows on buildings they own or statements/payouts/approvals they own. Staff keep
+organization-wide reads; tightening managers to assigned buildings would empty their
+screens because the live database has no `member_building_access` rows. The portals rely
+on these policies as the single gate and add no application-level scoping.
+
+**D-015 · Platform admins live in a separate table, not in `member_role`.**
+SPEC §4 lists `platform_admin` as a role, but platform operators have no organization
+membership. Adding the value to `member_role` would force a synthetic organization and
+expose them to every `org_id = auth_org()` policy. The `(platform)` route group instead
+checks `is_platform_admin()` against `platform_admins` and uses the service-role client
+below the layout, with an audit row for every mutation.
+
+**D-014 · Printable HTML instead of `@react-pdf/renderer`.**
+SPEC §8 A2 and M5 call for bilingual PDFs. The four print routes render an A4 sheet
+(`@page { size: A4; margin: 15mm }`) with a browser print button and a link to the other
+language; the user saves as PDF from the print dialog. This avoids a rendering dependency
+and keeps Arabic layout in the app's existing RTL stack. Cost: no server-side PDF file,
+so nothing writes `pdf_path` or attaches a generated contract to a lease.
+
 **D-013 · Lease contract PDFs and signed-copy upload move to M4.**
 SPEC M2 includes bilingual contract PDFs and uploading the signed copy. Both need object storage and
 the documents table that arrive with `0005_ops` in M4, so building them now would mean a second

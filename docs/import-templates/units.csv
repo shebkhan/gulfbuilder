@@ -1,0 +1,4 @@
+type,code,name,owner,city,country_code,floor,unit_no,unit_type,area_sqm,rent
+unit,ALM,,,,QA,1,101,apartment,120,6500
+unit,ALM,,,,QA,1,102,apartment,95,5200
+unit,BLR,,,,QA,2,201,studio,60,3800
