@@ -90,6 +90,7 @@ export default async function BuildingsPage({
                   create: t("create"),
                   creating: t("creating"),
                   created: t("created"),
+                  help: t.raw("help") as Record<string, string>,
                   errors: t.raw("errors") as Record<string, string>,
                 }}
               />

@@ -102,6 +102,7 @@ export default async function BuildingPage({
     generate: t("generate"),
     generating: t("generating"),
     result: t.raw("result") as string,
+    help: t.raw("help") as Record<string, string>,
     errors: t.raw("errors") as Record<string, string>,
   };
 
@@ -210,6 +211,7 @@ export default async function BuildingPage({
                 grant: t("grant"),
                 revoke: t("revoke"),
                 noStaff: t("noStaff"),
+                help: t.raw("help") as Record<string, string>,
                 errors: t.raw("errors") as Record<string, string>,
               }}
             />

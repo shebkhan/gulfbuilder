@@ -375,6 +375,23 @@
     "grant": "Grant access",
     "revoke": "Remove",
     "noStaff": "Invite a manager or caretaker first.",
+    "help": {
+      "code": "Short unique code for the building (up to 40 characters).",
+      "name": "Display name shown throughout the workspace.",
+      "owner": "Owner recorded on this building.",
+      "city": "Optional; defaults to the organisation's city.",
+      "from": "Lowest level to create; ground floor is 0.",
+      "to": "Highest level to create.",
+      "prefix": "Optional prefix for generated unit numbers.",
+      "count": "Number of units to create on this floor.",
+      "start": "First number in the generated sequence.",
+      "pad": "Digits to pad numbers to, e.g. 01 or 001.",
+      "unitType": "Optional type such as Office or Retail.",
+      "areaSqm": "Optional area in square metres.",
+      "rent": "Optional default rent for each generated unit.",
+      "file": "Upload a CSV that follows the template below.",
+      "staff": "Team member to grant access to this building."
+    },
     "errors": {
       "invalid_input": "Check the fields.",
       "invalid_range": "The level range is invalid.",
@@ -423,6 +440,17 @@
     "hide": "Hide",
     "copy": "Copy",
     "copied": "Copied!",
+    "help": {
+      "fullName": "As shown on official identification.",
+      "kind": "Individuals and companies are stored differently.",
+      "language": "Language used for the tenant portal.",
+      "idNumber": "QID or passport number; stored encrypted.",
+      "phone": "Primary contact number.",
+      "whatsapp": "Used for payment reminders.",
+      "email": "An email address creates a tenant portal login.",
+      "nationality": "Optional.",
+      "employer": "Optional sponsor or employer."
+    },
     "errors": {
       "invalid_input": "Please check the entered fields.",
       "not_authorised": "You do not have permission to manage tenants.",

@@ -6,6 +6,7 @@ import { parseCsv } from "@/lib/csv";
 import { IMPORT_HEADERS, toImportRows } from "@/lib/import-rows";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { buildingSchema, floorsSchema, unitsSchema } from "@/schemas/property";
 import { getOrgContext } from "@/server/org-context";
 
 export type ImportReport = {
@@ -18,30 +19,6 @@ export type ImportReport = {
 };
 
 export type PropertyState = { error?: string; ok?: string; report?: ImportReport };
-
-const buildingSchema = z.object({
-  code: z.string().trim().min(1).max(40),
-  name: z.string().trim().min(1).max(120),
-  ownerId: z.string().uuid(),
-  city: z.string().trim().max(80).optional(),
-});
-
-const floorsSchema = z.object({
-  buildingId: z.string().uuid(),
-  from: z.coerce.number().int().min(-5).max(150),
-  to: z.coerce.number().int().min(-5).max(199),
-});
-
-const unitsSchema = z.object({
-  floorId: z.string().uuid(),
-  prefix: z.string().trim().max(10).optional(),
-  start: z.coerce.number().int().min(0).default(1),
-  count: z.coerce.number().int().min(1).max(500).default(1),
-  pad: z.coerce.number().int().min(1).max(5).default(2),
-  unitType: z.string().trim().max(30).optional(),
-  areaSqm: z.coerce.number().positive().optional(),
-  rent: z.string().trim().optional(),
-});
 
 function fail(error: string): PropertyState {
   return { error };

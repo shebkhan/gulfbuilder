@@ -1,16 +1,39 @@
 "use client";
 
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
 import {
   grantBuildingAccessAction,
   revokeBuildingAccessAction,
   type PropertyState,
 } from "@/server/actions/property";
-import { Label } from "@/components/ui/label";
 
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none transition-shadow focus:bg-surface-container-low focus:ring-[3px] focus:ring-primary-fixed";
+const grantAccessSchema = z.object({
+  buildingId: z.string().uuid("validation.invalidUuid"),
+  userId: z.string().uuid("validation.invalidUuid"),
+});
+
+type GrantValues = z.infer<typeof grantAccessSchema>;
 
 type Props = {
   buildingId: string;
@@ -21,6 +44,7 @@ type Props = {
     grant: string;
     revoke: string;
     noStaff: string;
+    help: Record<string, string>;
     errors: Record<string, string>;
   };
 };
@@ -31,12 +55,17 @@ export function BuildingAccess({
   access,
   labels,
 }: Props) {
-  const [state, formAction, pending] = useActionState<PropertyState, FormData>(
+  const assigned = new Set(access.map((entry) => entry.userId));
+  const available = staff.filter((member) => !assigned.has(member.id));
+
+  const form = useForm<GrantValues>({
+    resolver: zodResolver(grantAccessSchema),
+    defaultValues: { buildingId, userId: available[0]?.id ?? "" },
+  });
+  const [state, dispatch, pending] = useActionState<PropertyState, FormData>(
     grantBuildingAccessAction,
     {},
   );
-  const assigned = new Set(access.map((entry) => entry.userId));
-  const available = staff.filter((member) => !assigned.has(member.id));
 
   return (
     <div className="flex flex-col gap-4">
@@ -67,22 +96,42 @@ export function BuildingAccess({
       </ul>
 
       {available.length > 0 ? (
-        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <input type="hidden" name="buildingId" value={buildingId} />
-          <div className="flex-1">
-            <Label htmlFor="userId">{labels.staff}</Label>
-            <select id="userId" name="userId" className={selectClass} required>
-              {available.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Button type="submit" variant="secondary" disabled={pending}>
-            {labels.grant}
-          </Button>
-        </form>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
+            noValidate
+            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          >
+            <FormField
+              control={form.control}
+              name="userId"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>{labels.staff}</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {available.map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {member.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>{labels.help.staff}</FormDescription>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" variant="secondary" disabled={pending}>
+              {labels.grant}
+            </Button>
+          </form>
+        </Form>
       ) : null}
 
       {state.error ? (

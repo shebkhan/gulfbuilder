@@ -1,18 +1,38 @@
 "use client";
 
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
+import { floorsSchema, unitsSchema } from "@/schemas/property";
 import {
   generateFloorsAction,
   generateUnitsAction,
   type PropertyState,
 } from "@/server/actions/property";
 
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none transition-shadow focus:bg-surface-container-low focus:ring-[3px] focus:ring-primary-fixed";
+type FloorValues = z.infer<typeof floorsSchema>;
+type UnitValues = z.infer<typeof unitsSchema>;
 
 type Labels = {
   bulkFloors: string;
@@ -30,6 +50,7 @@ type Labels = {
   generate: string;
   generating: string;
   result: string;
+  help: Record<string, string>;
   errors: Record<string, string>;
 };
 
@@ -58,7 +79,11 @@ export function FloorsForm({
   buildingId: string;
   labels: Labels;
 }) {
-  const [state, formAction, pending] = useActionState<PropertyState, FormData>(
+  const form = useForm<FloorValues>({
+    resolver: zodResolver(floorsSchema),
+    defaultValues: { buildingId, from: 0, to: 4 },
+  });
+  const [state, dispatch, pending] = useActionState<PropertyState, FormData>(
     generateFloorsAction,
     {},
   );
@@ -69,23 +94,48 @@ export function FloorsForm({
         <CardTitle>{labels.bulkFloors}</CardTitle>
       </CardHeader>
       <CardBody>
-        <form action={formAction} className="flex flex-col gap-4">
-          <input type="hidden" name="buildingId" value={buildingId} />
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="from">{labels.from}</Label>
-              <Input id="from" name="from" type="number" defaultValue={0} required />
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
+            noValidate
+            className="flex flex-col gap-4"
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="from"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.from}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>{labels.help.from}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="to"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.to}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>{labels.help.to}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div>
-              <Label htmlFor="to">{labels.to}</Label>
-              <Input id="to" name="to" type="number" defaultValue={4} required />
-            </div>
-          </div>
-          <Result state={state} labels={labels} />
-          <Button type="submit" disabled={pending} className="self-start" variant="secondary">
-            {pending ? labels.generating : labels.generate}
-          </Button>
-        </form>
+            <Result state={state} labels={labels} />
+            <Button type="submit" disabled={pending} className="self-start" variant="secondary">
+              {pending ? labels.generating : labels.generate}
+            </Button>
+          </form>
+        </Form>
       </CardBody>
     </Card>
   );
@@ -98,7 +148,20 @@ export function UnitsForm({
   floors: { id: string; level: number; label: string | null }[];
   labels: Labels;
 }) {
-  const [state, formAction, pending] = useActionState<PropertyState, FormData>(
+  const form = useForm<UnitValues>({
+    resolver: zodResolver(unitsSchema),
+    defaultValues: {
+      floorId: floors[0]?.id ?? "",
+      prefix: "",
+      start: 1,
+      count: 4,
+      pad: 2,
+      unitType: "",
+      areaSqm: "",
+      rent: "",
+    },
+  });
+  const [state, dispatch, pending] = useActionState<PropertyState, FormData>(
     generateUnitsAction,
     {},
   );
@@ -109,52 +172,142 @@ export function UnitsForm({
         <CardTitle>{labels.bulkUnits}</CardTitle>
       </CardHeader>
       <CardBody>
-        <form action={formAction} className="flex flex-col gap-4">
-          <div>
-            <Label htmlFor="floorId">{labels.floor}</Label>
-            <select id="floorId" name="floorId" className={selectClass} required>
-              {floors.map((floor) => (
-                <option key={floor.id} value={floor.id}>
-                  {floor.label ?? floor.level}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="prefix">{labels.prefix}</Label>
-              <Input id="prefix" name="prefix" dir="ltr" maxLength={10} />
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
+            noValidate
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="floorId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{labels.floor}</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {floors.map((floor) => (
+                        <SelectItem key={floor.id} value={floor.id}>
+                          {floor.label ?? floor.level}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.prefix}</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} dir="ltr" maxLength={10} />
+                    </FormControl>
+                    <FormDescription>{labels.help.prefix}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="count"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.count}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>{labels.help.count}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="start"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.start}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>{labels.help.start}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="pad"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.pad}</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>{labels.help.pad}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unitType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.type}</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} dir="ltr" maxLength={30} />
+                    </FormControl>
+                    <FormDescription>{labels.help.unitType}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="areaSqm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.area}</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormDescription>{labels.help.areaSqm}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div>
-              <Label htmlFor="count">{labels.count}</Label>
-              <Input id="count" name="count" type="number" defaultValue={4} min={1} max={500} required />
-            </div>
-            <div>
-              <Label htmlFor="start">{labels.start}</Label>
-              <Input id="start" name="start" type="number" defaultValue={1} min={0} required />
-            </div>
-            <div>
-              <Label htmlFor="pad">{labels.pad}</Label>
-              <Input id="pad" name="pad" type="number" defaultValue={2} min={1} max={5} required />
-            </div>
-            <div>
-              <Label htmlFor="unitType">{labels.type}</Label>
-              <Input id="unitType" name="unitType" dir="ltr" maxLength={30} />
-            </div>
-            <div>
-              <Label htmlFor="areaSqm">{labels.area}</Label>
-              <Input id="areaSqm" name="areaSqm" type="number" step="0.01" min={1} />
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="rent">{labels.rent}</Label>
-            <Input id="rent" name="rent" inputMode="decimal" dir="ltr" />
-          </div>
-          <Result state={state} labels={labels} />
-          <Button type="submit" disabled={pending} className="self-start" variant="secondary">
-            {pending ? labels.generating : labels.generate}
-          </Button>
-        </form>
+            <FormField
+              control={form.control}
+              name="rent"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{labels.rent}</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} inputMode="decimal" dir="ltr" />
+                  </FormControl>
+                  <FormDescription>{labels.help.rent}</FormDescription>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+            <Result state={state} labels={labels} />
+            <Button type="submit" disabled={pending} className="self-start" variant="secondary">
+              {pending ? labels.generating : labels.generate}
+            </Button>
+          </form>
+        </Form>
       </CardBody>
     </Card>
   );

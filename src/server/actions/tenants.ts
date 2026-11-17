@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { can } from "@/lib/rbac";
+import { tenantSchema } from "@/schemas/tenants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getOrgContext } from "@/server/org-context";
 
@@ -12,29 +12,6 @@ export type TenantState = {
   plaintextId?: string;
   portalEnabled?: boolean;
 };
-
-const tenantSchema = z.object({
-  fullName: z.string().trim().min(1).max(120),
-  kind: z.enum(["person", "company"]).default("person"),
-  language: z.enum(["ar", "en"]).default("ar"),
-  idNumber: z
-    .string()
-    .trim()
-    .min(4)
-    .max(30)
-    .optional()
-    .or(z.literal("")),
-  phone: z.string().trim().max(30).optional().or(z.literal("")),
-  whatsapp: z.string().trim().max(30).optional().or(z.literal("")),
-  email: z
-    .string()
-    .trim()
-    .email()
-    .optional()
-    .or(z.literal("")),
-  nationality: z.string().trim().max(60).optional().or(z.literal("")),
-  employer: z.string().trim().max(120).optional().or(z.literal("")),
-});
 
 function fail(error: string): TenantState {
   return { error };

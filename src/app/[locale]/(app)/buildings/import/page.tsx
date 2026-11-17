@@ -48,6 +48,7 @@ export default async function ImportBuildingsPage({
               nothingWritten: t("nothingWritten"),
               row: t("row"),
               message: t("message"),
+              help: t.raw("help") as Record<string, string>,
               errors: t.raw("errors") as Record<string, string>,
             }}
           />
