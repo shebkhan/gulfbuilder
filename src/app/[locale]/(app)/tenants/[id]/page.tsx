@@ -10,6 +10,7 @@ import { maskId } from "@/lib/mask";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 /** The unit a lease belongs to, with the building it sits in. */
 type UnitRef = {
@@ -81,30 +82,27 @@ export default async function TenantDetailPage({
         </Link>
       </div>
 
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <h1 className="font-headline-lg text-headline-lg text-on-surface">
-              {tenant.full_name}
-            </h1>
+      <PageHeader
+        section="tenants"
+        role={ctx.role}
+        title={tenant.full_name}
+        description={tenant.nationality || ""}
+        actions={
+          <>
             <Badge variant="neutral">
               {tenant.kind === "company" ? t("company") : t("person")}
             </Badge>
-          </div>
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            {tenant.nationality || ""}
-          </p>
-        </div>
-
-        {can(ctx.role, "leases.write") ? (
-          <Link
-            href={`/leases/new?tenantId=${tenant.id}`}
-            className="rounded-xl bg-primary px-4 py-2 font-label-md text-label-md text-on-primary shadow-sm hover:bg-primary/90"
-          >
-            {tl("new")}
-          </Link>
-        ) : null}
-      </div>
+            {can(ctx.role, "leases.write") ? (
+              <Link
+                href={`/leases/new?tenantId=${tenant.id}`}
+                className="rounded-xl bg-primary px-4 py-2 font-label-md text-label-md text-on-primary shadow-sm hover:bg-primary/90"
+              >
+                {tl("new")}
+              </Link>
+            ) : null}
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">

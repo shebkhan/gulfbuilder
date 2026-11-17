@@ -155,12 +155,12 @@ export default async function DashboardPage({
               <Building2 className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Occupancy</KpiLabel>
+              <KpiLabel>{t("occupancy")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {kpis?.occupancy_pct ?? 0}%
               </span>
               <span className="text-xs text-on-surface-variant">
-                {kpis?.occupied_units ?? 0} / {kpis?.total_units ?? 0} units
+                {kpis?.occupied_units ?? 0} / {kpis?.total_units ?? 0} {t("units")}
               </span>
             </div>
           </CardBody>
@@ -172,11 +172,11 @@ export default async function DashboardPage({
               <TrendingUp className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Monthly Rent Roll</KpiLabel>
+              <KpiLabel>{t("monthlyRentRoll")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(BigInt(kpis?.monthly_rent_roll ?? 0), "QAR", locale)}
               </span>
-              <span className="text-xs text-on-surface-variant">Active lease pipeline</span>
+              <span className="text-xs text-on-surface-variant">{t("activeLeasePipeline")}</span>
             </div>
           </CardBody>
         </Card>
@@ -187,11 +187,11 @@ export default async function DashboardPage({
               <DollarSign className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Net Operating Income</KpiLabel>
+              <KpiLabel>{t("netOperatingIncome")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(BigInt(kpis?.net_operating_income ?? 0), "QAR", locale)}
               </span>
-              <span className="text-xs text-on-surface-variant">YTD collections less expenses</span>
+              <span className="text-xs text-on-surface-variant">{t("ytdCollections")}</span>
             </div>
           </CardBody>
         </Card>
@@ -202,13 +202,13 @@ export default async function DashboardPage({
               <Wrench className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Active Work Orders</KpiLabel>
+              <KpiLabel>{t("activeWorkOrders")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {openMaintCount ?? 0}
               </span>
               <span className="text-xs text-on-surface-variant">
                 <Link href="/maintenance" className="underline hover:text-on-surface">
-                  View queue
+                  {t("viewQueue")}
                 </Link>
               </span>
             </div>
@@ -226,7 +226,7 @@ export default async function DashboardPage({
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-title-md">{t("expiringLeases")}</CardTitle>
+                  <CardTitle>{t("expiringLeases")}</CardTitle>
                 </div>
                 <Link
                   href="/leases?expiring=true"
@@ -249,12 +249,12 @@ export default async function DashboardPage({
                       <div className="flex flex-col">
                         <Link
                           href={`/leases/${lease.lease_id}`}
-                          className="font-label-lg text-label-lg font-semibold text-on-surface hover:text-primary hover:underline underline-offset-4"
+                          className="font-label-md text-label-md font-semibold text-on-surface hover:text-primary hover:underline underline-offset-4"
                         >
                           {lease.lease_no}
                         </Link>
                         <span className="font-body-sm text-body-sm text-on-surface-variant">
-                          {lease.tenant_name} · Ends {lease.end_date}
+                          {lease.tenant_name} · {t("ends")} {lease.end_date}
                         </span>
                       </div>
 
@@ -273,7 +273,7 @@ export default async function DashboardPage({
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="flex items-center gap-2">
                 <Banknote className="h-5 w-5 text-secondary" />
-                <CardTitle className="text-title-md">{t("upcomingCheques")}</CardTitle>
+                <CardTitle>{t("upcomingCheques")}</CardTitle>
               </div>
               <Link
                 href="/cheques"
@@ -299,10 +299,10 @@ export default async function DashboardPage({
                       >
                         <div className="flex flex-col">
                           <span className="font-medium text-on-surface">
-                            Cheque #{c.cheque_no} ({c.bank_name})
+                            {t("cheque")} #{c.cheque_no} ({c.bank_name})
                           </span>
                           <span className="text-xs text-on-surface-variant">
-                            {tenant?.full_name} · Due {c.cheque_date}
+                            {tenant?.full_name} · {t("due")} {c.cheque_date}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ export default async function DashboardPage({
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="flex items-center gap-2">
                 <Receipt className="h-5 w-5 text-primary" />
-                <CardTitle className="text-title-md">{t("recentPayments")}</CardTitle>
+                <CardTitle>{t("recentPayments")}</CardTitle>
               </div>
               <Link
                 href="/payments"
@@ -378,7 +378,7 @@ export default async function DashboardPage({
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="flex items-center gap-2">
                 <Building2 className="h-5 w-5 text-primary" />
-                <CardTitle className="text-title-md">{t("buildingsOccupancy")}</CardTitle>
+                <CardTitle>{t("buildingsOccupancy")}</CardTitle>
               </div>
               <Link
                 href="/buildings"
@@ -391,7 +391,7 @@ export default async function DashboardPage({
             <CardBody className="pt-0">
               {(!rawBuildings || rawBuildings.length === 0) ? (
                 <p className="py-4 font-body-sm text-body-sm text-on-surface-variant">
-                  No buildings created.
+                  {t("noBuildings")}
                 </p>
               ) : (
                 <div className="flex flex-col divide-y divide-hairline">
@@ -433,7 +433,7 @@ export default async function DashboardPage({
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-error" />
-                <CardTitle className="text-title-md">{t("recentMaintenance")}</CardTitle>
+                <CardTitle>{t("recentMaintenance")}</CardTitle>
               </div>
               <Link
                 href="/maintenance"

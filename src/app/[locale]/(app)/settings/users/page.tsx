@@ -4,6 +4,7 @@ import { FormDialog } from "@/components/domain/form-dialog";
 import { InviteForm } from "@/components/domain/invite-form";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PageHeader } from "@/components/domain/page-header";
 
 const INVITABLE_ROLES = ["manager", "accountant", "caretaker", "owner", "tenant"] as const;
 
@@ -36,13 +37,13 @@ export default async function UsersSettingsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">
-            {t("subtitle")}
-          </p>
-        </div>
+      <PageHeader
+        section="settings"
+        role={role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
         <FormDialog title={t("invite")} triggerLabel={t("invite")}>
           <InviteForm
             locale={locale}
@@ -57,7 +58,9 @@ export default async function UsersSettingsPage({
             roles={INVITABLE_ROLES.map((value) => ({ value, label: t(`roles.${value}`) }))}
           />
         </FormDialog>
-      </div>
+          </div>
+        }
+      />
     </div>
   );
 }

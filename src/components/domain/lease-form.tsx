@@ -525,7 +525,7 @@ export function LeaseForm({
 
         {previewCharges.length > 0 ? (
           <div className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-lowest p-4">
-            <h3 className="font-title-sm text-title-sm text-on-surface">{labels.preview}</h3>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">{labels.preview}</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-start font-body-sm text-body-sm">
                 <thead>

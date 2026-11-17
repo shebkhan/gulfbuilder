@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BrandingForm } from "@/components/domain/branding-form";
+import { PageHeader } from "@/components/domain/page-header";
 import { SettingsNav } from "@/components/domain/settings-nav";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -39,9 +40,16 @@ export default async function BrandingSettingsPage({
     .maybeSingle();
 
   const terminology = branding?.terminology ?? {};
+  const t = await getTranslations("settings.branding");
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
+      <PageHeader
+        section="settings"
+        role={role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
       <SettingsNav />
       <BrandingForm
         values={{

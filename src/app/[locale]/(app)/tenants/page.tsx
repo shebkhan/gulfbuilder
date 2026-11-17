@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{ q?: string; page?: string }>;
 
@@ -53,11 +54,13 @@ export default async function TenantsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
+      <PageHeader
+        section="tenants"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
         {writable ? (
           <FormDialog title={t("new")} triggerLabel={t("new")}>
             <TenantForm
@@ -85,7 +88,9 @@ export default async function TenantsPage({
             />
           </FormDialog>
         ) : null}
-      </div>
+          </div>
+        }
+      />
 
       <div className="flex flex-col gap-3">
         <form method="get" className="max-w-md">

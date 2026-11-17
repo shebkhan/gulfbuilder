@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/domain/page-header";
 
 export default async function ImportBuildingsPage({
   params,
@@ -22,16 +23,20 @@ export default async function ImportBuildingsPage({
 
   return (
     <div className="flex max-w-3xl flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <Link
-          href="/buildings"
-          className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
-        >
-          ← {t("title")}
-        </Link>
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("importTitle")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("importSubtitle")}</p>
-      </div>
+      <PageHeader
+        section="buildings"
+        role={ctx.role}
+        title={t("importTitle")}
+        description={t("importSubtitle")}
+        actions={
+          <Link
+            href="/buildings"
+            className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
+          >
+            ← {t("title")}
+          </Link>
+        }
+      />
 
       <Card>
         <CardHeader>

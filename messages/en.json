@@ -36,7 +36,8 @@
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
     "daysLeftHeader": "Days left",
     "relatedSections": "Related sections",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "notifications": "Notifications"
   },
   "validation": {
     "required": "This field is required",
@@ -122,7 +123,19 @@
     "buildingsOccupancy": "Building Occupancy",
     "noUpcomingCheques": "No post-dated cheques due in the next 30 days.",
     "noRecentPayments": "No recent payments recorded.",
-    "noRecentMaintenance": "No active maintenance tickets."
+    "noRecentMaintenance": "No active maintenance tickets.",
+    "occupancy": "Occupancy",
+    "units": "units",
+    "monthlyRentRoll": "Monthly Rent Roll",
+    "activeLeasePipeline": "Active lease pipeline",
+    "netOperatingIncome": "Net Operating Income",
+    "ytdCollections": "YTD collections less expenses",
+    "activeWorkOrders": "Active Work Orders",
+    "viewQueue": "View queue",
+    "ends": "Ends",
+    "cheque": "Cheque",
+    "due": "Due",
+    "noBuildings": "No buildings created."
   },
   "settings": {
     "users": {
@@ -223,7 +236,9 @@
         "domain_taken": "That domain is already used by another organization.",
         "failed": "Could not save. Try again."
       },
-      "terminologyPlaceholder": "{\"leases\": \"Tenancy contracts\"}"
+      "terminologyPlaceholder": "{\"leases\": \"Tenancy contracts\"}",
+      "title": "Branding",
+      "subtitle": "Your app name, logo, colours and terminology."
     },
     "accounting": {
       "title": "Accounting",
@@ -577,7 +592,9 @@
       "not_found": "Lease not found.",
       "unit_already_leased": "The unit is already leased."
     },
-    "openLease": "Open lease"
+    "openLease": "Open lease",
+    "cancel": "Cancel",
+    "filter": "Filter"
   },
   "payments": {
     "title": "Payments & Receipts",
@@ -626,7 +643,12 @@
       "payment_failed": "The payment could not be recorded."
     },
     "remaining": "Remaining: {amount}",
-    "dueOn": "Due: {date}"
+    "dueOn": "Due: {date}",
+    "kpis": {
+      "totalCollections": "Total Collections",
+      "receiptsIssued": "Receipts Issued",
+      "defaultCurrency": "Default Currency"
+    }
   },
   "cheques": {
     "title": "Cheque Register",
@@ -686,6 +708,11 @@
       "clear_failed": "The cheque could not be cleared.",
       "bounce_failed": "The cheque could not be marked as bounced.",
       "replacement_failed": "The replacement cheque could not be created."
+    },
+    "kpis": {
+      "pendingClearance": "Pending Clearance",
+      "clearedTotal": "Cleared Total",
+      "bouncedCheques": "Bounced Cheques"
     }
   },
   "deposits": {
@@ -725,6 +752,11 @@
       "invalid_amount": "Enter a valid amount.",
       "deduction_failed": "The deduction could not be applied.",
       "refund_failed": "The refund could not be processed."
+    },
+    "kpis": {
+      "totalHeldInEscrow": "Total Held in Escrow",
+      "deductionsApplied": "Deductions Applied",
+      "refundsDisbursed": "Refunds Disbursed"
     }
   },
   "expenses": {
@@ -781,6 +813,11 @@
       "expense_creation_failed": "The expense could not be recorded.",
       "approval_failed": "The expense could not be approved.",
       "payment_failed": "The expense could not be paid."
+    },
+    "kpis": {
+      "totalExpenses": "Total Expenses",
+      "pendingApproval": "Pending Approval",
+      "disbursed": "Disbursed"
     }
   },
   "maintenance": {
@@ -849,6 +886,11 @@
       "request_creation_failed": "The request could not be created.",
       "status_update_failed": "The status could not be updated.",
       "invalid_amount": "Enter a valid cost."
+    },
+    "kpis": {
+      "openWorkOrders": "Open Work Orders",
+      "inProgress": "In Progress",
+      "urgentHighPriority": "Urgent / High Priority"
     }
   },
   "inspections": {
@@ -896,6 +938,11 @@
       "inspection_creation_failed": "The inspection could not be created.",
       "complete_failed": "The inspection could not be completed.",
       "invalid_amount": "Enter a valid amount."
+    },
+    "kpis": {
+      "moveInSurveys": "Move-In Surveys",
+      "moveOutSurveys": "Move-Out Surveys",
+      "pendingCompletion": "Pending Completion"
     }
   },
   "reports": {
@@ -965,7 +1012,12 @@
     "bank": "Bank",
     "date": "Date",
     "noReportData": "No data for this period.",
-    "ownerSubtitle": "Your buildings' occupancy, lease expiries, collections and cheques."
+    "ownerSubtitle": "Your buildings' occupancy, lease expiries, collections and cheques.",
+    "kpis": {
+      "activeAnnualizedPipeline": "Active annualized pipeline",
+      "collectionsLessExpenses": "Collections less expenses",
+      "agedOutstanding": "Aged outstanding"
+    }
   },
   "portal": {
     "nav": {

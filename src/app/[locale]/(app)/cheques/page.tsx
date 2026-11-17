@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   status?: string;
@@ -109,10 +110,12 @@ export default async function ChequesPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="cheques"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -122,7 +125,7 @@ export default async function ChequesPage({
               <Clock className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Pending Clearance</KpiLabel>
+              <KpiLabel>{t("kpis.pendingClearance")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(pendingAmountMinor, "QAR", locale)}
               </span>
@@ -136,7 +139,7 @@ export default async function ChequesPage({
               <CheckCircle className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Cleared Total</KpiLabel>
+              <KpiLabel>{t("kpis.clearedTotal")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(clearedAmountMinor, "QAR", locale)}
               </span>
@@ -150,7 +153,7 @@ export default async function ChequesPage({
               <AlertTriangle className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Bounced Cheques</KpiLabel>
+              <KpiLabel>{t("kpis.bouncedCheques")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {bouncedCount}
               </span>

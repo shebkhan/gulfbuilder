@@ -36,7 +36,8 @@
     "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
     "daysLeftHeader": "الأيام المتبقية",
     "relatedSections": "أقسام ذات صلة",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "notifications": "الإشعارات"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -122,7 +123,19 @@
     "buildingsOccupancy": "نسبة إشغال المباني",
     "noUpcomingCheques": "لا توجد شيكات تستحق خلال الـ ٣٠ يومًا القادمة.",
     "noRecentPayments": "لم يتم تسجيل دفعات مؤخرًا.",
-    "noRecentMaintenance": "لا توجد طلبات صيانة نشطة حاليًا."
+    "noRecentMaintenance": "لا توجد طلبات صيانة نشطة حاليًا.",
+    "occupancy": "الإشغال",
+    "units": "وحدات",
+    "monthlyRentRoll": "إيجارات شهرية",
+    "activeLeasePipeline": "عقود إيجار نشطة",
+    "netOperatingIncome": "صافي الدخل التشغيلي",
+    "ytdCollections": "تحصيلات السنة حتى تاريخه مطروحًا منها المصروفات",
+    "activeWorkOrders": "أوامر عمل نشطة",
+    "viewQueue": "عرض القائمة",
+    "ends": "تنتهي",
+    "cheque": "شيك",
+    "due": "يستحق",
+    "noBuildings": "لم يتم إنشاء أي عقار."
   },
   "settings": {
     "users": {
@@ -223,7 +236,9 @@
         "domain_taken": "النطاق مستخدم بالفعل من منشأة أخرى.",
         "failed": "تعذر الحفظ. حاول مرة أخرى."
       },
-      "terminologyPlaceholder": "{\"leases\": \"عقود الإيجار\"}"
+      "terminologyPlaceholder": "{\"leases\": \"عقود الإيجار\"}",
+      "title": "الهوية",
+      "subtitle": "اسم التطبيق والشعار والألوان والتعريفات البديلة."
     },
     "accounting": {
       "title": "المحاسبة",
@@ -577,7 +592,9 @@
       "not_found": "العقد غير موجود.",
       "unit_already_leased": "الوحدة مؤجرة بالفعل."
     },
-    "openLease": "فتح العقد"
+    "openLease": "فتح العقد",
+    "cancel": "إلغاء",
+    "filter": "تصفية"
   },
   "payments": {
     "title": "المدفوعات والإيصالات",
@@ -626,7 +643,12 @@
       "payment_failed": "تعذّر تسجيل الدفعة."
     },
     "remaining": "المتبقي: {amount}",
-    "dueOn": "الاستحقاق: {date}"
+    "dueOn": "الاستحقاق: {date}",
+    "kpis": {
+      "totalCollections": "إجمالي التحصيلات",
+      "receiptsIssued": "إيصالات صادرة",
+      "defaultCurrency": "العملة الافتراضية"
+    }
   },
   "cheques": {
     "title": "سجل الشيكات",
@@ -686,6 +708,11 @@
       "clear_failed": "تعذّر تحصيل الشيك.",
       "bounce_failed": "تعذّر تحديد الشيك كمرتد.",
       "replacement_failed": "تعذّر إنشاء الشيك البديل."
+    },
+    "kpis": {
+      "pendingClearance": "بانتظار الصرف",
+      "clearedTotal": "إجمالي المصروف",
+      "bouncedCheques": "شيكات مرتدة"
     }
   },
   "deposits": {
@@ -725,6 +752,11 @@
       "invalid_amount": "أدخل مبلغًا صالحًا.",
       "deduction_failed": "تعذّر تطبيق الخصم.",
       "refund_failed": "تعذّر تنفيذ الرد."
+    },
+    "kpis": {
+      "totalHeldInEscrow": "إجمالي المحتجز كضمان",
+      "deductionsApplied": "خصومات مطبقة",
+      "refundsDisbursed": "مبالغ مستردة"
     }
   },
   "expenses": {
@@ -781,6 +813,11 @@
       "expense_creation_failed": "تعذّر تسجيل المصروف.",
       "approval_failed": "تعذّر اعتماد المصروف.",
       "payment_failed": "تعذّر دفع المصروف."
+    },
+    "kpis": {
+      "totalExpenses": "إجمالي المصروفات",
+      "pendingApproval": "بانتظار الموافقة",
+      "disbursed": "تم الصرف"
     }
   },
   "maintenance": {
@@ -849,6 +886,11 @@
       "request_creation_failed": "تعذّر إنشاء طلب الصيانة.",
       "status_update_failed": "تعذّر تحديث الحالة.",
       "invalid_amount": "أدخل تكلفة صالحة."
+    },
+    "kpis": {
+      "openWorkOrders": "أوامر عمل مفتوحة",
+      "inProgress": "قيد التنفيذ",
+      "urgentHighPriority": "عاجل / أولوية عالية"
     }
   },
   "inspections": {
@@ -896,6 +938,11 @@
       "inspection_creation_failed": "تعذّر إنشاء المعاينة.",
       "complete_failed": "تعذّر إكمال المعاينة.",
       "invalid_amount": "أدخل قيمة صالحة."
+    },
+    "kpis": {
+      "moveInSurveys": "معاينات الدخول",
+      "moveOutSurveys": "معاينات الخروج",
+      "pendingCompletion": "بانتظار الاستكمال"
     }
   },
   "reports": {
@@ -965,7 +1012,12 @@
     "bank": "البنك",
     "date": "التاريخ",
     "noReportData": "لا توجد بيانات لهذه الفترة.",
-    "ownerSubtitle": "إشغال مبانيك وانتهاء عقودك وتحصيلاتك وشيكاتك."
+    "ownerSubtitle": "إشغال مبانيك وانتهاء عقودك وتحصيلاتك وشيكاتك.",
+    "kpis": {
+      "activeAnnualizedPipeline": "مسار نشط سنويًا",
+      "collectionsLessExpenses": "التحصيلات مطروحًا منها المصروفات",
+      "agedOutstanding": "المستحقات المتأخرة"
+    }
   },
   "portal": {
     "nav": {

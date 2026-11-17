@@ -6,8 +6,10 @@ import { ListPagination } from "@/components/domain/list-pagination";
 import { MeterForms } from "@/components/domain/meter-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -59,15 +61,19 @@ export default async function MetersPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
+      <PageHeader
+        section="meters"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
         <FormDialog title={t("title")} triggerLabel={t("newMeter")} wide>
           <MeterForms buildings={buildingOptions} meters={meterOptions} />
         </FormDialog>
-      </div>
+          </div>
+        }
+      />
 
       <Card>
         <CardHeader className="pb-2">
@@ -92,7 +98,13 @@ export default async function MetersPage({
                   <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                     <div className="flex flex-col">
                       <span className="font-body-md text-body-md font-medium text-on-surface">
-                        {building?.code ?? "—"} · {t(`kinds.${m.kind}` as never)}
+                        <Link
+                          href={`/buildings/${m.building_id}`}
+                          className="text-primary underline-offset-4 hover:underline"
+                        >
+                          {building?.code ?? "—"}
+                        </Link>{" "}
+                        · {t(`kinds.${m.kind}` as never)}
                       </span>
                       <span className="font-body-sm text-body-sm text-on-surface-variant">
                         {m.meter_no ?? "—"}

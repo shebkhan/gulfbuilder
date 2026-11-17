@@ -69,7 +69,7 @@ export async function AppShell({
               <LocaleSwitcher />
               <button
                 type="button"
-                aria-label={t("dashboard.title")}
+                aria-label={t("common.notifications")}
                 className="relative rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
               >
                 <Bell className="size-5" />

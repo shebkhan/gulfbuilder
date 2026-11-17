@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 const STATUS_VARIANT: Record<string, "warning" | "success" | "info" | "danger"> = {
   vacant: "warning",
@@ -108,21 +109,27 @@ export default async function BuildingPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <Link
-          href="/buildings"
-          className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
-        >
-          ← {t("title")}
-        </Link>
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{building.name}</h1>
-        <p className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">
-          {building.code}
-          {[building.zone, building.street, building.city].filter(Boolean).length
-            ? ` · ${[building.zone, building.street, building.city].filter(Boolean).join(", ")}`
-            : ""}
-        </p>
-      </div>
+      <PageHeader
+        section="buildings"
+        role={ctx.role}
+        actions={
+          <Link
+            href="/buildings"
+            className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
+          >
+            ← {t("title")}
+          </Link>
+        }
+        title={building.name}
+        description={
+          <>
+            {building.code}
+            {[building.zone, building.street, building.city].filter(Boolean).length
+              ? ` · ${[building.zone, building.street, building.city].filter(Boolean).join(", ")}`
+              : ""}
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

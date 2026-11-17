@@ -25,6 +25,7 @@ import {
   fetchRentRoll,
 } from "@/server/actions/reports";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   tab?: string;
@@ -131,14 +132,18 @@ export default async function ReportsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
+      <PageHeader
+        section="reports"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
 
         <StatementGenerator owners={ownerOptions} bankAccounts={bankOptions} writable={writable} />
-      </div>
+          </div>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -169,7 +174,7 @@ export default async function ReportsPage({
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(BigInt(kpis?.monthly_rent_roll ?? 0), "QAR", locale)}
               </span>
-              <span className="text-xs text-on-surface-variant">Active annualized pipeline</span>
+              <span className="text-xs text-on-surface-variant">{t("kpis.activeAnnualizedPipeline")}</span>
             </div>
           </CardBody>
         </Card>
@@ -184,7 +189,7 @@ export default async function ReportsPage({
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(BigInt(kpis?.net_operating_income ?? 0), "QAR", locale)}
               </span>
-              <span className="text-xs text-on-surface-variant">Collections less expenses</span>
+              <span className="text-xs text-on-surface-variant">{t("kpis.collectionsLessExpenses")}</span>
             </div>
           </CardBody>
         </Card>
@@ -199,7 +204,7 @@ export default async function ReportsPage({
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(BigInt(kpis?.overdue_receivables ?? 0), "QAR", locale)}
               </span>
-              <span className="text-xs text-on-surface-variant">Aged outstanding</span>
+              <span className="text-xs text-on-surface-variant">{t("kpis.agedOutstanding")}</span>
             </div>
           </CardBody>
         </Card>

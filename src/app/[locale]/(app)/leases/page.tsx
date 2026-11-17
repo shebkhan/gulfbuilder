@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   status?: string;
@@ -94,11 +95,13 @@ export default async function LeasesPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
+      <PageHeader
+        section="leases"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
 
         {writable ? (
           <Link
@@ -108,7 +111,9 @@ export default async function LeasesPage({
             {t("new")}
           </Link>
         ) : null}
-      </div>
+          </div>
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-3">
         <form method="get" className="flex flex-wrap items-center gap-2">
@@ -144,7 +149,7 @@ export default async function LeasesPage({
             className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-hairline bg-surface-container-low px-3.5 font-label-sm text-label-sm text-on-surface hover:bg-surface-container"
           >
             <Filter className="h-4 w-4" />
-            <span>Filter</span>
+            <span>{t("filter")}</span>
           </button>
         </form>
 
@@ -197,7 +202,14 @@ export default async function LeasesPage({
                           {lease.lease_no}
                         </Link>
                       </td>
-                      <td className="p-4 text-on-surface">{tenantName}</td>
+                      <td className="p-4 text-on-surface">
+                        <Link
+                          href={`/tenants/${(lease.tenants as unknown as { id: string }).id}`}
+                          className="text-primary underline-offset-4 hover:underline"
+                        >
+                          {tenantName}
+                        </Link>
+                      </td>
                       <td className="p-4 text-on-surface-variant">{unitLabel}</td>
                       <td className="p-4 text-on-surface-variant">
                         <DateCell date={lease.end_date} locale={locale} />

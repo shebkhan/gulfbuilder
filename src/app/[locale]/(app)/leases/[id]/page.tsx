@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 export default async function LeaseDetailPage({
   params,
@@ -52,7 +53,7 @@ export default async function LeaseDetailPage({
   const unitData = lease.units as unknown as {
     id: string;
     unit_no: string;
-    buildings: { name: string; code: string } | null;
+    buildings: { id: string; name: string; code: string } | null;
   } | null;
 
   const canWrite = can(ctx.role, "leases.write");
@@ -83,54 +84,70 @@ export default async function LeaseDetailPage({
         </Link>
       </div>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
-            <h1 className="font-headline-lg text-headline-lg text-on-surface">{lease.lease_no}</h1>
-            <Badge variant={getStatusVariant(lease.status)}>
-              {t(`statuses.${lease.status}`)}
-            </Badge>
-          </div>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+      <PageHeader
+        section="leases"
+        role={ctx.role}
+        title={lease.lease_no}
+        description={
+          <>
             <Link
               href={`/tenants/${tenant.id}`}
               className="font-medium text-primary hover:underline underline-offset-4"
             >
               {tenant.full_name}
             </Link>
-            {unitData ? ` · ${unitData.buildings?.name || ""} (${unitData.unit_no})` : ""}
-          </p>
-        </div>
-
-        <LeaseActions
-          leaseId={lease.id}
-          status={lease.status}
-          isSublet={!!lease.parent_lease_id}
-          subletApproved={!!lease.sublet_approved_by}
-          canWrite={canWrite}
-          canApprove={canApprove}
-          labels={{
-            activate: t("activate"),
-            activating: t("activating"),
-            terminate: t("terminate"),
-            terminating: t("terminating"),
-            renew: t("renew"),
-            renewing: t("renewing"),
-            approveSublet: t("approveSublet"),
-            approving: t("approving"),
-            terminationDate: t("terminationDate"),
-            terminationReason: t("terminationReason"),
-            startDate: t("startDate"),
-            endDate: t("endDate"),
-            rent: t("rent"),
-            frequency: t("frequency"),
-            installments: t("installments"),
-            dueDay: t("dueDay"),
-            deposit: t("deposit"),
-            cancel: "Cancel",
-          }}
-        />
-      </div>
+            {unitData ? (
+              <>
+                {" · "}
+                {unitData.buildings ? (
+                  <Link
+                    href={`/buildings/${unitData.buildings.id}`}
+                    className="text-primary hover:underline underline-offset-4"
+                  >
+                    {unitData.buildings.name}
+                  </Link>
+                ) : null}
+                {` (${unitData.unit_no})`}
+              </>
+            ) : ""}
+          </>
+        }
+        actions={
+          <>
+            <Badge variant={getStatusVariant(lease.status)}>
+              {t(`statuses.${lease.status}`)}
+            </Badge>
+            <LeaseActions
+              leaseId={lease.id}
+              status={lease.status}
+              isSublet={!!lease.parent_lease_id}
+              subletApproved={!!lease.sublet_approved_by}
+              canWrite={canWrite}
+              canApprove={canApprove}
+              labels={{
+                activate: t("activate"),
+                activating: t("activating"),
+                terminate: t("terminate"),
+                terminating: t("terminating"),
+                renew: t("renew"),
+                renewing: t("renewing"),
+                approveSublet: t("approveSublet"),
+                approving: t("approving"),
+                terminationDate: t("terminationDate"),
+                terminationReason: t("terminationReason"),
+                startDate: t("startDate"),
+                endDate: t("endDate"),
+                rent: t("rent"),
+                frequency: t("frequency"),
+                installments: t("installments"),
+                dueDay: t("dueDay"),
+                deposit: t("deposit"),
+                cancel: t("cancel"),
+              }}
+            />
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">
@@ -154,7 +171,7 @@ export default async function LeaseDetailPage({
 
             <div className="flex justify-between py-2">
               <span className="font-body-sm text-body-sm text-on-surface-variant">{t("rent")}</span>
-              <span className="font-title-sm font-semibold text-title-sm text-on-surface">
+              <span className="font-headline-sm text-headline-sm text-on-surface">
                 {formatMoney(BigInt(lease.rent_minor), lease.currency)}
               </span>
             </div>

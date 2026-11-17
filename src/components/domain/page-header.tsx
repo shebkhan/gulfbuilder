@@ -9,8 +9,8 @@ import type { Role } from "@/lib/rbac";
 type PageHeaderProps = {
   section: RelatedSection;
   role: Role;
-  title: string;
-  description: string;
+  title: React.ReactNode;
+  description: React.ReactNode;
   actions?: React.ReactNode;
 };
 

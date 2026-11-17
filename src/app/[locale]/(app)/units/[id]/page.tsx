@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 export default async function UnitPage({
   params,
@@ -49,27 +50,25 @@ export default async function UnitPage({
 
   return (
     <div className="flex max-w-4xl flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <Link
-          href={`/buildings/${unit.building_id}`}
-          className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
-        >
-          ← {building?.name ?? t("title")}
-        </Link>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">
-            {t("unitNo")} {unit.unit_no}
-          </h1>
-          <Badge variant={unit.status === "occupied" ? "success" : "neutral"}>
-            {t(`statuses.${unit.status}`)}
-          </Badge>
-        </div>
-        {building ? (
-          <p className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-            {building.code}
-          </p>
-        ) : null}
-      </div>
+      <PageHeader
+        section="buildings"
+        role={ctx.role}
+        title={`${t("unitNo")} ${unit.unit_no}`}
+        description={building ? building.code : ""}
+        actions={
+          <>
+            <Link
+              href={`/buildings/${unit.building_id}`}
+              className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
+            >
+              ← {building?.name ?? t("title")}
+            </Link>
+            <Badge variant={unit.status === "occupied" ? "success" : "neutral"}>
+              {t(`statuses.${unit.status}`)}
+            </Badge>
+          </>
+        }
+      />
 
       <Card>
         <CardBody className="pt-5">
