@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { recordPaymentSchema } from "@/schemas/payments";
 import { getOrgContext } from "@/server/org-context";
 import type { Database } from "@/types/database";
 
@@ -14,18 +14,6 @@ export type PaymentState = {
 };
 
 type PaymentMethod = Database["public"]["Enums"]["payment_method"];
-
-const recordPaymentSchema = z.object({
-  tenantId: z.string().uuid(),
-  leaseId: z.string().uuid().optional().or(z.literal("")),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  method: z.enum(["cash", "bank_transfer", "cheque", "card", "online"]),
-  receivedAt: z.string().min(1),
-  reference: z.string().trim().max(100).optional().or(z.literal("")),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-  allocations: z.string().optional().or(z.literal("")),
-});
 
 function fail(error: string): PaymentState {
   return { error };

@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { createRequestSchema, updateStatusSchema } from "@/schemas/maintenance";
 import { getOrgContext } from "@/server/org-context";
 import type { Database } from "@/types/database";
 
@@ -15,25 +15,6 @@ export type MaintenanceState = {
 
 type MaintPriority = Database["public"]["Enums"]["maint_priority"];
 type MaintStatus = Database["public"]["Enums"]["maint_status"];
-
-const createRequestSchema = z.object({
-  buildingId: z.string().uuid(),
-  unitId: z.string().uuid().optional().or(z.literal("")),
-  roomId: z.string().uuid().optional().or(z.literal("")),
-  tenantId: z.string().uuid().optional().or(z.literal("")),
-  title: z.string().trim().min(3).max(150),
-  description: z.string().trim().max(1000).optional().or(z.literal("")),
-  category: z.string().trim().min(1).default("general"),
-  priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"),
-  vendorId: z.string().uuid().optional().or(z.literal("")),
-});
-
-const updateStatusSchema = z.object({
-  requestId: z.string().uuid(),
-  status: z.enum(["open", "in_progress", "waiting_parts", "completed", "cancelled"]),
-  note: z.string().trim().max(500).optional().or(z.literal("")),
-  cost: z.string().optional().or(z.literal("")),
-});
 
 function fail(error: string): MaintenanceState {
   return { error };

@@ -2,13 +2,29 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
+import { organizationSchema } from "@/schemas/settings";
 import { updateOrganizationSettingsAction, type SettingsState } from "@/server/actions/settings";
-
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed";
 
 export type OrganizationSettings = {
   name: string;
@@ -26,165 +42,278 @@ export type OrganizationSettings = {
   revenueRecognition: string;
 };
 
+type Values = OrganizationSettings;
+
+const CURRENCIES = ["QAR", "AED", "SAR", "KWD", "BHD", "OMR"] as const;
+
 export function OrganizationSettingsForm({ values }: { values: OrganizationSettings }) {
   const t = useTranslations("settings.organization");
-  const [state, formAction, pending] = useActionState<SettingsState, FormData>(
+  const errors = t.raw("errors") as Record<string, string>;
+
+  const form = useForm<Values>({
+    resolver: zodResolver(organizationSchema),
+    defaultValues: values,
+  });
+
+  const [state, dispatch, pending] = useActionState<SettingsState, FormData>(
     updateOrganizationSettingsAction,
     {},
   );
 
   return (
-    <form action={formAction} className="flex max-w-2xl flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="name">{t("name")}</Label>
-          <Input id="name" name="name" defaultValue={values.name} required />
-        </div>
-        <div>
-          <Label htmlFor="legalName">{t("legalName")}</Label>
-          <Input id="legalName" name="legalName" defaultValue={values.legalName} />
-        </div>
-        <div>
-          <Label htmlFor="taxId">{t("taxId")}</Label>
-          <Input id="taxId" name="taxId" defaultValue={values.taxId} />
-        </div>
-        <div>
-          <Label htmlFor="baseCurrency">{t("baseCurrency")}</Label>
-          <select
-            id="baseCurrency"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((formValues) => dispatch(toFormData(formValues)))}
+        noValidate
+        className="flex max-w-2xl flex-col gap-4"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("name")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="legalName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("legalName")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="taxId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("taxId")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="baseCurrency"
-            defaultValue={values.baseCurrency}
-            className={selectClass}
-          >
-            {["QAR", "AED", "SAR", "KWD", "BHD", "OMR"].map((code) => (
-              <option key={code} value={code}>
-                {code}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="defaultLocale">{t("defaultLocale")}</Label>
-          <select
-            id="defaultLocale"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("baseCurrency")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {CURRENCIES.map((code) => (
+                      <SelectItem key={code} value={code}>
+                        {code}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>{t("baseCurrencyHint")}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="defaultLocale"
-            defaultValue={values.defaultLocale}
-            className={selectClass}
-          >
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="timezone">{t("timezone")}</Label>
-          <Input id="timezone" name="timezone" defaultValue={values.timezone} required />
-        </div>
-      </div>
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("defaultLocale")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="en">{t("languages.en")}</SelectItem>
+                    <SelectItem value="ar">{t("languages.ar")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
 
-      <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("policy")}</h2>
+          <FormField
+            control={form.control}
+            name="timezone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("timezone")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="graceDays">{t("graceDays")}</Label>
-          <Input
-            id="graceDays"
+        <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("policy")}</h2>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
             name="graceDays"
-            type="number"
-            min={0}
-            max={90}
-            defaultValue={values.graceDays}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("graceDays")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" min={0} max={90} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="lateFee">{t("lateFee")}</Label>
-          <Input
-            id="lateFee"
+
+          <FormField
+            control={form.control}
             name="lateFee"
-            defaultValue={values.lateFee}
-            inputMode="decimal"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("lateFee")}</FormLabel>
+                <FormControl>
+                  <Input {...field} inputMode="decimal" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="lateFeeType">{t("lateFeeType")}</Label>
-          <select
-            id="lateFeeType"
+
+          <FormField
+            control={form.control}
             name="lateFeeType"
-            defaultValue={values.lateFeeType}
-            className={selectClass}
-          >
-            <option value="flat">{t("lateFeeTypes.flat")}</option>
-            <option value="percent">{t("lateFeeTypes.percent")}</option>
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="lateFeePercent">{t("lateFeePercent")}</Label>
-          <Input
-            id="lateFeePercent"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("lateFeeType")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="flat">{t("lateFeeTypes.flat")}</SelectItem>
+                    <SelectItem value="percent">{t("lateFeeTypes.percent")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="lateFeePercent"
-            type="number"
-            min={0}
-            max={100}
-            step="0.01"
-            defaultValue={values.lateFeePercent}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("lateFeePercent")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" min={0} max={100} step="0.01" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="taxRate">{t("taxRate")}</Label>
-          <Input
-            id="taxRate"
+
+          <FormField
+            control={form.control}
             name="taxRate"
-            type="number"
-            min={0}
-            max={100}
-            step="0.01"
-            defaultValue={values.taxRate}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("taxRate")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" min={0} max={100} step="0.01" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="reminderDays">{t("reminderDays")}</Label>
-          <Input
-            id="reminderDays"
+
+          <FormField
+            control={form.control}
             name="reminderDays"
-            type="number"
-            min={0}
-            max={60}
-            defaultValue={values.reminderDays}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("reminderDays")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" min={0} max={60} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="revenueRecognition"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("revenueRecognition")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="on_due">{t("recognition.on_due")}</SelectItem>
+                    <SelectItem value="straight_line_monthly">
+                      {t("recognition.straight_line_monthly")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
         </div>
-        <div>
-          <Label htmlFor="revenueRecognition">{t("revenueRecognition")}</Label>
-          <select
-            id="revenueRecognition"
-            name="revenueRecognition"
-            defaultValue={values.revenueRecognition}
-            className={selectClass}
+
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
           >
-            <option value="on_due">{t("recognition.on_due")}</option>
-            <option value="straight_line_monthly">{t("recognition.straight_line_monthly")}</option>
-          </select>
-        </div>
-      </div>
+            {errors[state.error] ?? state.error}
+          </p>
+        ) : null}
+        {state.ok ? (
+          <p
+            role="status"
+            className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+          >
+            {t("saved")}
+          </p>
+        ) : null}
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-        >
-          {t(`errors.${state.error}` as never)}
-        </p>
-      ) : null}
-      {state.ok ? (
-        <p
-          role="status"
-          className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
-        >
-          {t("saved")}
-        </p>
-      ) : null}
-
-      <Button type="submit" size="lg" disabled={pending} className="self-start">
-        {pending ? t("saving") : t("save")}
-      </Button>
-    </form>
+        <Button type="submit" size="lg" disabled={pending} className="self-start">
+          {pending ? t("saving") : t("save")}
+        </Button>
+      </form>
+    </Form>
   );
 }

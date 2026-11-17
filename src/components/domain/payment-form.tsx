@@ -2,7 +2,10 @@
 
 import { Check, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useActionState, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,8 +14,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toFormData } from "@/lib/form-data";
 import { formatMoney } from "@/lib/money";
+import { recordPaymentSchema } from "@/schemas/payments";
 import {
   getTenantOutstandingCharges,
   recordPaymentAction,
@@ -20,15 +41,19 @@ import {
   type UnallocatedCharge,
 } from "@/server/actions/payments";
 
-type TenantOption = {
-  id: string;
-  name: string;
-};
+type TenantOption = { id: string; name: string };
+type LeaseOption = { id: string; lease_no: string; tenant_id: string };
 
-type LeaseOption = {
-  id: string;
-  lease_no: string;
-  tenant_id: string;
+type Values = {
+  tenantId: string;
+  leaseId?: string;
+  amount: string;
+  currency: string;
+  method: "cash" | "bank_transfer" | "cheque" | "card" | "online";
+  receivedAt: string;
+  reference?: string;
+  notes?: string;
+  allocations?: string;
 };
 
 export function PaymentForm({
@@ -41,34 +66,57 @@ export function PaymentForm({
   locale?: string;
 }) {
   const t = useTranslations("payments");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [state, setState] = useState<PaymentState>({});
-
-  const [selectedTenant, setSelectedTenant] = useState("");
-  const [selectedLease, setSelectedLease] = useState("");
-  const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("cash");
-  const [reference, setReference] = useState("");
-  const [notes, setNotes] = useState("");
-  const [receivedAt, setReceivedAt] = useState(new Date().toISOString().slice(0, 10));
 
   const [charges, setCharges] = useState<UnallocatedCharge[]>([]);
   const [allocations, setAllocations] = useState<Record<string, string>>({});
   const [loadingCharges, setLoadingCharges] = useState(false);
 
-  const handleTenantChange = async (tenantId: string) => {
-    setSelectedTenant(tenantId);
-    setSelectedLease("");
+  const form = useForm<Values>({
+    resolver: zodResolver(recordPaymentSchema),
+    defaultValues: {
+      tenantId: "",
+      leaseId: "",
+      amount: "",
+      currency: "QAR",
+      method: "cash",
+      receivedAt: new Date().toISOString().slice(0, 10),
+      reference: "",
+      notes: "",
+      allocations: "",
+    },
+  });
+
+  const [state, dispatch, pending] = useActionState<PaymentState, FormData>(
+    async (prev, formData) => {
+      const res = await recordPaymentAction(prev, formData);
+      if (res.ok) {
+        setOpen(false);
+        form.reset();
+        setAllocations({});
+      }
+      return res;
+    },
+    {},
+  );
+
+  const tenantId = form.watch("tenantId");
+  const filteredLeases = tenantId ? leases.filter((l) => l.tenant_id === tenantId) : leases;
+
+  const handleTenantChange = async (value: string) => {
+    form.setValue("tenantId", value);
+    form.setValue("leaseId", "");
     setAllocations({});
-    if (!tenantId) {
+    if (!value) {
       setCharges([]);
       return;
     }
     setLoadingCharges(true);
     try {
-      const outstanding = await getTenantOutstandingCharges(tenantId);
-      setCharges(outstanding);
+      setCharges(await getTenantOutstandingCharges(value));
     } catch {
       setCharges([]);
     } finally {
@@ -76,51 +124,14 @@ export function PaymentForm({
     }
   };
 
-  const handleAllocationChange = (chargeId: string, val: string) => {
-    setAllocations((prev) => ({ ...prev, [chargeId]: val }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setState({});
-
-    const formData = new FormData();
-    formData.set("tenantId", selectedTenant);
-    if (selectedLease) formData.set("leaseId", selectedLease);
-    formData.set("amount", amount);
-    formData.set("method", method);
-    formData.set("receivedAt", receivedAt);
-    if (reference) formData.set("reference", reference);
-    if (notes) formData.set("notes", notes);
-
-    // Format allocations
-    const allocArr: { charge_id: string; amount: string }[] = [];
-    for (const [cid, val] of Object.entries(allocations)) {
-      if (val && parseFloat(val) > 0) {
-        allocArr.push({ charge_id: cid, amount: val });
-      }
-    }
-    if (allocArr.length > 0) {
-      formData.set("allocations", JSON.stringify(allocArr));
-    }
-
-    startTransition(async () => {
-      const res = await recordPaymentAction({}, formData);
-      setState(res);
-      if (res.ok) {
-        setOpen(false);
-        setAmount("");
-        setReference("");
-        setNotes("");
-        setAllocations({});
-        setSelectedTenant("");
-      }
-    });
-  };
-
-  const filteredLeases = selectedTenant
-    ? leases.filter((l) => l.tenant_id === selectedTenant)
-    : leases;
+  const onSubmit = form.handleSubmit((values) => {
+    const formData = toFormData(values);
+    const allocArr = Object.entries(allocations)
+      .filter(([, value]) => value && Number(value) > 0)
+      .map(([charge_id, amount]) => ({ charge_id, amount }));
+    if (allocArr.length > 0) formData.set("allocations", JSON.stringify(allocArr));
+    dispatch(formData);
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -132,126 +143,155 @@ export function PaymentForm({
       </DialogTrigger>
 
       <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>{t("recordPayment")}</DialogTitle>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{t("recordPayment")}</DialogTitle>
+        </DialogHeader>
 
-          {state.error && (
-            <div className="mt-4 rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container">
-              {state.error}
-            </div>
-          )}
+        <Form {...form}>
+          <form onSubmit={onSubmit} noValidate className="mt-4 flex flex-col gap-4">
+            <FormField
+              control={form.control}
+              name="tenantId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("tenant")}</FormLabel>
+                  <Select value={field.value} onValueChange={handleTenantChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("selectTenant")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {tenants.map((tenant) => (
+                        <SelectItem key={tenant.id} value={tenant.id}>
+                          {tenant.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>{help.tenant}</FormDescription>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
 
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("tenant")} *
-              </label>
-              <select
-                required
-                value={selectedTenant}
-                onChange={(e) => handleTenantChange(e.target.value)}
-                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">{t("selectTenant")}</option>
-                {tenants.map((ten) => (
-                  <option key={ten.id} value={ten.id}>
-                    {ten.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {selectedTenant && (
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("lease")}
-                </label>
-                <select
-                  value={selectedLease}
-                  onChange={(e) => setSelectedLease(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="">{t("selectLease")}</option>
-                  {filteredLeases.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.lease_no}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amount")} (QAR) *
-                </label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("method")} *
-                </label>
-                <select
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="cash">{t("methods.cash")}</option>
-                  <option value="bank_transfer">{t("methods.bank_transfer")}</option>
-                  <option value="cheque">{t("methods.cheque")}</option>
-                  <option value="card">{t("methods.card")}</option>
-                  <option value="online">{t("methods.online")}</option>
-                </select>
-              </div>
-            </div>
+            {tenantId ? (
+              <FormField
+                control={form.control}
+                name="leaseId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("lease")}</FormLabel>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("selectLease")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {filteredLeases.map((lease) => (
+                          <SelectItem key={lease.id} value={lease.id}>
+                            {lease.lease_no}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>{help.lease}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("date")} *
-                </label>
-                <input
-                  required
-                  type="date"
-                  value={receivedAt}
-                  onChange={(e) => setReceivedAt(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="any" {...field} dir="ltr" />
+                    </FormControl>
+                    <FormDescription>{help.amount}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("reference")}
-                </label>
-                <input
-                  type="text"
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                  placeholder="TRX-12345 or CHQ-001"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("method")}</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {(["cash", "bank_transfer", "cheque", "card", "online"] as const).map(
+                          (key) => (
+                            <SelectItem key={key} value={key}>
+                              {t(`methods.${key}`)}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>{help.method}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            {selectedTenant && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="receivedAt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("date")}</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} dir="ltr" />
+                    </FormControl>
+                    <FormDescription>{help.date}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="reference"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("reference")}</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ""} dir="ltr" />
+                    </FormControl>
+                    <FormDescription>{help.reference}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {tenantId ? (
               <div className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-low p-3">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                <p className="font-label-md text-label-md font-semibold text-on-surface">
                   {t("allocations")}
-                </label>
+                </p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  {help.allocations}
+                </p>
                 {loadingCharges ? (
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    {tCommon("loading")}
+                  </p>
                 ) : charges.length === 0 ? (
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     {t("noOutstandingCharges")}
@@ -261,60 +301,82 @@ export function PaymentForm({
                     <p className="font-label-sm text-label-sm text-on-surface-variant">
                       {t("outstandingCharges")}
                     </p>
-                    {charges.map((c) => (
+                    {charges.map((charge) => (
                       <div
-                        key={c.id}
-                        className="flex items-center justify-between gap-2 border-b border-hairline/50 pb-2 text-xs"
+                        key={charge.id}
+                        className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline/50 pb-2 text-xs"
                       >
                         <div className="flex flex-col">
                           <span className="font-semibold text-on-surface">
-                            {c.type} {c.lease_no ? `(${c.lease_no})` : ""} - Due: {c.due_date}
+                            {charge.type} {charge.lease_no ? `(${charge.lease_no})` : ""} ·{" "}
+                            {t("dueOn", { date: charge.due_date })}
                           </span>
                           <span className="text-on-surface-variant">
-                            Remaining: {formatMoney(BigInt(c.remaining_minor), c.currency, locale)}
+                            {t("remaining", {
+                              amount: formatMoney(
+                                BigInt(charge.remaining_minor),
+                                charge.currency,
+                                locale,
+                              ),
+                            })}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            step="0.01"
-                            max={(c.remaining_minor / 100).toFixed(2)}
-                            value={allocations[c.id] || ""}
-                            onChange={(e) => handleAllocationChange(c.id, e.target.value)}
-                            placeholder="0.00"
-                            className="w-24 rounded-lg border border-hairline bg-surface-container-lowest px-2 py-1 text-end"
-                          />
-                        </div>
+                        <Input
+                          type="number"
+                          step="any"
+                          max={(charge.remaining_minor / 100).toFixed(2)}
+                          value={allocations[charge.id] ?? ""}
+                          onChange={(event) =>
+                            setAllocations((prev) => ({ ...prev, [charge.id]: event.target.value }))
+                          }
+                          placeholder="0.00"
+                          aria-label={help.allocationAmount}
+                          className="w-24 text-end"
+                          dir="ltr"
+                        />
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
 
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("notes")}
-              </label>
-              <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
-            </div>
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("notes")}</FormLabel>
+                  <FormControl>
+                    <Textarea rows={2} {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <FormDescription>{help.notes}</FormDescription>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+
+            {state.error ? (
+              <p
+                role="alert"
+                className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+              >
+                {errors[state.error] ?? state.error}
+              </p>
+            ) : null}
 
             <div className="flex items-center justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Cancel
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                {tCommon("cancel")}
               </Button>
-              <Button type="submit" disabled={isPending} className="flex items-center gap-2">
+              <Button type="submit" disabled={pending} className="flex items-center gap-2">
                 <Check className="size-4" />
-                {isPending ? t("recording") : t("recordPayment")}
+                {pending ? t("recording") : t("recordPayment")}
               </Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { completeInspectionSchema, createInspectionSchema } from "@/schemas/inspections";
 import { getOrgContext } from "@/server/org-context";
 
 export type InspectionState = {
@@ -11,19 +11,6 @@ export type InspectionState = {
   ok?: string;
   inspectionId?: string;
 };
-
-const createInspectionSchema = z.object({
-  leaseId: z.string().uuid(),
-  kind: z.enum(["move_in", "move_out"]),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-});
-
-const completeInspectionSchema = z.object({
-  inspectionId: z.string().uuid(),
-  checklistData: z.string().default("{}"),
-  deductAmount: z.string().optional().or(z.literal("")),
-  deductReason: z.string().trim().max(300).optional().or(z.literal("")),
-});
 
 function fail(error: string): InspectionState {
   return { error };

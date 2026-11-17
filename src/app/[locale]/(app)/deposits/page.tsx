@@ -6,6 +6,7 @@ import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { paginate } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -64,10 +65,12 @@ export default async function DepositsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="deposits"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -77,7 +80,7 @@ export default async function DepositsPage({
               <PiggyBank className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Total Held in Escrow</KpiLabel>
+              <KpiLabel>{t("kpis.totalHeldInEscrow")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(totalHeldMinor, "QAR", locale)}
               </span>
@@ -91,7 +94,7 @@ export default async function DepositsPage({
               <MinusCircle className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Deductions Applied</KpiLabel>
+              <KpiLabel>{t("kpis.deductionsApplied")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(totalDeductedMinor, "QAR", locale)}
               </span>
@@ -105,7 +108,7 @@ export default async function DepositsPage({
               <RotateCcw className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Refunds Disbursed</KpiLabel>
+              <KpiLabel>{t("kpis.refundsDisbursed")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(totalRefundedMinor, "QAR", locale)}
               </span>

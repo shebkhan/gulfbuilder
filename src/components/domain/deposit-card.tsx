@@ -2,13 +2,27 @@
 
 import { MinusCircle, PiggyBank, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useActionState, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
+import { toFormData } from "@/lib/form-data";
 import { formatMoney } from "@/lib/money";
+import { deductionSchema, refundSchema } from "@/schemas/deposits";
 import {
   applyDeductionAction,
   refundDepositAction,
@@ -27,6 +41,21 @@ export type DepositItem = {
   lease: { id: string; lease_no: string } | null;
 };
 
+type DeductionValues = {
+  depositId: string;
+  amount: string;
+  currency: string;
+  reason: string;
+  chargeId?: string;
+};
+
+type RefundValues = {
+  depositId: string;
+  amount: string;
+  currency: string;
+  reason?: string;
+};
+
 export function DepositCard({
   deposits,
   writable = false,
@@ -37,67 +66,69 @@ export function DepositCard({
   locale?: string;
 }) {
   const t = useTranslations("deposits");
-  const [isPending, startTransition] = useTransition();
-  const [state, setState] = useState<DepositState>({});
-
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
   const [deductTarget, setDeductTarget] = useState<DepositItem | null>(null);
-  const [deductAmount, setDeductAmount] = useState("");
-  const [deductReason, setDeductReason] = useState("");
-
   const [refundTarget, setRefundTarget] = useState<DepositItem | null>(null);
-  const [refundAmount, setRefundAmount] = useState("");
-  const [refundReason, setRefundReason] = useState("");
 
-  const handleDeductSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!deductTarget) return;
-    setState({});
+  const deductForm = useForm<DeductionValues>({
+    resolver: zodResolver(deductionSchema),
+    defaultValues: {
+      depositId: "",
+      amount: "",
+      currency: "QAR",
+      reason: "",
+      chargeId: "",
+    },
+  });
 
-    const formData = new FormData();
-    formData.set("depositId", deductTarget.id);
-    formData.set("amount", deductAmount);
-    formData.set("reason", deductReason);
+  const [deductState, deductDispatch, deductPending] = useActionState<DepositState, FormData>(
+    async (prev, formData) => {
+      const res = await applyDeductionAction(prev, formData);
+      if (res.ok) setDeductTarget(null);
+      return res;
+    },
+    {},
+  );
 
-    startTransition(async () => {
-      const res = await applyDeductionAction({}, formData);
-      setState(res);
-      if (res.ok) {
-        setDeductTarget(null);
-        setDeductAmount("");
-        setDeductReason("");
-      }
+  const refundForm = useForm<RefundValues>({
+    resolver: zodResolver(refundSchema),
+    defaultValues: { depositId: "", amount: "", currency: "QAR", reason: "" },
+  });
+
+  const [refundState, refundDispatch, refundPending] = useActionState<DepositState, FormData>(
+    async (prev, formData) => {
+      const res = await refundDepositAction(prev, formData);
+      if (res.ok) setRefundTarget(null);
+      return res;
+    },
+    {},
+  );
+
+  const openDeduct = (deposit: DepositItem) => {
+    deductForm.reset({
+      depositId: deposit.id,
+      amount: "",
+      currency: "QAR",
+      reason: "",
+      chargeId: "",
     });
+    setDeductTarget(deposit);
   };
 
-  const handleRefundSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!refundTarget) return;
-    setState({});
-
-    const formData = new FormData();
-    formData.set("depositId", refundTarget.id);
-    formData.set("amount", refundAmount);
-    if (refundReason) formData.set("reason", refundReason);
-
-    startTransition(async () => {
-      const res = await refundDepositAction({}, formData);
-      setState(res);
-      if (res.ok) {
-        setRefundTarget(null);
-        setRefundAmount("");
-        setRefundReason("");
-      }
+  const openRefund = (deposit: DepositItem, balance: number) => {
+    refundForm.reset({
+      depositId: deposit.id,
+      amount: (balance / 100).toFixed(2),
+      currency: "QAR",
+      reason: "",
     });
+    setRefundTarget(deposit);
   };
 
   return (
     <>
-      {state.error && (
-        <div className="rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container">
-          {state.error}
-        </div>
-      )}
-
       {deposits.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-hairline bg-surface-container-lowest p-12 text-center shadow-card">
           <PiggyBank className="size-12 text-on-surface-variant/40" />
@@ -105,29 +136,30 @@ export function DepositCard({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {deposits.map((dep) => {
-            const currentBalance = BigInt(dep.held_minor - dep.deducted_minor - dep.refunded_minor);
+          {deposits.map((deposit) => {
+            const balance = deposit.held_minor - deposit.deducted_minor - deposit.refunded_minor;
+            const currentBalance = BigInt(balance);
             const canAct = writable && currentBalance > 0n;
 
             return (
-              <Card key={dep.id} className="flex flex-col justify-between">
+              <Card key={deposit.id} className="flex flex-col justify-between">
                 <CardBody className="p-5">
                   <div className="flex items-start justify-between gap-3 border-b border-hairline pb-3">
                     <div className="flex flex-col">
                       <span className="font-headline-sm text-headline-sm font-semibold text-on-surface">
-                        {dep.tenant?.full_name || "—"}
+                        {deposit.tenant?.full_name || "—"}
                       </span>
-                      {dep.lease && (
+                      {deposit.lease ? (
                         <Link
-                          href={`/leases/${dep.lease.id}`}
+                          href={`/leases/${deposit.lease.id}`}
                           className="font-mono text-sm text-primary hover:underline"
                         >
-                          {dep.lease.lease_no}
+                          {deposit.lease.lease_no}
                         </Link>
-                      )}
+                      ) : null}
                     </div>
                     <Badge variant={currentBalance > 0n ? "success" : "neutral"}>
-                      {currentBalance > 0n ? "Active escrow" : "Settled"}
+                      {currentBalance > 0n ? t("activeEscrow") : t("settled")}
                     </Badge>
                   </div>
 
@@ -137,25 +169,23 @@ export function DepositCard({
                         {t("held")}
                       </span>
                       <span className="font-semibold text-on-surface">
-                        {formatMoney(BigInt(dep.held_minor), dep.currency, locale)}
+                        {formatMoney(BigInt(deposit.held_minor), deposit.currency, locale)}
                       </span>
                     </div>
-
                     <div className="rounded-lg bg-surface-container-low p-2">
                       <span className="block text-[11px] uppercase tracking-wider text-error">
                         {t("deducted")}
                       </span>
                       <span className="font-semibold text-error">
-                        {formatMoney(BigInt(dep.deducted_minor), dep.currency, locale)}
+                        {formatMoney(BigInt(deposit.deducted_minor), deposit.currency, locale)}
                       </span>
                     </div>
-
                     <div className="rounded-lg bg-surface-container-low p-2">
                       <span className="block text-[11px] uppercase tracking-wider text-on-surface-variant">
                         {t("refunded")}
                       </span>
                       <span className="font-semibold text-on-surface">
-                        {formatMoney(BigInt(dep.refunded_minor), dep.currency, locale)}
+                        {formatMoney(BigInt(deposit.refunded_minor), deposit.currency, locale)}
                       </span>
                     </div>
                   </div>
@@ -165,21 +195,16 @@ export function DepositCard({
                       {t("balance")}
                     </span>
                     <span className="font-headline-sm text-headline-sm font-bold text-primary">
-                      {formatMoney(currentBalance, dep.currency, locale)}
+                      {formatMoney(currentBalance, deposit.currency, locale)}
                     </span>
                   </div>
 
-                  {canAct && (
+                  {canAct ? (
                     <div className="mt-4 flex items-center justify-end gap-2 border-t border-hairline pt-3">
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => {
-                          setDeductTarget(dep);
-                          setDeductAmount("");
-                          setDeductReason("");
-                        }}
-                        disabled={isPending}
+                        onClick={() => openDeduct(deposit)}
                         className="flex items-center gap-1.5"
                       >
                         <MinusCircle className="size-3.5" />
@@ -188,19 +213,14 @@ export function DepositCard({
                       <Button
                         size="sm"
                         variant="primary"
-                        onClick={() => {
-                          setRefundTarget(dep);
-                          setRefundAmount((Number(currentBalance) / 100).toFixed(2));
-                          setRefundReason("");
-                        }}
-                        disabled={isPending}
+                        onClick={() => openRefund(deposit, balance)}
                         className="flex items-center gap-1.5"
                       >
                         <RotateCcw className="size-3.5" />
                         {t("refund")}
                       </Button>
                     </div>
-                  )}
+                  ) : null}
                 </CardBody>
               </Card>
             );
@@ -208,130 +228,161 @@ export function DepositCard({
         </div>
       )}
 
-      {/* Deduction Modal */}
-      {deductTarget && (
+      {/* Deduction modal */}
+      {deductTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
             <h2 className="font-headline-sm text-headline-sm text-on-surface">
               {t("applyDeduction")}
             </h2>
             <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
-              Tenant: {deductTarget.tenant?.full_name} ({deductTarget.lease?.lease_no})
+              {t("tenantLine", {
+                tenant: deductTarget.tenant?.full_name ?? "—",
+                lease: deductTarget.lease?.lease_no ?? "—",
+              })}
             </p>
-            <form onSubmit={handleDeductSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amount")} (QAR) *
-                </label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  max={(
-                    (deductTarget.held_minor -
-                      deductTarget.deducted_minor -
-                      deductTarget.refunded_minor) /
-                    100
-                  ).toFixed(2)}
-                  value={deductAmount}
-                  onChange={(e) => setDeductAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+            <Form {...deductForm}>
+              <form
+                onSubmit={deductForm.handleSubmit((values) => deductDispatch(toFormData(values)))}
+                noValidate
+                className="mt-4 flex flex-col gap-4"
+              >
+                <FormField
+                  control={deductForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("amount")}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.deductAmount}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("reason")} *
-                </label>
-                <Textarea
-                  required
-                  rows={2}
-                  value={deductReason}
-                  onChange={(e) => setDeductReason(e.target.value)}
-                  placeholder="Damage repairs / unpaid utility bills"
+                <FormField
+                  control={deductForm.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("reason")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={2}
+                          {...field}
+                          placeholder={t("deductReasonPlaceholder")}
+                        />
+                      </FormControl>
+                      <FormDescription>{help.deductReason}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setDeductTarget(null)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" variant="destructive" disabled={isPending}>
-                  {t("applyDeduction")}
-                </Button>
-              </div>
-            </form>
+                {deductState.error ? (
+                  <p
+                    role="alert"
+                    className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+                  >
+                    {errors[deductState.error] ?? deductState.error}
+                  </p>
+                ) : null}
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setDeductTarget(null)}
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                  <Button type="submit" variant="destructive" disabled={deductPending}>
+                    {t("applyDeduction")}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Refund Modal */}
-      {refundTarget && (
+      {/* Refund modal */}
+      {refundTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
             <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("refund")}</h2>
             <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
-              Tenant: {refundTarget.tenant?.full_name} ({refundTarget.lease?.lease_no})
+              {t("tenantLine", {
+                tenant: refundTarget.tenant?.full_name ?? "—",
+                lease: refundTarget.lease?.lease_no ?? "—",
+              })}
             </p>
-            <form onSubmit={handleRefundSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amount")} (QAR) *
-                </label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  max={(
-                    (refundTarget.held_minor -
-                      refundTarget.deducted_minor -
-                      refundTarget.refunded_minor) /
-                    100
-                  ).toFixed(2)}
-                  value={refundAmount}
-                  onChange={(e) => setRefundAmount(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+            <Form {...refundForm}>
+              <form
+                onSubmit={refundForm.handleSubmit((values) => refundDispatch(toFormData(values)))}
+                noValidate
+                className="mt-4 flex flex-col gap-4"
+              >
+                <FormField
+                  control={refundForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("amount")}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.refundAmount}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("reason")}
-                </label>
-                <input
-                  type="text"
-                  value={refundReason}
-                  onChange={(e) => setRefundReason(e.target.value)}
-                  placeholder="Lease concluded with full clearance"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                <FormField
+                  control={refundForm.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("reason")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ""}
+                          placeholder={t("refundReasonPlaceholder")}
+                        />
+                      </FormControl>
+                      <FormDescription>{help.refundReason}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setRefundTarget(null)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {t("refund")}
-                </Button>
-              </div>
-            </form>
+                {refundState.error ? (
+                  <p
+                    role="alert"
+                    className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+                  >
+                    {errors[refundState.error] ?? refundState.error}
+                  </p>
+                ) : null}
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setRefundTarget(null)}
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                  <Button type="submit" disabled={refundPending}>
+                    {t("refund")}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

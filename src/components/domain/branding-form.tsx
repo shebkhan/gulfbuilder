@@ -2,10 +2,22 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toFormData } from "@/lib/form-data";
+import { brandingSchema } from "@/schemas/settings";
 import { updateBrandingAction, type SettingsState } from "@/server/actions/settings";
 
 export type BrandingValues = {
@@ -20,103 +32,179 @@ export type BrandingValues = {
   customDomainStatus: string;
 };
 
+type Values = Omit<BrandingValues, "customDomainStatus">;
+
 export function BrandingForm({ values }: { values: BrandingValues }) {
   const t = useTranslations("settings.branding");
-  const [state, formAction, pending] = useActionState<SettingsState, FormData>(
+  const errors = t.raw("errors") as Record<string, string>;
+
+  const form = useForm<Values>({
+    resolver: zodResolver(brandingSchema),
+    defaultValues: {
+      appName: values.appName,
+      logoUrl: values.logoUrl,
+      faviconUrl: values.faviconUrl,
+      primaryColor: values.primaryColor,
+      secondaryColor: values.secondaryColor,
+      fontFamily: values.fontFamily,
+      terminology: values.terminology,
+      customDomain: values.customDomain,
+    },
+  });
+
+  const [state, dispatch, pending] = useActionState<SettingsState, FormData>(
     updateBrandingAction,
     {},
   );
 
   return (
-    <form action={formAction} className="flex max-w-2xl flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="appName">{t("appName")}</Label>
-          <Input id="appName" name="appName" defaultValue={values.appName} />
-        </div>
-        <div>
-          <Label htmlFor="fontFamily">{t("fontFamily")}</Label>
-          <Input id="fontFamily" name="fontFamily" defaultValue={values.fontFamily} />
-        </div>
-        <div>
-          <Label htmlFor="logoUrl">{t("logoUrl")}</Label>
-          <Input id="logoUrl" name="logoUrl" defaultValue={values.logoUrl} dir="ltr" />
-        </div>
-        <div>
-          <Label htmlFor="faviconUrl">{t("faviconUrl")}</Label>
-          <Input id="faviconUrl" name="faviconUrl" defaultValue={values.faviconUrl} dir="ltr" />
-        </div>
-        <div>
-          <Label htmlFor="primaryColor">{t("primaryColor")}</Label>
-          <Input
-            id="primaryColor"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((formValues) => dispatch(toFormData(formValues)))}
+        noValidate
+        className="flex max-w-2xl flex-col gap-4"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="appName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("appName")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fontFamily"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("fontFamily")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="logoUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("logoUrl")}</FormLabel>
+                <FormControl>
+                  <Input {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="faviconUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("faviconUrl")}</FormLabel>
+                <FormControl>
+                  <Input {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="primaryColor"
-            defaultValue={values.primaryColor}
-            placeholder="#795919"
-            dir="ltr"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("primaryColor")}</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="#795919" dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <Label htmlFor="secondaryColor">{t("secondaryColor")}</Label>
-          <Input
-            id="secondaryColor"
+
+          <FormField
+            control={form.control}
             name="secondaryColor"
-            defaultValue={values.secondaryColor}
-            placeholder="#156c47"
-            dir="ltr"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("secondaryColor")}</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="#156c47" dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
           />
         </div>
-      </div>
 
-      <div>
-        <Label htmlFor="terminology">{t("terminology")}</Label>
-        <Textarea
-          id="terminology"
+        <FormField
+          control={form.control}
           name="terminology"
-          rows={5}
-          defaultValue={values.terminology}
-          placeholder='{"leases": "Tenancy contracts"}'
-          dir="ltr"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("terminology")}</FormLabel>
+              <FormControl>
+                <Textarea rows={5} {...field} placeholder={t("terminologyPlaceholder")} dir="ltr" />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <Label htmlFor="customDomain">{t("customDomain")}</Label>
-        <Input
-          id="customDomain"
+        <FormField
+          control={form.control}
           name="customDomain"
-          defaultValue={values.customDomain}
-          placeholder="property.example.com"
-          dir="ltr"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("customDomain")}</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="property.example.com" dir="ltr" />
+              </FormControl>
+              <FormDescription>
+                {t("customDomainHint")}
+                {values.customDomainStatus && values.customDomainStatus !== "none"
+                  ? ` (${t(`domainStatus.${values.customDomainStatus}` as never)})`
+                  : ""}
+              </FormDescription>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
         />
-        <p className="mt-1.5 font-body-sm text-body-sm text-on-surface-variant">
-          {t("customDomainHint")}
-          {values.customDomainStatus && values.customDomainStatus !== "none"
-            ? ` (${t(`domainStatus.${values.customDomainStatus}` as never)})`
-            : ""}
-        </p>
-      </div>
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-        >
-          {t(`errors.${state.error}` as never)}
-        </p>
-      ) : null}
-      {state.ok ? (
-        <p
-          role="status"
-          className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
-        >
-          {t("saved")}
-        </p>
-      ) : null}
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[state.error] ?? state.error}
+          </p>
+        ) : null}
+        {state.ok ? (
+          <p
+            role="status"
+            className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+          >
+            {t("saved")}
+          </p>
+        ) : null}
 
-      <Button type="submit" size="lg" disabled={pending} className="self-start">
-        {pending ? t("saving") : t("save")}
-      </Button>
-    </form>
+        <Button type="submit" size="lg" disabled={pending} className="self-start">
+          {pending ? t("saving") : t("save")}
+        </Button>
+      </form>
+    </Form>
   );
 }

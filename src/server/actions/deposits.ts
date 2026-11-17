@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
+import { deductionSchema, refundSchema } from "@/schemas/deposits";
 import { getOrgContext } from "@/server/org-context";
 
 export type DepositState = {
@@ -10,21 +10,6 @@ export type DepositState = {
   ok?: string;
   depositId?: string;
 };
-
-const deductionSchema = z.object({
-  depositId: z.string().uuid(),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  reason: z.string().trim().min(1).max(300),
-  chargeId: z.string().uuid().optional().or(z.literal("")),
-});
-
-const refundSchema = z.object({
-  depositId: z.string().uuid(),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  reason: z.string().trim().max(300).optional().or(z.literal("")),
-});
 
 function fail(error: string): DepositState {
   return { error };

@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { toMinor } from "@/lib/money";
+import { registerChequeSchema, replaceChequeSchema } from "@/schemas/cheques";
 import { getOrgContext } from "@/server/org-context";
 
 export type ChequeState = {
@@ -11,27 +11,6 @@ export type ChequeState = {
   chequeId?: string;
   paymentId?: string;
 };
-
-const registerChequeSchema = z.object({
-  tenantId: z.string().uuid(),
-  leaseId: z.string().uuid(),
-  chequeNo: z.string().trim().min(1).max(50),
-  bankName: z.string().trim().min(1).max(100),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  chequeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-});
-
-const replaceChequeSchema = z.object({
-  oldChequeId: z.string().uuid(),
-  chequeNo: z.string().trim().min(1).max(50),
-  bankName: z.string().trim().min(1).max(100),
-  amount: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  chequeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
-});
 
 function fail(error: string): ChequeState {
   return { error };

@@ -1,16 +1,52 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter } from "@/i18n/navigation";
 import { planLeaseCharges, type PlannedCharge } from "@/lib/lease-schedule";
 import { formatMoney, toMinor } from "@/lib/money";
+import { toFormData } from "@/lib/form-data";
+import { createLeaseSchema } from "@/schemas/leases";
 import { createLeaseAction, type LeaseState } from "@/server/actions/leases";
 
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none transition-shadow focus:bg-surface-container-low focus:ring-[3px] focus:ring-primary-fixed";
+type LeaseFormValues = {
+  unitId?: string;
+  roomId?: string;
+  tenantId: string;
+  startDate: string;
+  endDate: string;
+  rent: string;
+  currency: string;
+  frequency: "monthly" | "quarterly" | "semiannual" | "annual";
+  installments: number;
+  dueDay: number;
+  deposit?: string;
+  noticeDays: number;
+  isSublet: boolean;
+  parentLeaseId?: string;
+  leaseNo?: string;
+};
 
 type UnitOption = {
   id: string;
@@ -52,6 +88,8 @@ type Props = {
     selectTenant: string;
     unit: string;
     selectUnit: string;
+    room: string;
+    autoLeaseNo: string;
     startDate: string;
     endDate: string;
     rent: string;
@@ -62,11 +100,21 @@ type Props = {
     dueDay: string;
     deposit: string;
     noticeDays: string;
+    leaseNoHint: string;
+    rentHint: string;
+    dueDayHint: string;
+    depositHint: string;
+    noticeDaysHint: string;
     isSublet: string;
     parentLease: string;
     selectParentLease: string;
     mainTenant: string;
+    subletExplanation: string;
     preview: string;
+    type: string;
+    period: string;
+    dueDate: string;
+    amount: string;
     create: string;
     creating: string;
     created: string;
@@ -85,30 +133,33 @@ export function LeaseForm({
 }: Props) {
   const router = useRouter();
   const [targetType, setTargetType] = useState<"unit" | "room">("unit");
-  const [unitId, setUnitId] = useState(defaultUnitId || units[0]?.id || "");
-  const [roomId, setRoomId] = useState(rooms[0]?.id || "");
-  const [tenantId, setTenantId] = useState(defaultTenantId || tenants[0]?.id || "");
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
-  const [endDate, setEndDate] = useState(() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() + 1);
-    return d.toISOString().slice(0, 10);
-  });
-  const [rent, setRent] = useState("10000");
-  const [currency] = useState("QAR");
-  const [frequency, setFrequency] = useState<"monthly" | "quarterly" | "semiannual" | "annual">(
-    "annual",
-  );
-  const [installments, setInstallments] = useState(4);
-  const [dueDay, setDueDay] = useState(1);
-  const [deposit, setDeposit] = useState("0");
-  const [noticeDays, setNoticeDays] = useState(60);
-  const [isSublet, setIsSublet] = useState(false);
-  const [parentLeaseId, setParentLeaseId] = useState(activeParentLeases[0]?.id || "");
 
-  const [state, formAction, pending] = useActionState<LeaseState, FormData>(
+  const today = new Date().toISOString().slice(0, 10);
+  const endDate = new Date();
+  endDate.setFullYear(endDate.getFullYear() + 1);
+
+  const form = useForm<LeaseFormValues>({
+    resolver: zodResolver(createLeaseSchema),
+    defaultValues: {
+      unitId: defaultUnitId || units[0]?.id || "",
+      roomId: "",
+      tenantId: defaultTenantId || tenants[0]?.id || "",
+      startDate: today,
+      endDate: endDate.toISOString().slice(0, 10),
+      rent: "10000",
+      currency: "QAR",
+      frequency: "annual",
+      installments: 4,
+      dueDay: 1,
+      deposit: "0",
+      noticeDays: 60,
+      isSublet: false,
+      parentLeaseId: activeParentLeases[0]?.id || "",
+      leaseNo: "",
+    },
+  });
+
+  const [state, dispatch, pending] = useActionState<LeaseState, FormData>(
     async (prev, formData) => {
       const res = await createLeaseAction(prev, formData);
       if (res.ok && res.leaseId) {
@@ -119,325 +170,406 @@ export function LeaseForm({
     {},
   );
 
+  const values = form.watch();
+
   // Live schedule preview calculation
   const previewCharges: PlannedCharge[] = useMemo(() => {
-    if (!startDate || !endDate || !rent || Number(rent) <= 0 || installments < 1) {
+    if (
+      !values.startDate ||
+      !values.endDate ||
+      !values.rent ||
+      Number(values.rent) <= 0 ||
+      values.installments < 1
+    ) {
       return [];
     }
     try {
-      const rentMinor = toMinor(rent, currency);
-      const depositMinor = deposit ? toMinor(deposit, currency) : 0n;
       return planLeaseCharges({
-        rentMinor,
-        currency,
-        frequency,
-        installments,
-        startDate,
-        endDate,
-        dueDay,
-        depositMinor,
+        rentMinor: toMinor(values.rent, values.currency),
+        currency: values.currency,
+        frequency: values.frequency,
+        installments: values.installments,
+        startDate: values.startDate,
+        endDate: values.endDate,
+        dueDay: values.dueDay,
+        depositMinor: values.deposit ? toMinor(values.deposit, values.currency) : 0n,
       });
     } catch {
       return [];
     }
-  }, [startDate, endDate, rent, currency, frequency, installments, dueDay, deposit]);
+  }, [
+    values.startDate,
+    values.endDate,
+    values.rent,
+    values.currency,
+    values.frequency,
+    values.installments,
+    values.dueDay,
+    values.deposit,
+  ]);
 
-  const selectedParent = activeParentLeases.find((l) => l.id === parentLeaseId);
+  const selectedParent = activeParentLeases.find((l) => l.id === values.parentLeaseId);
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="tenantId">{labels.tenant}</Label>
-          <select
-            id="tenantId"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((data) => dispatch(toFormData(data)))}
+        className="flex flex-col gap-6"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
             name="tenantId"
-            value={tenantId}
-            onChange={(e) => setTenantId(e.target.value)}
-            className={selectClass}
-            required
-          >
-            {tenants.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.full_name} {t.phone ? `(${t.phone})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.tenant}</FormLabel>
+                <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={labels.selectTenant} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {tenants.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.full_name} {t.phone ? `(${t.phone})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div>
-          <Label htmlFor="leaseNo">{labels.leaseNo}</Label>
-          <Input id="leaseNo" name="leaseNo" placeholder="Auto-generated if empty" dir="ltr" maxLength={50} />
-        </div>
+          <FormField
+            control={form.control}
+            name="leaseNo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.leaseNo}</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} placeholder={labels.autoLeaseNo} dir="ltr" maxLength={50} />
+                </FormControl>
+                <FormDescription>{labels.leaseNoHint}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="sm:col-span-2 flex items-center gap-4">
-          <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-            <input
-              type="radio"
-              name="targetType"
-              checked={targetType === "unit"}
-              onChange={() => setTargetType("unit")}
+          <div className="sm:col-span-2 flex items-center gap-4">
+            <RadioGroup
+              value={targetType}
+              onValueChange={(value) => {
+                const next = value as "unit" | "room";
+                setTargetType(next);
+                form.setValue(next === "unit" ? "roomId" : "unitId", "");
+              }}
+              className="flex flex-wrap items-center gap-4"
+            >
+              <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
+                <RadioGroupItem value="unit" />
+                {labels.unit}
+              </label>
+              {rooms.length > 0 ? (
+                <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
+                  <RadioGroupItem value="room" />
+                  {labels.room}
+                </label>
+              ) : null}
+            </RadioGroup>
+          </div>
+
+          {targetType === "unit" ? (
+            <FormField
+              control={form.control}
+              name="unitId"
+              render={({ field }) => (
+                <FormItem className="sm:col-span-2">
+                  <FormLabel>{labels.unit}</FormLabel>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={labels.selectUnit} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {units.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>
+                          {u.building_name} · {labels.unit} {u.unit_no}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
             />
-            {labels.unit}
-          </label>
-          {rooms.length > 0 ? (
-            <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-              <input
-                type="radio"
-                name="targetType"
-                checked={targetType === "room"}
-                onChange={() => setTargetType("room")}
+          ) : (
+            <FormField
+              control={form.control}
+              name="roomId"
+              render={({ field }) => (
+                <FormItem className="sm:col-span-2">
+                  <FormLabel>{labels.room}</FormLabel>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={labels.selectUnit} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {rooms.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.building_name} · {labels.unit} {r.unit_no} · {labels.room} {r.room_number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <LocalizedFormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.startDate}</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.endDate}</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="rent"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.rent}</FormLabel>
+                <FormControl>
+                  <Input type="number" step="any" {...field} dir="ltr" />
+                </FormControl>
+                <FormDescription>{labels.rentHint}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.currency}</FormLabel>
+                <FormControl>
+                  <Input {...field} readOnly dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="frequency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.frequency}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(["monthly", "quarterly", "semiannual", "annual"] as const).map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {labels.frequencies[key]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="installments"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.installments}</FormLabel>
+                <FormControl>
+                  <Input type="number" min={1} max={60} {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="dueDay"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.dueDay}</FormLabel>
+                <FormControl>
+                  <Input type="number" min={1} max={28} {...field} dir="ltr" />
+                </FormControl>
+                <FormDescription>{labels.dueDayHint}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="deposit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.deposit}</FormLabel>
+                <FormControl>
+                  <Input type="number" step="any" {...field} value={field.value ?? ""} dir="ltr" />
+                </FormControl>
+                <FormDescription>{labels.depositHint}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="noticeDays"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.noticeDays}</FormLabel>
+                <FormControl>
+                  <Input type="number" min={0} {...field} dir="ltr" />
+                </FormControl>
+                <FormDescription>{labels.noticeDaysHint}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="isSublet"
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-2 sm:col-span-2">
+                <FormControl>
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+                <FormLabel className="font-body-sm text-body-sm">{labels.isSublet}</FormLabel>
+              </FormItem>
+            )}
+          />
+
+          {values.isSublet ? (
+            <div className="sm:col-span-2 flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4">
+              <FormField
+                control={form.control}
+                name="parentLeaseId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.parentLease}</FormLabel>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={labels.selectParentLease} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {activeParentLeases.map((l) => (
+                          <SelectItem key={l.id} value={l.id}>
+                            {l.lease_no} ({l.tenant_name})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
               />
-              Room
-            </label>
+
+              {selectedParent ? (
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  {labels.mainTenant}: <strong className="text-on-surface">{selectedParent.tenant_name}</strong>.{" "}
+                  {labels.subletExplanation}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
 
-        {targetType === "unit" ? (
-          <div className="sm:col-span-2">
-            <Label htmlFor="unitId">{labels.unit}</Label>
-            <select
-              id="unitId"
-              name="unitId"
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
-              className={selectClass}
-              required
-            >
-              {units.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.building_name} · Unit {u.unit_no}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : (
-          <div className="sm:col-span-2">
-            <Label htmlFor="roomId">Room</Label>
-            <select
-              id="roomId"
-              name="roomId"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              className={selectClass}
-              required
-            >
-              {rooms.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.building_name} · Unit {r.unit_no} · Room {r.room_number}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div>
-          <Label htmlFor="startDate">{labels.startDate}</Label>
-          <Input
-            id="startDate"
-            name="startDate"
-            type="date"
-            required
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="endDate">{labels.endDate}</Label>
-          <Input
-            id="endDate"
-            name="endDate"
-            type="date"
-            required
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="rent">{labels.rent}</Label>
-          <Input
-            id="rent"
-            name="rent"
-            type="number"
-            step="any"
-            required
-            dir="ltr"
-            value={rent}
-            onChange={(e) => setRent(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="currency">{labels.currency}</Label>
-          <Input id="currency" name="currency" value={currency} readOnly dir="ltr" />
-        </div>
-
-        <div>
-          <Label htmlFor="frequency">{labels.frequency}</Label>
-          <select
-            id="frequency"
-            name="frequency"
-            value={frequency}
-            onChange={(e) =>
-              setFrequency(
-                e.target.value as "monthly" | "quarterly" | "semiannual" | "annual",
-              )
-            }
-            className={selectClass}
-          >
-            <option value="monthly">{labels.frequencies.monthly}</option>
-            <option value="quarterly">{labels.frequencies.quarterly}</option>
-            <option value="semiannual">{labels.frequencies.semiannual}</option>
-            <option value="annual">{labels.frequencies.annual}</option>
-          </select>
-        </div>
-
-        <div>
-          <Label htmlFor="installments">{labels.installments}</Label>
-          <Input
-            id="installments"
-            name="installments"
-            type="number"
-            min={1}
-            max={60}
-            required
-            dir="ltr"
-            value={installments}
-            onChange={(e) => setInstallments(Number(e.target.value))}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="dueDay">{labels.dueDay}</Label>
-          <Input
-            id="dueDay"
-            name="dueDay"
-            type="number"
-            min={1}
-            max={28}
-            required
-            dir="ltr"
-            value={dueDay}
-            onChange={(e) => setDueDay(Number(e.target.value))}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="deposit">{labels.deposit}</Label>
-          <Input
-            id="deposit"
-            name="deposit"
-            type="number"
-            step="any"
-            dir="ltr"
-            value={deposit}
-            onChange={(e) => setDeposit(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="noticeDays">{labels.noticeDays}</Label>
-          <Input
-            id="noticeDays"
-            name="noticeDays"
-            type="number"
-            min={0}
-            dir="ltr"
-            value={noticeDays}
-            onChange={(e) => setNoticeDays(Number(e.target.value))}
-          />
-        </div>
-
-        <div className="sm:col-span-2 border-t border-hairline pt-4">
-          <label className="flex items-center gap-2 font-label-md text-label-md text-on-surface">
-            <input
-              type="checkbox"
-              name="isSublet"
-              checked={isSublet}
-              onChange={(e) => setIsSublet(e.target.checked)}
-              className="size-4 rounded accent-primary"
-            />
-            {labels.isSublet}
-          </label>
-        </div>
-
-        {isSublet ? (
-          <div className="sm:col-span-2 flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4">
-            <Label htmlFor="parentLeaseId">{labels.parentLease}</Label>
-            <select
-              id="parentLeaseId"
-              name="parentLeaseId"
-              value={parentLeaseId}
-              onChange={(e) => setParentLeaseId(e.target.value)}
-              className={selectClass}
-              required={isSublet}
-            >
-              {activeParentLeases.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.lease_no} ({l.tenant_name})
-                </option>
-              ))}
-            </select>
-
-            {selectedParent ? (
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                {labels.mainTenant}: <strong className="text-on-surface">{selectedParent.tenant_name}</strong>.
-                Rent will be collected by the main tenant. Sub-let approval by an org admin is required before activation.
-              </p>
-            ) : null}
+        {previewCharges.length > 0 ? (
+          <div className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-lowest p-4">
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">{labels.preview}</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-start font-body-sm text-body-sm">
+                <thead>
+                  <tr className="border-b border-hairline text-on-surface-variant">
+                    <th className="py-2 pe-3 text-start font-medium">{labels.type}</th>
+                    <th className="py-2 pe-3 text-start font-medium">{labels.period}</th>
+                    <th className="py-2 pe-3 text-start font-medium">{labels.dueDate}</th>
+                    <th className="py-2 text-end font-medium">{labels.amount}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-hairline">
+                  {previewCharges.map((c, i) => (
+                    <tr key={i}>
+                      <td className="py-2 pe-3 capitalize text-on-surface">{c.type}</td>
+                      <td className="py-2 pe-3 text-on-surface-variant">
+                        {c.periodStart} → {c.periodEnd}
+                      </td>
+                      <td className="py-2 pe-3 text-on-surface-variant" dir="ltr">
+                        {c.dueDate}
+                      </td>
+                      <td className="py-2 text-end font-medium text-on-surface">
+                        {formatMoney(c.amountMinor, values.currency)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
-      </div>
 
-      {previewCharges.length > 0 ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-lowest p-4">
-          <h3 className="font-title-sm text-title-sm text-on-surface">{labels.preview}</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-start font-body-sm text-body-sm">
-              <thead>
-                <tr className="border-b border-hairline text-on-surface-variant">
-                  <th className="py-2 pe-3 text-start font-medium">Type</th>
-                  <th className="py-2 pe-3 text-start font-medium">Period</th>
-                  <th className="py-2 pe-3 text-start font-medium">Due Date</th>
-                  <th className="py-2 text-end font-medium">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hairline">
-                {previewCharges.map((c, i) => (
-                  <tr key={i}>
-                    <td className="py-2 pe-3 capitalize text-on-surface">{c.type}</td>
-                    <td className="py-2 pe-3 text-on-surface-variant">
-                      {c.periodStart} → {c.periodEnd}
-                    </td>
-                    <td className="py-2 pe-3 text-on-surface-variant" dir="ltr">
-                      {c.dueDate}
-                    </td>
-                    <td className="py-2 text-end font-medium text-on-surface">
-                      {formatMoney(c.amountMinor, currency)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : null}
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {labels.errors[state.error] ?? state.error}
+          </p>
+        ) : null}
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-        >
-          {labels.errors[state.error] ?? state.error}
-        </p>
-      ) : null}
-
-      <Button type="submit" disabled={pending} className="self-start">
-        {pending ? labels.creating : labels.create}
-      </Button>
-    </form>
+        <Button type="submit" disabled={pending} className="self-start">
+          {pending ? labels.creating : labels.create}
+        </Button>
+      </form>
+    </Form>
   );
 }
-

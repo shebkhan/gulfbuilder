@@ -39,7 +39,24 @@
     "today": "Today",
     "daysLeft": "{count, plural, one {# day left} other {# days left}}",
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
-    "daysLeftHeader": "Days left"
+    "daysLeftHeader": "Days left",
+    "relatedSections": "Related sections",
+    "cancel": "Cancel",
+    "notifications": "Notifications",
+    "all": "All",
+    "unknown": "Unknown"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email address",
+    "invalidDate": "Enter a valid date (YYYY-MM-DD)",
+    "invalidAmount": "Enter a valid amount",
+    "invalidSlug": "Use letters, numbers and hyphens only",
+    "tooShort": "This value is too short",
+    "tooLong": "This value is too long",
+    "invalidUuid": "Enter a valid identifier",
+    "invalidRange": "Value is outside the allowed range",
+    "invalidInput": "Enter a valid value"
   },
   "auth": {
     "signIn": "Sign in",
@@ -89,10 +106,14 @@
     "saudi": "Saudi Arabia",
     "kuwait": "Kuwait",
     "bahrain": "Bahrain",
-    "oman": "Oman"
+    "oman": "Oman",
+    "slugHint": "3–40 lowercase letters, numbers or hyphens. This becomes your workspace URL.",
+    "currencyHint": "Used for all amounts in this workspace."
   },
   "dashboard": {
     "title": "Dashboard",
+    "unitLabel": "Unit {no}",
+    "commonArea": "Common Area",
     "empty": "Portfolio overview, operational alerts, and real-time financial metrics.",
     "orgCreated": "Organization created",
     "expiringLeases": "Leases expiring soon",
@@ -111,7 +132,19 @@
     "buildingsOccupancy": "Building Occupancy",
     "noUpcomingCheques": "No post-dated cheques due in the next 30 days.",
     "noRecentPayments": "No recent payments recorded.",
-    "noRecentMaintenance": "No active maintenance tickets."
+    "noRecentMaintenance": "No active maintenance tickets.",
+    "occupancy": "Occupancy",
+    "units": "units",
+    "monthlyRentRoll": "Monthly Rent Roll",
+    "activeLeasePipeline": "Active lease pipeline",
+    "netOperatingIncome": "Net Operating Income",
+    "ytdCollections": "YTD collections less expenses",
+    "activeWorkOrders": "Active Work Orders",
+    "viewQueue": "View queue",
+    "ends": "Ends",
+    "cheque": "Cheque",
+    "due": "Due",
+    "noBuildings": "No buildings created."
   },
   "settings": {
     "users": {
@@ -134,7 +167,8 @@
         "not_authorised": "Only organization admins can invite people.",
         "already_member": "That person is already in this workspace.",
         "invite_failed": "The invite could not be sent."
-      }
+      },
+      "roleHint": "Choose the access level this person will have."
     },
     "sections": {
       "users": "Team",
@@ -178,6 +212,11 @@
         "invalid_input": "Check the details and try again.",
         "invalid_amount": "Enter the late fee like 50.00.",
         "failed": "Could not save. Try again."
+      },
+      "baseCurrencyHint": "Used for all amounts across the workspace.",
+      "languages": {
+        "en": "English",
+        "ar": "العربية"
       }
     },
     "branding": {
@@ -205,7 +244,10 @@
         "invalid_terminology": "Terminology must be a JSON object of key/value pairs.",
         "domain_taken": "That domain is already used by another organization.",
         "failed": "Could not save. Try again."
-      }
+      },
+      "terminologyPlaceholder": "{\"leases\": \"Tenancy contracts\"}",
+      "title": "Branding",
+      "subtitle": "Your app name, logo, colours and terminology."
     },
     "accounting": {
       "title": "Accounting",
@@ -278,6 +320,10 @@
         "invalid_input": "Check the details and try again.",
         "failed": "Could not save. Try again.",
         "no_recipient": "No recipient is linked for this channel."
+      },
+      "languages": {
+        "en": "English",
+        "ar": "العربية"
       }
     },
     "audit": {
@@ -367,6 +413,23 @@
     "grant": "Grant access",
     "revoke": "Remove",
     "noStaff": "Invite a manager or caretaker first.",
+    "help": {
+      "code": "Short unique code for the building (up to 40 characters).",
+      "name": "Display name shown throughout the workspace.",
+      "owner": "Owner recorded on this building.",
+      "city": "Optional; defaults to the organisation's city.",
+      "from": "Lowest level to create; ground floor is 0.",
+      "to": "Highest level to create.",
+      "prefix": "Optional prefix for generated unit numbers.",
+      "count": "Number of units to create on this floor.",
+      "start": "First number in the generated sequence.",
+      "pad": "Digits to pad numbers to, e.g. 01 or 001.",
+      "unitType": "Optional type such as Office or Retail.",
+      "areaSqm": "Optional area in square metres.",
+      "rent": "Optional default rent for each generated unit.",
+      "file": "Upload a CSV that follows the template below.",
+      "staff": "Team member to grant access to this building."
+    },
     "errors": {
       "invalid_input": "Check the fields.",
       "invalid_range": "The level range is invalid.",
@@ -415,6 +478,17 @@
     "hide": "Hide",
     "copy": "Copy",
     "copied": "Copied!",
+    "help": {
+      "fullName": "As shown on official identification.",
+      "kind": "Individuals and companies are stored differently.",
+      "language": "Language used for the tenant portal.",
+      "idNumber": "QID or passport number; stored encrypted.",
+      "phone": "Primary contact number.",
+      "whatsapp": "Used for payment reminders.",
+      "email": "An email address creates a tenant portal login.",
+      "nationality": "Optional.",
+      "employer": "Optional sponsor or employer."
+    },
     "errors": {
       "invalid_input": "Please check the entered fields.",
       "not_authorised": "You do not have permission to manage tenants.",
@@ -424,18 +498,23 @@
   },
   "leases": {
     "title": "Leases",
+    "pendingApproval": "Pending Approval",
     "subtitle": "Active, draft and past tenancy agreements.",
     "new": "New lease",
     "leaseNo": "Lease number",
+    "autoLeaseNo": "Auto-generated if empty",
+    "leaseNoHint": "Leave blank to generate a number automatically.",
     "tenant": "Tenant",
     "selectTenant": "Select tenant",
     "unitOrRoom": "Unit or Room",
     "selectUnit": "Select unit",
     "unit": "Unit",
+    "room": "Room",
     "building": "Building",
     "startDate": "Start date",
     "endDate": "End date",
     "rent": "Rent",
+    "rentHint": "Enter the total rent for the lease term.",
     "currency": "Currency",
     "frequency": "Payment frequency",
     "frequencies": {
@@ -446,12 +525,16 @@
     },
     "installments": "Installments per period",
     "dueDay": "Due day of month",
+    "dueDayHint": "Day of the month when installments are due (1–28).",
     "deposit": "Security deposit",
+    "depositHint": "Refundable amount held for the tenancy.",
     "noticeDays": "Notice period (days)",
+    "noticeDaysHint": "Days of notice required before termination.",
     "isSublet": "This is a sub-let (Mode B)",
     "parentLease": "Parent lease",
     "selectParentLease": "Select parent active lease",
     "mainTenant": "Main tenant",
+    "subletExplanation": "Rent will be collected by the main tenant. Sub-let approval by an org admin is required before activation.",
     "rentCollectedBy": "Rent collected by",
     "landlord": "Landlord",
     "preview": "Payment schedule preview",
@@ -519,7 +602,9 @@
       "not_found": "Lease not found.",
       "unit_already_leased": "The unit is already leased."
     },
-    "openLease": "Open lease"
+    "openLease": "Open lease",
+    "cancel": "Cancel",
+    "filter": "Filter"
   },
   "payments": {
     "title": "Payments & Receipts",
@@ -547,6 +632,32 @@
       "cheque": "Cheque",
       "card": "Card",
       "online": "Online"
+    },
+    "help": {
+      "tenant": "Tenant this payment is received from.",
+      "lease": "Optional; links the receipt to a specific lease.",
+      "amount": "Amount received, in QAR.",
+      "method": "How the payment was received.",
+      "date": "Date the payment was received.",
+      "reference": "Transaction or cheque number, if any.",
+      "notes": "Optional internal note.",
+      "allocations": "Optionally split this payment across outstanding charges.",
+      "allocationAmount": "Amount to apply to this charge."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot record payments.",
+      "invalid_input": "Check the payment details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "invalid_allocations": "The allocation amounts are invalid.",
+      "payment_failed": "The payment could not be recorded."
+    },
+    "remaining": "Remaining: {amount}",
+    "dueOn": "Due: {date}",
+    "kpis": {
+      "totalCollections": "Total Collections",
+      "receiptsIssued": "Receipts Issued",
+      "defaultCurrency": "Default Currency"
     }
   },
   "cheques": {
@@ -577,6 +688,41 @@
       "bounced": "Bounced",
       "returned": "Returned",
       "replaced": "Replaced"
+    },
+    "actions": "Actions",
+    "selectTenant": "Select tenant",
+    "selectLease": "Select lease",
+    "bounceTitle": "Mark cheque #{no} as bounced",
+    "bounceReason": "Bounce reason",
+    "bounceReasonPlaceholder": "Insufficient funds / Signature mismatch",
+    "confirmBounce": "Confirm bounce",
+    "replaceTitle": "Replace bounced cheque #{no}",
+    "newChequeNo": "New cheque #",
+    "newBankName": "New bank name",
+    "createReplacement": "Create replacement",
+    "help": {
+      "chequeNo": "Cheque number as printed on the cheque.",
+      "bank": "Bank that issued the cheque.",
+      "amount": "Cheque value, in QAR.",
+      "chequeDate": "Post-dated cheques can be registered for a future date.",
+      "newChequeNo": "Number printed on the replacement cheque.",
+      "newBankName": "Bank that issued the replacement cheque."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage cheques.",
+      "invalid_input": "Check the cheque details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "cheque_registration_failed": "The cheque could not be registered.",
+      "deposit_failed": "The cheque could not be deposited.",
+      "clear_failed": "The cheque could not be cleared.",
+      "bounce_failed": "The cheque could not be marked as bounced.",
+      "replacement_failed": "The replacement cheque could not be created."
+    },
+    "kpis": {
+      "pendingClearance": "Pending Clearance",
+      "clearedTotal": "Cleared Total",
+      "bouncedCheques": "Bounced Cheques"
     }
   },
   "deposits": {
@@ -597,7 +743,31 @@
     "tenant": "Tenant",
     "lease": "Lease",
     "empty": "No security deposits on file.",
-    "transactions": "Deposit transactions"
+    "transactions": "Deposit transactions",
+    "activeEscrow": "Active escrow",
+    "settled": "Settled",
+    "tenantLine": "Tenant: {tenant} ({lease})",
+    "deductReasonPlaceholder": "Damage repairs / unpaid utility bills",
+    "refundReasonPlaceholder": "Lease concluded with full clearance",
+    "help": {
+      "deductAmount": "Amount to deduct from the held balance.",
+      "deductReason": "Why this amount is being deducted.",
+      "refundAmount": "Amount to return to the tenant; defaults to the full balance.",
+      "refundReason": "Optional note for the refund transaction."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage deposits.",
+      "invalid_input": "Check the deposit details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "deduction_failed": "The deduction could not be applied.",
+      "refund_failed": "The refund could not be processed."
+    },
+    "kpis": {
+      "totalHeldInEscrow": "Total Held in Escrow",
+      "deductionsApplied": "Deductions Applied",
+      "refundsDisbursed": "Refunds Disbursed"
+    }
   },
   "expenses": {
     "title": "Operating Expenses",
@@ -632,6 +802,32 @@
       "approved": "Approved",
       "paid": "Paid",
       "rejected": "Rejected"
+    },
+    "actions": "Actions",
+    "generalExpense": "General property expense",
+    "selectVendor": "Select vendor (optional)",
+    "descriptionPlaceholder": "AC Maintenance / Elevator Inspection",
+    "help": {
+      "category": "Expense category for reporting.",
+      "date": "Date on the invoice or receipt.",
+      "description": "Short description of what was purchased.",
+      "amount": "Expense amount, in QAR.",
+      "property": "Optional; leave blank for a general expense.",
+      "vendor": "Optional supplier for this expense."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot record expenses.",
+      "invalid_input": "Check the expense details.",
+      "amount_must_be_positive": "Amount must be greater than zero.",
+      "invalid_amount": "Enter a valid amount.",
+      "expense_creation_failed": "The expense could not be recorded.",
+      "approval_failed": "The expense could not be approved.",
+      "payment_failed": "The expense could not be paid."
+    },
+    "kpis": {
+      "totalExpenses": "Total Expenses",
+      "pendingApproval": "Pending Approval",
+      "disbursed": "Disbursed"
     }
   },
   "maintenance": {
@@ -665,6 +861,46 @@
       "waiting_parts": "Waiting for parts",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    },
+    "actions": "Actions",
+    "selectBuilding": "Select building",
+    "commonArea": "Common area",
+    "unitOption": "Unit {no}",
+    "titlePlaceholder": "Water leakage in master bathroom",
+    "unassigned": "Unassigned",
+    "note": "Note",
+    "notePlaceholder": "Parts replaced, pressure tested",
+    "categories": {
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "hvac": "HVAC / Air Conditioning",
+      "carpentry": "Carpentry",
+      "painting": "Painting",
+      "general": "General"
+    },
+    "help": {
+      "building": "The building this request belongs to.",
+      "unit": "Choose \"Common area\" if the issue is not in a specific unit.",
+      "title": "A short summary of the problem (at least 3 characters).",
+      "category": "Category used for reporting.",
+      "priority": "Used to order requests by urgency.",
+      "vendor": "Optional vendor assigned to this request.",
+      "description": "Optional details about the issue.",
+      "status": "The current status of the request.",
+      "cost": "Repair cost, in QAR.",
+      "note": "Optional note about this status change."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage maintenance requests.",
+      "invalid_input": "Check the request details.",
+      "request_creation_failed": "The request could not be created.",
+      "status_update_failed": "The status could not be updated.",
+      "invalid_amount": "Enter a valid cost."
+    },
+    "kpis": {
+      "openWorkOrders": "Open Work Orders",
+      "inProgress": "In Progress",
+      "urgentHighPriority": "Urgent / High Priority"
     }
   },
   "inspections": {
@@ -679,11 +915,54 @@
     "empty": "No inspection surveys on file.",
     "deductDeposit": "Apply deposit deduction",
     "deductReason": "Deduction reason",
-    "deductAmount": "Damage cost to deduct (QAR)"
+    "deductAmount": "Damage cost to deduct (QAR)",
+    "lease": "Lease",
+    "tenant": "Tenant",
+    "status": "Status",
+    "completedDate": "Completed date",
+    "notes": "Notes",
+    "actions": "Actions",
+    "completedLabel": "Completed",
+    "pending": "Pending survey",
+    "selectLease": "Select lease",
+    "optional": "(Optional)",
+    "checklistTitle": "Survey checklist",
+    "deductReasonPlaceholder": "Broken kitchen cabinet door / Repaint needed",
+    "checklist": {
+      "keys": "All keys and access cards handed over",
+      "walls": "Walls, paint, and fixtures in acceptable condition",
+      "appliances": "Appliances and AC units tested and working",
+      "meters": "Final utility meter readings logged"
+    },
+    "help": {
+      "lease": "The lease this survey is attached to.",
+      "kind": "Move-in or move-out survey.",
+      "notes": "Optional notes for the survey.",
+      "checklist": "Tick each item you have verified.",
+      "deductAmount": "Damage cost to deduct from the deposit, in QAR.",
+      "deductReason": "Reason for the deduction (required when an amount is entered)."
+    },
+    "errors": {
+      "not_authorised": "Your role cannot manage inspections.",
+      "invalid_input": "Check the inspection details.",
+      "inspection_creation_failed": "The inspection could not be created.",
+      "complete_failed": "The inspection could not be completed.",
+      "invalid_amount": "Enter a valid amount."
+    },
+    "kpis": {
+      "moveInSurveys": "Move-In Surveys",
+      "moveOutSurveys": "Move-Out Surveys",
+      "pendingCompletion": "Pending Completion"
+    }
   },
   "reports": {
     "title": "Reports & Financial Analytics",
     "subtitle": "Portfolio KPIs, rent roll, aged receivables, and owner distribution statements.",
+    "executiveSummary": "Executive Summary",
+    "viewAll": "View all",
+    "unitsSummary": "{occupied} of {total} units",
+    "overdueDue": "{days} days overdue (Due: {date})",
+    "days": "days",
     "rentRoll": "Rent Roll",
     "agedReceivables": "Aged Receivables",
     "statements": "Owner Statements",
@@ -748,7 +1027,12 @@
     "bank": "Bank",
     "date": "Date",
     "noReportData": "No data for this period.",
-    "ownerSubtitle": "Your buildings' occupancy, lease expiries, collections and cheques."
+    "ownerSubtitle": "Your buildings' occupancy, lease expiries, collections and cheques.",
+    "kpis": {
+      "activeAnnualizedPipeline": "Active annualized pipeline",
+      "collectionsLessExpenses": "Collections less expenses",
+      "agedOutstanding": "Aged outstanding"
+    }
   },
   "portal": {
     "nav": {
@@ -1029,6 +1313,8 @@
   },
   "documents": {
     "title": "Document vault",
+    "tenantTag": "(tenant)",
+    "buildingTag": "(building)",
     "subtitle": "Contracts, IDs, receipts and photos for every entity.",
     "list": "Files",
     "empty": "No documents yet.",
@@ -1066,6 +1352,13 @@
       "unsupported_file_type": "Only images and PDF files are accepted.",
       "upload_failed": "The file could not be uploaded. Try again.",
       "failed": "The document could not be saved. Try again."
+    },
+    "help": {
+      "entityType": "The type of record this document is attached to.",
+      "entity": "The specific record this document is attached to.",
+      "kind": "Category of the document.",
+      "expiresOn": "Expiry date, if applicable.",
+      "file": "An image or PDF up to 10 MB."
     }
   },
   "meters": {
@@ -1099,6 +1392,15 @@
       "invalid_input": "Check the details and try again.",
       "invalid_value": "Enter the meter value as a number.",
       "failed": "Could not save. Try again."
+    },
+    "created": "Meter created.",
+    "help": {
+      "kind": "The utility this meter measures.",
+      "building": "The building the meter belongs to.",
+      "meterNo": "Meter number as printed on the device.",
+      "meter": "The meter this reading belongs to.",
+      "readOn": "The date the reading was taken.",
+      "value": "The reading value shown on the meter."
     }
   },
   "platform": {
@@ -1173,10 +1475,19 @@
     "otherLanguage": "النسخة العربية",
     "appName": "Gulf Property",
     "footer": "Generated by Gulf Property. Figures are in minor units converted at print time.",
-    "receipt": { "title": "Payment receipt" },
-    "statement": { "title": "Tenant statement" },
-    "ownerStatement": { "title": "Owner statement" },
-    "contract": { "title": "Lease contract", "landlord": "Landlord" },
+    "receipt": {
+      "title": "Payment receipt"
+    },
+    "statement": {
+      "title": "Tenant statement"
+    },
+    "ownerStatement": {
+      "title": "Owner statement"
+    },
+    "contract": {
+      "title": "Lease contract",
+      "landlord": "Landlord"
+    },
     "receiptNo": "Receipt no.",
     "pendingReceipt": "Pending confirmation",
     "tenant": "Tenant",
@@ -1212,5 +1523,7 @@
     "next": "Next",
     "summary": "Showing {from}–{to} of {total}",
     "page": "Page {page} of {pages}"
-  }
+  },
+  "invalid_slug": "Use 3–40 lowercase letters, numbers or dashes.",
+  "invalid_color": "Enter a 6-digit hex colour, e.g. #795919."
 }

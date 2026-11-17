@@ -54,7 +54,7 @@ export function TenantIdReveal({ tenantId, initialMasked, labels }: Props) {
     <div className="flex flex-wrap items-center justify-between gap-2 py-2">
       <div className="flex flex-col">
         <span className="font-label-sm text-label-sm text-on-surface-variant">{labels.idNumber}</span>
-        <span className="font-title-md text-title-md tracking-wider text-on-surface" dir="ltr">
+        <span className="font-headline-sm text-headline-sm tracking-wider text-on-surface" dir="ltr">
           {show && revealed ? revealed : initialMasked}
         </span>
       </div>

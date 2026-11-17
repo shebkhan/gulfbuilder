@@ -3,10 +3,38 @@
 import { Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
+import { uploadSchema } from "@/schemas/documents";
 import { uploadDocumentAction, type DocumentState } from "@/server/actions/documents";
+
+type Values = {
+  entityType: "lease" | "tenant" | "building" | "unit" | "vendor" | "inspection";
+  entityId: string;
+  kind: "contract" | "id_card" | "trade_license" | "title_deed" | "photo" | "receipt";
+  expiresOn?: string;
+  notes?: string;
+  file?: File | null;
+};
 
 export function DocumentUploadForm({
   entities,
@@ -16,99 +44,187 @@ export function DocumentUploadForm({
   defaultEntityType?: string;
 }) {
   const t = useTranslations("documents");
-  const [state, formAction, pending] = useActionState<DocumentState, FormData>(
-    uploadDocumentAction,
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
+
+  const form = useForm<Values>({
+    resolver: zodResolver(uploadSchema),
+    defaultValues: {
+      entityType: defaultEntityType as Values["entityType"],
+      entityId: "",
+      kind: "contract",
+      expiresOn: "",
+      notes: "",
+      file: null,
+    },
+  });
+
+  const [state, dispatch, pending] = useActionState<DocumentState, FormData>(
+    async (prev, formData) => {
+      const res = await uploadDocumentAction(prev, formData);
+      if (res.ok) form.reset();
+      return res;
+    },
     {},
   );
 
   return (
-    <form action={formAction} className="flex max-w-xl flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="entityType">{t("entityType")}</Label>
-          <select
-            id="entityType"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(() => dispatch(toFormData(form.getValues())))}
+        noValidate
+        className="flex max-w-xl flex-col gap-4"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
             name="entityType"
-            defaultValue={defaultEntityType}
-            className="h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
-          >
-            {(["lease", "tenant", "building", "unit", "vendor", "inspection"] as const).map((kind) => (
-              <option key={kind} value={kind}>
-                {t(`entityTypes.${kind}` as never)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <Label htmlFor="entityId">{t("entity")}</Label>
-          <select
-            id="entityId"
-            name="entityId"
-            className="h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
-            required
-          >
-            <option value="">{t("selectEntity")}</option>
-            {entities.map((entity) => (
-              <option key={entity.id} value={entity.id}>
-                {entity.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="kind">{t("kind")}</Label>
-          <select
-            id="kind"
-            name="kind"
-            defaultValue="contract"
-            className="h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
-          >
-            {(["contract", "id_card", "trade_license", "title_deed", "photo", "receipt"] as const).map(
-              (kind) => (
-                <option key={kind} value={kind}>
-                  {t(`kinds.${kind}` as never)}
-                </option>
-              ),
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("entityType")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(["lease", "tenant", "building", "unit", "vendor", "inspection"] as const).map(
+                      (kind) => (
+                        <SelectItem key={kind} value={kind}>
+                          {t(`entityTypes.${kind}` as never)}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormDescription>{help.entityType}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
             )}
-          </select>
+          />
+
+          <FormField
+            control={form.control}
+            name="entityId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("entity")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("selectEntity")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {entities.map((entity) => (
+                      <SelectItem key={entity.id} value={entity.id}>
+                        {entity.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>{help.entity}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        <div>
-          <Label htmlFor="expiresOn">{t("expiresOn")}</Label>
-          <Input id="expiresOn" name="expiresOn" type="date" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="kind"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("kind")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(
+                      [
+                        "contract",
+                        "id_card",
+                        "trade_license",
+                        "title_deed",
+                        "photo",
+                        "receipt",
+                      ] as const
+                    ).map((kind) => (
+                      <SelectItem key={kind} value={kind}>
+                        {t(`kinds.${kind}` as never)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>{help.kind}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="expiresOn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("expiresOn")}</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} value={field.value ?? ""} dir="ltr" />
+                </FormControl>
+                <FormDescription>{help.expiresOn}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </div>
 
-      <div>
-        <Label htmlFor="file">{t("file")}</Label>
-        <Input id="file" name="file" type="file" required />
-      </div>
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("file")}</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  onChange={(event) => field.onChange(event.target.files?.[0] ?? null)}
+                />
+              </FormControl>
+              <FormDescription>{help.file}</FormDescription>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-        >
-          {t(`errors.${state.error}` as never)}
-        </p>
-      ) : null}
-      {state.ok ? (
-        <p
-          role="status"
-          className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
-        >
-          {t("uploaded")}
-        </p>
-      ) : null}
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[state.error] ?? state.error}
+          </p>
+        ) : null}
+        {state.ok ? (
+          <p
+            role="status"
+            className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+          >
+            {t("uploaded")}
+          </p>
+        ) : null}
 
-      <Button type="submit" size="lg" disabled={pending} className="self-start">
-        <Upload />
-        {pending ? t("uploading") : t("upload")}
-      </Button>
-    </form>
+        <Button type="submit" size="lg" disabled={pending} className="self-start">
+          <Upload />
+          {pending ? t("uploading") : t("upload")}
+        </Button>
+      </form>
+    </Form>
   );
 }

@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -79,11 +80,13 @@ export default async function PaymentsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-        </div>
+      <PageHeader
+        section="payments"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
 
         {writable && (
           <PaymentForm
@@ -92,7 +95,9 @@ export default async function PaymentsPage({
             locale={locale}
           />
         )}
-      </div>
+          </div>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -102,7 +107,7 @@ export default async function PaymentsPage({
               <TrendingUp className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Total Collections</KpiLabel>
+              <KpiLabel>{t("kpis.totalCollections")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(totalReceivedMinor, "QAR", locale)}
               </span>
@@ -116,7 +121,7 @@ export default async function PaymentsPage({
               <Receipt className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Receipts Issued</KpiLabel>
+              <KpiLabel>{t("kpis.receiptsIssued")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {paymentCount}
               </span>
@@ -130,7 +135,7 @@ export default async function PaymentsPage({
               <CreditCard className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Default Currency</KpiLabel>
+              <KpiLabel>{t("kpis.defaultCurrency")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 QAR
               </span>

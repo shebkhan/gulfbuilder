@@ -4,6 +4,7 @@ import { ExportButtons } from "@/components/domain/export-buttons";
 import { SettingsNav } from "@/components/domain/settings-nav";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PageHeader } from "@/components/domain/page-header";
 
 export default async function ExportSettingsPage({
   params,
@@ -34,10 +35,12 @@ export default async function ExportSettingsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="settings"
+        role={role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       <SettingsNav />
 

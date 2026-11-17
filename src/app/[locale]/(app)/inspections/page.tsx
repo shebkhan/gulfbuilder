@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   kind?: string;
@@ -28,6 +29,7 @@ export default async function InspectionsPage({
 
   const { kind, page } = await searchParams;
   const t = await getTranslations("inspections");
+  const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
   // Fetch inspections
@@ -67,7 +69,7 @@ export default async function InspectionsPage({
     return {
       id: l.id,
       lease_no: l.lease_no,
-      tenant_name: tenant?.full_name || "Unknown",
+      tenant_name: tenant?.full_name || tCommon("unknown"),
     };
   });
 
@@ -103,7 +105,7 @@ export default async function InspectionsPage({
   });
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "move_in", label: t("moveIn") },
     { key: "move_out", label: t("moveOut") },
   ];
@@ -112,10 +114,12 @@ export default async function InspectionsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="inspections"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -125,7 +129,7 @@ export default async function InspectionsPage({
               <ClipboardCheck className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Move-In Surveys</KpiLabel>
+              <KpiLabel>{t("kpis.moveInSurveys")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {moveInCount}
               </span>
@@ -139,7 +143,7 @@ export default async function InspectionsPage({
               <ClipboardCheck className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Move-Out Surveys</KpiLabel>
+              <KpiLabel>{t("kpis.moveOutSurveys")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {moveOutCount}
               </span>
@@ -153,7 +157,7 @@ export default async function InspectionsPage({
               <Clock className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Pending Completion</KpiLabel>
+              <KpiLabel>{t("kpis.pendingCompletion")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {pendingCount}
               </span>

@@ -1,11 +1,30 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
+import { createOrgSchema, type OrgState } from "@/schemas/auth";
 import { createOrganizationAction } from "@/server/actions/auth";
-import type { OrgState } from "@/schemas/auth";
 
 type Props = {
   locale: string;
@@ -15,81 +34,141 @@ type Props = {
   currencies: string[];
 };
 
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none transition-shadow focus:bg-surface-container-low focus:ring-[3px] focus:ring-primary-fixed";
+type Values = {
+  name: string;
+  slug: string;
+  countryCode: string;
+  baseCurrency: string;
+  locale: "en" | "ar";
+};
 
 export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: Props) {
-  const [state, formAction, pending] = useActionState<OrgState, FormData>(
+  const t = useTranslations("auth");
+  const to = useTranslations("onboarding");
+  const errors = t.raw("errors") as Record<string, string>;
+
+  const form = useForm<Values>({
+    resolver: zodResolver(createOrgSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      countryCode: "QA",
+      baseCurrency: "QAR",
+      locale: locale as Values["locale"],
+    },
+  });
+
+  const [state, dispatch, pending] = useActionState<OrgState, FormData>(
     createOrganizationAction,
     {},
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="uiLocale" value={locale} />
-
-      <div>
-        <Label htmlFor="name">{labels.orgName}</Label>
-        <Input id="name" name="name" required autoComplete="organization" />
-      </div>
-
-      <div>
-        <Label htmlFor="slug">{labels.slug}</Label>
-        <Input
-          id="slug"
-          name="slug"
-          required
-          pattern="[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])"
-          placeholder="doha-towers"
-          dir="ltr"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((values) => {
+          const formData = toFormData(values);
+          formData.set("uiLocale", locale);
+          dispatch(formData);
+        })}
+        noValidate
+        className="flex flex-col gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{labels.orgName}</FormLabel>
+              <FormControl>
+                <Input {...field} autoComplete="organization" />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="countryCode">{labels.market}</Label>
-          <select
-            id="countryCode"
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{labels.slug}</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="doha-towers" dir="ltr" />
+              </FormControl>
+              <FormDescription>{to("slugHint")}</FormDescription>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
             name="countryCode"
-            defaultValue="QA"
-            className={selectClass}
-            required
-          >
-            {markets.map((market) => (
-              <option key={market.value} value={market.value}>
-                {market.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="baseCurrency">{labels.currency}</Label>
-          <select
-            id="baseCurrency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.market}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {markets.map((market) => (
+                      <SelectItem key={market.value} value={market.value}>
+                        {market.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="baseCurrency"
-            defaultValue="QAR"
-            className={selectClass}
-            required
-          >
-            {currencies.map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-            ))}
-          </select>
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{labels.currency}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency} value={currency}>
+                        {currency}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>{to("currencyHint")}</FormDescription>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </div>
 
-      {state.error ? (
-        <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
-          {state.error}
-        </p>
-      ) : null}
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[state.error] ?? state.error}
+          </p>
+        ) : null}
 
-      <Button type="submit" size="lg" disabled={pending} className="mt-1">
-        {pending ? pendingLabel : labels.create}
-      </Button>
-    </form>
+        <Button type="submit" size="lg" disabled={pending} className="mt-1">
+          {pending ? pendingLabel : labels.create}
+        </Button>
+      </form>
+    </Form>
   );
 }

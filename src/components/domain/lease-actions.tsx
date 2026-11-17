@@ -171,7 +171,7 @@ export function LeaseActions({
           onSubmit={handleTerminate}
           className="mt-2 flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4"
         >
-          <h4 className="font-title-sm text-title-sm text-on-surface">{labels.terminate}</h4>
+          <h4 className="font-headline-sm text-headline-sm text-on-surface">{labels.terminate}</h4>
           <div>
             <Label htmlFor="terminateDate">{labels.terminationDate}</Label>
             <Input
@@ -211,7 +211,7 @@ export function LeaseActions({
           onSubmit={handleRenew}
           className="mt-2 flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-low p-4"
         >
-          <h4 className="font-title-sm text-title-sm text-on-surface">{labels.renew}</h4>
+          <h4 className="font-headline-sm text-headline-sm text-on-surface">{labels.renew}</h4>
           <div>
             <Label htmlFor="renewStartDate">{labels.startDate}</Label>
             <Input

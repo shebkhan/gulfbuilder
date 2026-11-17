@@ -2,11 +2,32 @@
 
 import { CheckCircle2, CreditCard, Plus, Receipt } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useActionState, useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toFormData } from "@/lib/form-data";
 import { formatMoney } from "@/lib/money";
+import { createExpenseSchema } from "@/schemas/expenses";
 import {
   approveExpenseAction,
   createExpenseAction,
@@ -30,6 +51,18 @@ export type ExpenseItem = {
 
 type VendorOption = { id: string; name: string };
 type BuildingOption = { id: string; name: string; code: string };
+
+type Values = {
+  category: string;
+  description: string;
+  amount: string;
+  currency: string;
+  expenseDate: string;
+  vendorId?: string;
+  buildingId?: string;
+  unitId?: string;
+  notes?: string;
+};
 
 /** The category column is free text: seeded rows hold labels, new rows hold keys. */
 const CATEGORY_KEYS: Record<string, string> = {
@@ -58,70 +91,56 @@ export function ExpenseForm({
   locale?: string;
 }) {
   const t = useTranslations("expenses");
+  const tCommon = useTranslations("common");
+  const errors = t.raw("errors") as Record<string, string>;
+  const help = t.raw("help") as Record<string, string>;
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [state, setState] = useState<ExpenseState>({});
+  const [statusState, setStatusState] = useState<ExpenseState>({});
 
-  // Create form state
-  const [category, setCategory] = useState("maintenance");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().slice(0, 10));
-  const [vendorId, setVendorId] = useState("");
-  const [buildingId, setBuildingId] = useState("");
-  const [notes, setNotes] = useState("");
+  const form = useForm<Values>({
+    resolver: zodResolver(createExpenseSchema),
+    defaultValues: {
+      category: "maintenance",
+      description: "",
+      amount: "",
+      currency: "QAR",
+      expenseDate: new Date().toISOString().slice(0, 10),
+      vendorId: "",
+      buildingId: "",
+      unitId: "",
+      notes: "",
+    },
+  });
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    setState({});
-
-    const formData = new FormData();
-    formData.set("category", category);
-    formData.set("description", description);
-    formData.set("amount", amount);
-    formData.set("expenseDate", expenseDate);
-    if (vendorId) formData.set("vendorId", vendorId);
-    if (buildingId) formData.set("buildingId", buildingId);
-    if (notes) formData.set("notes", notes);
-
-    startTransition(async () => {
-      const res = await createExpenseAction({}, formData);
-      setState(res);
+  const [createState, createDispatch, createPending] = useActionState<ExpenseState, FormData>(
+    async (prev, formData) => {
+      const res = await createExpenseAction(prev, formData);
       if (res.ok) {
         setOpen(false);
-        setDescription("");
-        setAmount("");
-        setNotes("");
-        setVendorId("");
-        setBuildingId("");
+        form.reset();
       }
-    });
-  };
+      return res;
+    },
+    {},
+  );
 
   const handleApprove = (expenseId: string) => {
-    setState({});
+    setStatusState({});
     const formData = new FormData();
     formData.set("expenseId", expenseId);
-
-    startTransition(async () => {
-      const res = await approveExpenseAction({}, formData);
-      setState(res);
-    });
+    startTransition(async () => setStatusState(await approveExpenseAction({}, formData)));
   };
 
   const handlePay = (expenseId: string) => {
-    setState({});
+    setStatusState({});
     const formData = new FormData();
     formData.set("expenseId", expenseId);
-
-    startTransition(async () => {
-      const res = await payExpenseAction({}, formData);
-      setState(res);
-    });
+    startTransition(async () => setStatusState(await payExpenseAction({}, formData)));
   };
 
-  const getStatusVariant = (s: string) => {
-    switch (s) {
+  const getStatusVariant = (status: string) => {
+    switch (status) {
       case "paid":
         return "success";
       case "approved":
@@ -138,18 +157,20 @@ export function ExpenseForm({
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {state.error && (
-          <div className="w-full rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container">
-            {state.error}
-          </div>
-        )}
-        <div />
-        {canWrite && (
+        {statusState.error ? (
+          <p
+            role="alert"
+            className="w-full rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[statusState.error] ?? statusState.error}
+          </p>
+        ) : null}
+        {canWrite ? (
           <Button onClick={() => setOpen(true)} className="flex items-center gap-2">
             <Plus className="size-4" />
             {t("createExpense")}
           </Button>
-        )}
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
@@ -170,65 +191,71 @@ export function ExpenseForm({
                   <th className="p-4 text-start">{t("property")}</th>
                   <th className="p-4 text-start">{t("status")}</th>
                   <th className="p-4 text-end">{t("amount")}</th>
-                  {(canApprove || canPay) && <th className="p-4 text-center">Actions</th>}
+                  {canApprove || canPay ? (
+                    <th className="p-4 text-center">{t("actions")}</th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
-                {expenses.map((exp) => {
-                  const categoryKey = CATEGORY_KEYS[exp.category] ?? exp.category;
+                {expenses.map((expense) => {
+                  const categoryKey = CATEGORY_KEYS[expense.category] ?? expense.category;
                   const category = t.has(`categories.${categoryKey}` as never)
                     ? t(`categories.${categoryKey}` as never)
-                    : exp.category;
+                    : expense.category;
                   return (
                     <tr
-                      key={exp.id}
+                      key={expense.id}
                       className="transition-colors hover:bg-surface-container-low/50"
                     >
-                      <td className="p-4 text-on-surface-variant">{exp.expense_date}</td>
+                      <td className="p-4 text-on-surface-variant" dir="ltr">
+                        {expense.expense_date}
+                      </td>
                       <td className="p-4 font-medium text-on-surface">{category}</td>
-                      <td className="p-4 text-on-surface">{exp.description}</td>
-                      <td className="p-4 text-on-surface-variant">{exp.vendor?.name || "—"}</td>
+                      <td className="p-4 text-on-surface">{expense.description}</td>
+                      <td className="p-4 text-on-surface-variant">{expense.vendor?.name || "—"}</td>
                       <td className="p-4 text-on-surface-variant">
-                        {exp.building ? `${exp.building.code} - ${exp.building.name}` : "—"}
+                        {expense.building
+                          ? `${expense.building.code} - ${expense.building.name}`
+                          : "—"}
                       </td>
                       <td className="p-4">
-                        <Badge variant={getStatusVariant(exp.status)}>
-                          {t(`statuses.${exp.status}` as never)}
+                        <Badge variant={getStatusVariant(expense.status)}>
+                          {t(`statuses.${expense.status}` as never)}
                         </Badge>
                       </td>
                       <td className="p-4 text-end font-semibold text-on-surface">
-                        {formatMoney(BigInt(exp.amount_minor), exp.currency, locale)}
+                        {formatMoney(BigInt(expense.amount_minor), expense.currency, locale)}
                       </td>
-                      {(canApprove || canPay) && (
+                      {canApprove || canPay ? (
                         <td className="p-4 text-center">
                           <div className="flex items-center justify-center gap-1.5">
-                            {exp.status === "submitted" && canApprove && (
+                            {expense.status === "submitted" && canApprove ? (
                               <Button
                                 size="sm"
                                 variant="primary"
-                                onClick={() => handleApprove(exp.id)}
+                                onClick={() => handleApprove(expense.id)}
                                 disabled={isPending}
                                 className="flex items-center gap-1"
                               >
                                 <CheckCircle2 className="size-3.5" />
                                 {t("approve")}
                               </Button>
-                            )}
-                            {exp.status === "approved" && canPay && (
+                            ) : null}
+                            {expense.status === "approved" && canPay ? (
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                onClick={() => handlePay(exp.id)}
+                                onClick={() => handlePay(expense.id)}
                                 disabled={isPending}
                                 className="flex items-center gap-1"
                               >
                                 <CreditCard className="size-3.5" />
                                 {t("pay")}
                               </Button>
-                            )}
+                            ) : null}
                           </div>
                         </td>
-                      )}
+                      ) : null}
                     </tr>
                   );
                 })}
@@ -238,129 +265,166 @@ export function ExpenseForm({
         )}
       </div>
 
-      {/* Modal */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{t("createExpense")}</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("category")} *
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="maintenance">{t("categories.maintenance")}</option>
-                  <option value="utilities">{t("categories.utilities")}</option>
-                  <option value="insurance">{t("categories.insurance")}</option>
-                  <option value="cleaning">{t("categories.cleaning")}</option>
-                  <option value="management_fee">{t("categories.management_fee")}</option>
-                  <option value="other">{t("categories.other")}</option>
-                </select>
-              </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit((values) => createDispatch(toFormData(values)))}
+              noValidate
+              className="mt-4 flex flex-col gap-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("category")}</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(["maintenance", "utilities", "insurance", "cleaning", "management_fee", "other"] as const).map(
+                            (key) => (
+                              <SelectItem key={key} value={key}>
+                                {t(`categories.${key}`)}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>{help.category}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("date")} *
-                </label>
-                <input
-                  required
-                  type="date"
-                  value={expenseDate}
-                  onChange={(e) => setExpenseDate(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                <FormField
+                  control={form.control}
+                  name="expenseDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("date")}</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.date}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("description")} *
-              </label>
-              <input
-                required
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="AC Maintenance / Elevator Inspection"
-                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("description")}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t("descriptionPlaceholder")} />
+                    </FormControl>
+                    <FormDescription>{help.description}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amount")} (QAR) *
-                </label>
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("amount")} ({tCommon("currency")})</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} dir="ltr" />
+                      </FormControl>
+                      <FormDescription>{help.amount}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="buildingId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("property")}</FormLabel>
+                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("generalExpense")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {buildings.map((building) => (
+                            <SelectItem key={building.id} value={building.id}>
+                              {building.code} - {building.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>{help.property}</FormDescription>
+                      <LocalizedFormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("property")}
-                </label>
-                <select
-                  value={buildingId}
-                  onChange={(e) => setBuildingId(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              <FormField
+                control={form.control}
+                name="vendorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("vendor")}</FormLabel>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("selectVendor")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {vendors.map((vendor) => (
+                          <SelectItem key={vendor.id} value={vendor.id}>
+                            {vendor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>{help.vendor}</FormDescription>
+                    <LocalizedFormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {createState.error ? (
+                <p
+                  role="alert"
+                  className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
                 >
-                  <option value="">General property expense</option>
-                  {buildings.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.code} - {b.name}
-                    </option>
-                  ))}
-                </select>
+                  {errors[createState.error] ?? createState.error}
+                </p>
+              ) : null}
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button type="submit" disabled={createPending}>
+                  {t("createExpense")}
+                </Button>
               </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                {t("vendor")}
-              </label>
-              <select
-                value={vendorId}
-                onChange={(e) => setVendorId(e.target.value)}
-                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-              >
-                <option value="">Select vendor (optional)</option>
-                {vendors.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {t("createExpense")}
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </>

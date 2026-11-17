@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   status?: string;
@@ -30,6 +31,7 @@ export default async function ExpensesPage({
 
   const { page, status, category } = await searchParams;
   const t = await getTranslations("expenses");
+  const tCommon = await getTranslations("common");
 
   const canWrite = can(ctx.role, "expenses.write");
   const canApprove = can(ctx.role, "expenses.approve");
@@ -109,7 +111,7 @@ export default async function ExpensesPage({
   const paged = paginate(transformedExpenses, Number(page ?? 1));
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "submitted", label: t("statuses.submitted") },
     { key: "approved", label: t("statuses.approved") },
     { key: "paid", label: t("statuses.paid") },
@@ -117,10 +119,12 @@ export default async function ExpensesPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="expenses"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -130,7 +134,7 @@ export default async function ExpensesPage({
               <Receipt className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Total Expenses</KpiLabel>
+              <KpiLabel>{t("kpis.totalExpenses")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(totalExpenseMinor, "QAR", locale)}
               </span>
@@ -144,7 +148,7 @@ export default async function ExpensesPage({
               <Clock className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Pending Approval</KpiLabel>
+              <KpiLabel>{t("kpis.pendingApproval")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(pendingApprovalMinor, "QAR", locale)}
               </span>
@@ -158,7 +162,7 @@ export default async function ExpensesPage({
               <CheckCircle2 className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Disbursed</KpiLabel>
+              <KpiLabel>{t("kpis.disbursed")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {formatMoney(paidMinor, "QAR", locale)}
               </span>

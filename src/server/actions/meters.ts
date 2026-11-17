@@ -1,27 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { can } from "@/lib/rbac";
+import { meterSchema, readingSchema } from "@/schemas/meters";
 import { getOrgContext } from "@/server/org-context";
 
 export type MeterState = {
   error?: string;
   ok?: string;
 };
-
-const meterSchema = z.object({
-  kind: z.enum(["electricity", "water", "gas"]),
-  buildingId: z.string().uuid(),
-  unitId: z.string().uuid().optional().or(z.literal("")),
-  meterNo: z.string().trim().max(60).optional().or(z.literal("")),
-});
-
-const readingSchema = z.object({
-  meterId: z.string().uuid(),
-  readOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  value: z.string().min(1),
-});
 
 function fail(error: string): MeterState {
   return { error };

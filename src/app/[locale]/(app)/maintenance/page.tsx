@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
+import { PageHeader } from "@/components/domain/page-header";
 
 type SearchParams = Promise<{
   status?: string;
@@ -29,6 +30,7 @@ export default async function MaintenancePage({
 
   const { page, status, priority } = await searchParams;
   const t = await getTranslations("maintenance");
+  const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
   // Fetch requests
@@ -119,7 +121,7 @@ export default async function MaintenancePage({
   const paged = paginate(transformedRequests, Number(page ?? 1));
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "open", label: t("statuses.open") },
     { key: "in_progress", label: t("statuses.in_progress") },
     { key: "waiting_parts", label: t("statuses.waiting_parts") },
@@ -128,10 +130,12 @@ export default async function MaintenancePage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="maintenance"
+        role={ctx.role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -141,7 +145,7 @@ export default async function MaintenancePage({
               <Clock className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Open Work Orders</KpiLabel>
+              <KpiLabel>{t("kpis.openWorkOrders")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {openCount}
               </span>
@@ -155,7 +159,7 @@ export default async function MaintenancePage({
               <Wrench className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>In Progress</KpiLabel>
+              <KpiLabel>{t("kpis.inProgress")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {inProgressCount}
               </span>
@@ -169,7 +173,7 @@ export default async function MaintenancePage({
               <AlertTriangle className="size-6" />
             </div>
             <div className="flex flex-col">
-              <KpiLabel>Urgent / High Priority</KpiLabel>
+              <KpiLabel>{t("kpis.urgentHighPriority")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
                 {urgentCount}
               </span>

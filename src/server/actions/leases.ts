@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { createLeaseSchema } from "@/schemas/leases";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
@@ -12,24 +12,6 @@ export type LeaseState = {
   leaseId?: string;
   newLeaseId?: string;
 };
-
-const createLeaseSchema = z.object({
-  unitId: z.string().uuid().optional().or(z.literal("")),
-  roomId: z.string().uuid().optional().or(z.literal("")),
-  tenantId: z.string().uuid(),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  rent: z.string().min(1),
-  currency: z.string().length(3).default("QAR"),
-  frequency: z.enum(["monthly", "quarterly", "semiannual", "annual"]),
-  installments: z.coerce.number().int().min(1).default(1),
-  dueDay: z.coerce.number().int().min(1).max(28).default(1),
-  deposit: z.string().optional().or(z.literal("")),
-  noticeDays: z.coerce.number().int().min(0).default(60),
-  isSublet: z.coerce.boolean().default(false),
-  parentLeaseId: z.string().uuid().optional().or(z.literal("")),
-  leaseNo: z.string().trim().max(50).optional().or(z.literal("")),
-});
 
 function fail(error: string): LeaseState {
   return { error };

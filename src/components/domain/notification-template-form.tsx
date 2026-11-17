@@ -2,85 +2,173 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toFormData } from "@/lib/form-data";
+import { templateSchema } from "@/schemas/settings";
 import { updateNotificationTemplateAction, type SettingsState } from "@/server/actions/settings";
 
-const selectClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed";
+type Values = {
+  event: string;
+  channel: "email" | "sms" | "telegram" | "push";
+  locale: "en" | "ar";
+  subject: string;
+  body: string;
+};
+
+const CHANNELS = ["email", "sms", "telegram", "push"] as const;
 
 export function NotificationTemplateForm() {
   const t = useTranslations("settings.notifications");
-  const [state, formAction, pending] = useActionState<SettingsState, FormData>(
+  const errors = t.raw("errors") as Record<string, string>;
+
+  const form = useForm<Values>({
+    resolver: zodResolver(templateSchema),
+    defaultValues: { event: "rent_due", channel: "email", locale: "en", subject: "", body: "" },
+  });
+
+  const [state, dispatch, pending] = useActionState<SettingsState, FormData>(
     updateNotificationTemplateAction,
     {},
   );
 
   return (
-    <form action={formAction} className="flex max-w-2xl flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <Label htmlFor="event">{t("event")}</Label>
-          <Input id="event" name="event" defaultValue="rent_due" required dir="ltr" />
-        </div>
-        <div>
-          <Label htmlFor="channel">{t("channel")}</Label>
-          <select id="channel" name="channel" defaultValue="email" className={selectClass}>
-            {(["email", "sms", "telegram", "push"] as const).map((channel) => (
-              <option key={channel} value={channel}>
-                {t(`channels.${channel}` as never)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="locale">{t("locale")}</Label>
-          <select id="locale" name="locale" defaultValue="en" className={selectClass}>
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-          </select>
-        </div>
-      </div>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
+        noValidate
+        className="flex max-w-2xl flex-col gap-4"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="event"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("event")}</FormLabel>
+                <FormControl>
+                  <Input {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div>
-        <Label htmlFor="subject">{t("subject")}</Label>
-        <Input id="subject" name="subject" maxLength={160} />
-      </div>
+          <FormField
+            control={form.control}
+            name="channel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("channel")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {CHANNELS.map((channel) => (
+                      <SelectItem key={channel} value={channel}>
+                        {t(`channels.${channel}` as never)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div>
-        <Label htmlFor="body">{t("body")}</Label>
-        <Textarea
-          id="body"
-          name="body"
-          rows={4}
-          required
-          maxLength={4000}
-          placeholder={t("bodyPlaceholder")}
+          <FormField
+            control={form.control}
+            name="locale"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("locale")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="en">{t("languages.en")}</SelectItem>
+                    <SelectItem value="ar">{t("languages.ar")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("subject")}</FormLabel>
+              <FormControl>
+                <Input {...field} maxLength={160} />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-        >
-          {t(`errors.${state.error}` as never)}
-        </p>
-      ) : null}
-      {state.ok ? (
-        <p
-          role="status"
-          className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
-        >
-          {t("saved")}
-        </p>
-      ) : null}
+        <FormField
+          control={form.control}
+          name="body"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("body")}</FormLabel>
+              <FormControl>
+                <Textarea rows={4} {...field} maxLength={4000} placeholder={t("bodyPlaceholder")} />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Button type="submit" size="lg" disabled={pending} className="self-start">
-        {pending ? t("saving") : t("save")}
-      </Button>
-    </form>
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[state.error] ?? state.error}
+          </p>
+        ) : null}
+        {state.ok ? (
+          <p
+            role="status"
+            className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+          >
+            {t("saved")}
+          </p>
+        ) : null}
+
+        <Button type="submit" size="lg" disabled={pending} className="self-start">
+          {pending ? t("saving") : t("save")}
+        </Button>
+      </form>
+    </Form>
   );
 }

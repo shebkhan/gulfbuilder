@@ -4,6 +4,7 @@ import { OrganizationSettingsForm } from "@/components/domain/organization-setti
 import { SettingsNav } from "@/components/domain/settings-nav";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PageHeader } from "@/components/domain/page-header";
 
 export default async function OrganizationSettingsPage({
   params,
@@ -41,10 +42,12 @@ export default async function OrganizationSettingsPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        section="settings"
+        role={role}
+        title={t("title")}
+        description={t("subtitle")}
+      />
 
       <SettingsNav />
 
