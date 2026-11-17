@@ -93,3 +93,4 @@ export function StatementsTable({ statements, locale, labels }: StatementsTableP
     </div>
   );
 }
+

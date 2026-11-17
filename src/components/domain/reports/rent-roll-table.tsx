@@ -65,3 +65,4 @@ export function RentRollTable({ rentRoll, locale, labels }: RentRollTableProps) 
     </div>
   );
 }
+
