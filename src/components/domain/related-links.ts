@@ -3,6 +3,7 @@ import type { Role } from "@/lib/rbac";
 
 export type RelatedSection =
   | "dashboard"
+  | "today"
   | "buildings"
   | "tenants"
   | "leases"
@@ -19,6 +20,7 @@ export type RelatedSection =
 
 export const RELATED_SECTIONS: Record<RelatedSection, readonly string[]> = {
   dashboard: ["/buildings", "/leases", "/reports"],
+  today: ["/maintenance", "/cheques", "/payments", "/leases"],
   buildings: ["/tenants", "/leases", "/documents", "/reports"],
   tenants: ["/buildings", "/leases", "/payments"],
   leases: ["/tenants", "/buildings", "/payments", "/cheques", "/reports"],

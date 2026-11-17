@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "لوحة التحكم",
+    "today": "اليوم",
     "properties": "العقارات",
     "tenants": "المستأجرون",
     "leases": "عقود الإيجار",
@@ -47,6 +48,26 @@
     "expandSidebar": "توسيع القائمة الجانبية",
     "all": "الكل",
     "unknown": "غير معروف"
+  },
+  "today": {
+    "title": "اليوم",
+    "description": "ما يحتاج إلى اهتمامك اليوم",
+    "date": "{date}",
+    "allClear": "لا شيء يحتاج إلى اهتمامك اليوم",
+    "priorityItems": "العناصر ذات الأولوية",
+    "repairs": "أعمال الصيانة المفتوحة",
+    "cheques": "الشيكات المستحقة",
+    "confirmations": "بانتظار التأكيد",
+    "leases": "العقود المنتهية قريباً",
+    "viewAll": "عرض الكل",
+    "urgent": "عاجل",
+    "high": "مرتفع",
+    "normal": "عادي",
+    "low": "منخفض",
+    "overdue": "متأخر {days} يوم",
+    "dueToday": "مستحق اليوم",
+    "awaiting": "بانتظار",
+    "daysLeft": "متبقٍ {days} يوم"
   },
   "tenantPicker": {
     "title": "اختيار مستأجر",

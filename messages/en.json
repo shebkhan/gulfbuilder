@@ -1,6 +1,7 @@
 {
   "nav": {
     "dashboard": "Dashboard",
+    "today": "Today",
     "properties": "Properties",
     "tenants": "Tenants",
     "leases": "Leases",
@@ -47,6 +48,26 @@
     "expandSidebar": "Expand sidebar",
     "all": "All",
     "unknown": "Unknown"
+  },
+  "today": {
+    "title": "Today",
+    "description": "What needs your attention today",
+    "date": "{date}",
+    "allClear": "Nothing needs attention today",
+    "priorityItems": "Priority items",
+    "repairs": "Open repairs",
+    "cheques": "Due cheques",
+    "confirmations": "Awaiting confirmation",
+    "leases": "Expiring leases",
+    "viewAll": "View all",
+    "urgent": "Urgent",
+    "high": "High",
+    "normal": "Normal",
+    "low": "Low",
+    "overdue": "{days}d overdue",
+    "dueToday": "Due today",
+    "awaiting": "Awaiting",
+    "daysLeft": "{days}d left"
   },
   "tenantPicker": {
     "title": "Select a tenant",
