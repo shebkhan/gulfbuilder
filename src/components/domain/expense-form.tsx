@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, CreditCard, Plus, Receipt } from "lucide-react";
+import { Check, CheckCircle2, CreditCard, Plus, Receipt } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { NumberField } from "@/components/ui/number-field";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Link } from "@/i18n/navigation";
 import {
   Select,
   SelectContent,
@@ -69,29 +69,16 @@ const CATEGORY_KEYS: Record<string, string> = {
 };
 
 export function ExpenseForm({
-  expenses,
   vendors,
   buildings,
-  canWrite = false,
-  canApprove = false,
-  canPay = false,
-  locale = "en",
 }: {
-  expenses: ExpenseItem[];
   vendors: VendorOption[];
   buildings: BuildingOption[];
-  canWrite?: boolean;
-  canApprove?: boolean;
-  canPay?: boolean;
-  locale?: string;
 }) {
   const t = useTranslations("expenses");
   const tCommon = useTranslations("common");
   const errors = t.raw("errors") as Record<string, string>;
   const help = t.raw("help") as Record<string, string>;
-  const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [statusState, setStatusState] = useState<ExpenseState>({});
 
   const form = useForm<Values>({
     resolver: zodResolver(createExpenseSchema),
@@ -111,14 +98,191 @@ export function ExpenseForm({
   const [createState, createDispatch, createPending] = useActionState<ExpenseState, FormData>(
     async (prev, formData) => {
       const res = await createExpenseAction(prev, formData);
-      if (res.ok) {
-        setOpen(false);
-        form.reset();
-      }
+      if (res.ok) form.reset();
       return res;
     },
     {},
   );
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((values) => createDispatch(toFormData(values)))}
+        noValidate
+        className="flex flex-col gap-6"
+      >
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.category}>{t("category")}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(
+                      [
+                        "maintenance",
+                        "utilities",
+                        "insurance",
+                        "cleaning",
+                        "management_fee",
+                        "other",
+                      ] as const
+                    ).map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {t(`categories.${key}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="expenseDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.date}>{t("date")}</FormLabel>
+                <FormControl>
+                  <DatePicker {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.description}>{t("description")}</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder={t("descriptionPlaceholder")} />
+              </FormControl>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.amount}>
+                  {t("amount")} ({tCommon("currency")})
+                </FormLabel>
+                <FormControl>
+                  <NumberField step="any" {...field} dir="ltr" />
+                </FormControl>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="buildingId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel description={help.property}>{t("property")}</FormLabel>
+                <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("generalExpense")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {buildings.map((building) => (
+                      <SelectItem key={building.id} value={building.id}>
+                        {building.code} - {building.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <LocalizedFormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="vendorId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel description={help.vendor}>{t("vendor")}</FormLabel>
+              <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectVendor")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {vendors.map((vendor) => (
+                    <SelectItem key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <LocalizedFormMessage />
+            </FormItem>
+          )}
+        />
+
+        {createState.error ? (
+          <p
+            role="alert"
+            className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+          >
+            {errors[createState.error] ?? createState.error}
+          </p>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" asChild>
+            <Link href="/expenses">{tCommon("cancel")}</Link>
+          </Button>
+          <Button type="submit" disabled={createPending}>
+            <Check className="size-4" />
+            {t("createExpense")}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+export function ExpenseList({
+  expenses,
+  canWrite,
+  canApprove,
+  canPay,
+  locale = "en",
+}: {
+  expenses: ExpenseItem[];
+  canWrite: boolean;
+  canApprove: boolean;
+  canPay: boolean;
+  locale?: string;
+}) {
+  const t = useTranslations("expenses");
+  const errors = t.raw("errors") as Record<string, string>;
+  const [isPending, startTransition] = useTransition();
+  const [statusState, setStatusState] = useState<ExpenseState>({});
 
   const handleApprove = (expenseId: string) => {
     setStatusState({});
@@ -161,9 +325,11 @@ export function ExpenseForm({
           </p>
         ) : null}
         {canWrite ? (
-          <Button onClick={() => setOpen(true)} className="flex items-center gap-2">
-            <Plus className="size-4" />
-            {t("createExpense")}
+          <Button asChild className="flex items-center gap-2">
+            <Link href="/expenses/new">
+              <Plus className="size-4" />
+              {t("createExpense")}
+            </Link>
           </Button>
         ) : null}
       </div>
@@ -259,172 +425,6 @@ export function ExpenseForm({
           </div>
         )}
       </div>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-[38.4rem]">
-          <DialogHeader>
-            <DialogTitle>{t("createExpense")}</DialogTitle>
-          </DialogHeader>
-
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit((values) => createDispatch(toFormData(values)))}
-              noValidate
-              className="mt-4 flex flex-col gap-6"
-            >
-              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.category}>{t("category")}</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {(
-                            [
-                              "maintenance",
-                              "utilities",
-                              "insurance",
-                              "cleaning",
-                              "management_fee",
-                              "other",
-                            ] as const
-                          ).map((key) => (
-                            <SelectItem key={key} value={key}>
-                              {t(`categories.${key}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="expenseDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.date}>{t("date")}</FormLabel>
-                      <FormControl>
-                        <DatePicker {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel description={help.description}>{t("description")}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t("descriptionPlaceholder")} />
-                    </FormControl>
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.amount}>
-                        {t("amount")} ({tCommon("currency")})
-                      </FormLabel>
-                      <FormControl>
-                        <NumberField step="any" {...field} dir="ltr" />
-                      </FormControl>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="buildingId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel description={help.property}>{t("property")}</FormLabel>
-                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("generalExpense")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {buildings.map((building) => (
-                            <SelectItem key={building.id} value={building.id}>
-                              {building.code} - {building.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <LocalizedFormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="vendorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel description={help.vendor}>{t("vendor")}</FormLabel>
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("selectVendor")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {vendors.map((vendor) => (
-                          <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <LocalizedFormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {createState.error ? (
-                <p
-                  role="alert"
-                  className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
-                >
-                  {errors[createState.error] ?? createState.error}
-                </p>
-              ) : null}
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  {tCommon("cancel")}
-                </Button>
-                <Button type="submit" disabled={createPending}>
-                  {t("createExpense")}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

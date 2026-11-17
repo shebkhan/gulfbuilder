@@ -1,6 +1,6 @@
 import { CheckCircle2, Clock, Receipt } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ExpenseForm, type ExpenseItem } from "@/components/domain/expense-form";
+import { ExpenseList, type ExpenseItem } from "@/components/domain/expense-form";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -64,25 +64,6 @@ export default async function ExpensesPage({
   }
 
   const { data: expenses } = await query;
-
-  // Options for vendors & buildings
-  const { data: rawVendors } = await ctx.supabase
-    .from("vendors")
-    .select("id, name")
-    .order("name");
-
-  const { data: rawBuildings } = await ctx.supabase
-    .from("buildings")
-    .select("id, name, code")
-    .is("deleted_at", null)
-    .order("code");
-
-  const vendorOptions = (rawVendors || []).map((v) => ({ id: v.id, name: v.name }));
-  const buildingOptions = (rawBuildings || []).map((b) => ({
-    id: b.id,
-    name: b.name,
-    code: b.code,
-  }));
 
   const allExpenses = expenses || [];
 
@@ -191,10 +172,8 @@ export default async function ExpensesPage({
         })}
       </div>
 
-      <ExpenseForm
+      <ExpenseList
         expenses={paged.rows}
-        vendors={vendorOptions}
-        buildings={buildingOptions}
         canWrite={canWrite}
         canApprove={canApprove}
         canPay={canPay}

@@ -1,9 +1,9 @@
-import { CreditCard, Receipt, TrendingUp } from "lucide-react";
+import { CreditCard, Plus, Receipt, TrendingUp } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { PaymentForm } from "@/components/domain/payment-form";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
@@ -50,25 +50,6 @@ export default async function PaymentsPage({
     .order("receipt_year", { ascending: false })
     .order("receipt_no", { ascending: false });
 
-  // Fetch buildings & leases for modal form (tenants load on demand per building)
-  const { data: rawBuildings } = await ctx.supabase
-    .from("buildings")
-    .select("id, code, name")
-    .order("code");
-
-  const { data: rawLeases } = await ctx.supabase
-    .from("leases")
-    .select("id, lease_no, tenant_id")
-    .in("status", ["active", "draft"])
-    .order("lease_no");
-
-  const buildingOptions = (rawBuildings || []).map((b) => ({ id: b.id, code: b.code, name: b.name }));
-  const leaseOptions = (rawLeases || []).map((l) => ({
-    id: l.id,
-    lease_no: l.lease_no,
-    tenant_id: l.tenant_id,
-  }));
-
   // KPI aggregates
   const totalReceivedMinor = (payments || []).reduce(
     (acc, p) => acc + BigInt(p.amount_minor),
@@ -88,13 +69,14 @@ export default async function PaymentsPage({
         actions={
           <div className="flex flex-wrap items-center gap-3">
 
-        {writable && (
-          <PaymentForm
-            buildings={buildingOptions}
-            leases={leaseOptions}
-            locale={locale}
-          />
-        )}
+        {writable ? (
+          <Button asChild>
+            <Link href="/payments/new">
+              <Plus aria-hidden />
+              {t("recordPayment")}
+            </Link>
+          </Button>
+        ) : null}
           </div>
         }
       />

@@ -19,4 +19,12 @@ describe("form modal migration", () => {
       expect(readFileSync(file, "utf8"), file).not.toContain("@/components/domain/form-dialog");
     }
   });
+
+  it("renders payment and expense forms outside a dialog", () => {
+    for (const name of ["payment-form.tsx", "expense-form.tsx"]) {
+      const source = readFileSync(join(DOMAIN, name), "utf8");
+      expect(source, name).not.toContain("@/components/ui/dialog");
+      expect(source, name).not.toContain("fixed inset-0");
+    }
+  });
 });
