@@ -53,7 +53,7 @@ export default async function PlatformDashboard({
   for (const sub of subscriptions.data ?? []) {
     if (sub.status !== "active") continue;
     const plan = sub.plan_code ? planByCode.get(sub.plan_code) : null;
-    const currency = plan?.currency ?? "USD";
+    const currency = plan?.currency ?? "QAR";
     mrr.set(currency, (mrr.get(currency) ?? 0n) + BigInt(plan?.price_minor ?? 0));
   }
   const mrrLabel =
@@ -131,7 +131,7 @@ export default async function PlatformDashboard({
                       <td className="py-2">{sub?.status ?? org.status}</td>
                       <td className="py-2">{unitCount.get(org.id) ?? 0}</td>
                       <td className="py-2">
-                        {formatMoney(BigInt(sub?.status === "active" ? (plan?.price_minor ?? 0) : 0), plan?.currency ?? "USD", locale)}
+                        {formatMoney(BigInt(sub?.status === "active" ? (plan?.price_minor ?? 0) : 0), plan?.currency ?? "QAR", locale)}
                       </td>
                     </tr>
                   );

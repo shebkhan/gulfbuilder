@@ -41,7 +41,13 @@ export default async function PrintReceipt({
   const money = (amount: number) => formatMoney(BigInt(amount), payment.currency, locale);
 
   const lines: PrintLine[] = [
-    { label: t("receiptNo"), value: `${payment.receipt_year ?? ""}/${payment.receipt_no ?? ""}` },
+    {
+      label: t("receiptNo"),
+      value:
+        payment.receipt_year && payment.receipt_no
+          ? `${payment.receipt_year}/${payment.receipt_no}`
+          : t("pendingReceipt"),
+    },
     { label: t("tenant"), value: tenant?.full_name ?? "—" },
     { label: t("lease"), value: lease?.lease_no ?? "—" },
     { label: t("method"), value: statement(`methods.${payment.method}` as never) },

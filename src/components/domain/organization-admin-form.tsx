@@ -208,6 +208,7 @@ export function ImpersonateButton({
       <Button type="submit" variant="ghost" size="sm" disabled={pending} title={state.error ?? ""}>
         {pending ? t("working") : t("impersonate")}
       </Button>
+      {state.ok ? <span role="status" className="font-body-sm text-body-sm text-secondary">{t("impersonated")}</span> : null}
       <span className="sr-only">{name}</span>
     </form>
   );

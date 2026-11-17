@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { CURRENCY_EXPONENTS } from "@/lib/money";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -20,7 +21,11 @@ const createOrgSchema = z.object({
     .trim()
     .regex(/^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/, "invalid_slug"),
   countryCode: z.string().trim().length(2).default("QA"),
-  baseCurrency: z.string().trim().length(3).default("QAR"),
+  baseCurrency: z
+    .string()
+    .trim()
+    .refine((code) => code in CURRENCY_EXPONENTS)
+    .default("QAR"),
   locale: z.enum(["en", "ar"]).default("en"),
 });
 
@@ -79,7 +84,7 @@ async function audit(
   rowId: string | null,
   newData: unknown,
 ) {
-  await admin.from("audit_log").insert({
+  const { error } = await admin.from("audit_log").insert({
     table_name: tableName,
     action,
     actor_id: actorId,
@@ -87,6 +92,7 @@ async function audit(
     row_id: rowId,
     new_data: newData as never,
   });
+  if (error) throw new Error(`audit insert failed: ${error.message}`);
 }
 
 export async function createOrganizationAction(
@@ -153,9 +159,12 @@ export async function setOrganizationPlanAction(
     .maybeSingle();
   if (!plan) return fail("plan_not_found");
 
-  const features = Object.fromEntries(
-    FEATURES.map((feature) => [feature, parsed.data.features.includes(feature)]),
-  );
+  const features = {
+    ...(typeof plan.features === "object" && plan.features ? plan.features : {}),
+    ...Object.fromEntries(
+      FEATURES.map((feature) => [feature, parsed.data.features.includes(feature)]),
+    ),
+  };
   const limits = { ...(typeof plan.limits === "object" && plan.limits ? plan.limits : {}), max_units: parsed.data.maxUnits };
 
   const { error: planError } = await ctx.admin
@@ -246,7 +255,7 @@ export async function updateMarketPackAction(
   });
   if (error) return fail("failed");
 
-  await audit(ctx.admin, ctx.userId, "market_packs", "update", null, parsed.data.countryCode, {
+  await audit(ctx.admin, ctx.userId, "market_packs", "update", null, null, {
     ...parsed.data,
     rules,
   });
