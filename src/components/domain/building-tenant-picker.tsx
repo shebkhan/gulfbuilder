@@ -3,12 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -134,27 +130,26 @@ export function BuildingTenantPicker({ buildings, value, initialTenant, onChange
               {t("error")}
             </p>
           ) : tenants.length === 0 ? (
-            <p className="py-6 text-center font-body-sm text-body-sm text-zinc-500">
-              {t("empty")}
-            </p>
+            <p className="py-6 text-center font-body-sm text-body-sm text-zinc-500">{t("empty")}</p>
           ) : (
             <div className="flex max-h-72 flex-col gap-1 overflow-y-auto rounded-md border border-zinc-200 p-1">
               {tenants.map((tenant) => (
-                <button
+                <Button
                   type="button"
                   key={tenant.id}
+                  variant="ghost"
                   onClick={() => {
                     onChange(tenant.id, tenant);
                     setOpen(false);
                   }}
-                  className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-start transition-colors hover:bg-zinc-100"
+                  className="flex h-auto items-center justify-between gap-3 rounded-md px-3 py-2 text-start hover:bg-zinc-100"
                 >
                   <span className="font-medium text-zinc-900">{tenant.full_name}</span>
                   <span className="flex items-center gap-2 text-sm text-zinc-500">
                     {tenant.id_number ? <span dir="ltr">{tenant.id_number}</span> : null}
                     {tenant.nationality ? <span>{tenant.nationality}</span> : null}
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
