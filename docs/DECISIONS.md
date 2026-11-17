@@ -3,6 +3,20 @@
 Deviations from `docs/SPEC.md` and `docs/CLAUDE.md`, newest first. Each entry names the spec
 section it departs from and why.
 
+## 2026-11-17
+
+**D-019 · `web-push` and Resend, Twilio and Telegram services are introduced for delivery.**
+The notification delivery core (1A) needs the `web-push` npm dependency plus the Resend, Twilio
+and Telegram services to actually send outbox rows. WhatsApp remains unimplemented: the channel
+value stays in the check constraints for existing data, but no adapter ships in this milestone.
+
+**D-018 · The service-role client is imported by `src/server/notifications/*` and
+`src/app/api/notifications/dispatch/*` instead of only Edge Functions and `(platform)`.**
+The dispatch worker must drain every organization's `notification_outbox` rows and claim them via
+`claim_notification_batch()`, which is granted to `service_role` only. The chosen trigger is a
+Next.js route rather than an Edge Function, so those modules hold the service-role client. The key
+never leaves the server, per D-007's rule.
+
 ## 2026-11-16
 
 **D-017 · No sender for `notification_outbox` while automation is excluded.**

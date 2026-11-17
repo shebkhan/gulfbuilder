@@ -1675,7 +1675,9 @@ export type Database = {
       }
       notification_outbox: {
         Row: {
+          attempts: number
           body: string
+          claimed_at: string | null
           channel: string
           created_at: string
           error: string | null
@@ -1691,7 +1693,9 @@ export type Database = {
           subject: string | null
         }
         Insert: {
+          attempts?: number
           body: string
+          claimed_at?: string | null
           channel: string
           created_at?: string
           error?: string | null
@@ -1707,7 +1711,9 @@ export type Database = {
           subject?: string | null
         }
         Update: {
+          attempts?: number
           body?: string
+          claimed_at?: string | null
           channel?: string
           created_at?: string
           error?: string | null
@@ -2476,6 +2482,9 @@ export type Database = {
           id: string
           locale: string | null
           phone: string | null
+          telegram_chat_id: string | null
+          telegram_link_code: string | null
+          telegram_link_expires_at: string | null
           updated_at: string
         }
         Insert: {
@@ -2486,6 +2495,9 @@ export type Database = {
           id: string
           locale?: string | null
           phone?: string | null
+          telegram_chat_id?: string | null
+          telegram_link_code?: string | null
+          telegram_link_expires_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -2496,6 +2508,9 @@ export type Database = {
           id?: string
           locale?: string | null
           phone?: string | null
+          telegram_chat_id?: string | null
+          telegram_link_code?: string | null
+          telegram_link_expires_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2736,6 +2751,21 @@ export type Database = {
             referencedColumns: ["code"]
           },
         ]
+      }
+      telegram_state: {
+        Row: {
+          id: boolean
+          last_update_id: number
+        }
+        Insert: {
+          id?: boolean
+          last_update_id?: number
+        }
+        Update: {
+          id?: boolean
+          last_update_id?: number
+        }
+        Relationships: []
       }
       tenant_credits: {
         Row: {
@@ -3056,6 +3086,50 @@ export type Database = {
           },
         ]
       }
+      web_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          created_by: string | null
+          endpoint: string
+          id: string
+          org_id: string
+          p256dh: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          created_by?: string | null
+          endpoint: string
+          id?: string
+          org_id: string
+          p256dh: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          created_by?: string | null
+          endpoint?: string
+          id?: string
+          org_id?: string
+          p256dh?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "web_push_subscriptions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       pg_all_foreign_keys: {
@@ -3200,6 +3274,27 @@ export type Database = {
       can_access_lease: {
         Args: { p_room: string; p_unit: string }
         Returns: boolean
+      }
+      claim_notification_batch: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          body: string
+          channel: string
+          claimed_at: string | null
+          created_at: string
+          error: string | null
+          event: string
+          id: string
+          locale: string
+          org_id: string
+          payload: Json | null
+          recipient: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          subject: string | null
+        }[]
       }
       clear_cheque: { Args: { p_cheque_id: string }; Returns: string }
       close_period: { Args: { p_month: string }; Returns: undefined }
