@@ -36,6 +36,18 @@
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
     "daysLeftHeader": "Days left"
   },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email address",
+    "invalidDate": "Enter a valid date (YYYY-MM-DD)",
+    "invalidAmount": "Enter a valid amount",
+    "invalidSlug": "Use letters, numbers and hyphens only",
+    "tooShort": "This value is too short",
+    "tooLong": "This value is too long",
+    "invalidUuid": "Enter a valid identifier",
+    "invalidRange": "Value is outside the allowed range",
+    "invalidInput": "Enter a valid value"
+  },
   "auth": {
     "signIn": "Sign in",
     "signUp": "Create account",

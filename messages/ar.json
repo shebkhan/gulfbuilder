@@ -36,6 +36,18 @@
     "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
     "daysLeftHeader": "الأيام المتبقية"
   },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "أدخل بريداً إلكترونياً صحيحاً",
+    "invalidDate": "أدخل تاريخاً صحيحاً (YYYY-MM-DD)",
+    "invalidAmount": "أدخل مبلغاً صحيحاً",
+    "invalidSlug": "استخدم حروفاً وأرقاماً وشرطات فقط",
+    "tooShort": "هذه القيمة قصيرة جداً",
+    "tooLong": "هذه القيمة طويلة جداً",
+    "invalidUuid": "أدخل معرفاً صحيحاً",
+    "invalidRange": "القيمة خارج النطاق المسموح",
+    "invalidInput": "أدخل قيمة صحيحة"
+  },
   "auth": {
     "signIn": "تسجيل الدخول",
     "signUp": "إنشاء حساب",
