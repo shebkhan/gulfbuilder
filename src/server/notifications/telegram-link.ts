@@ -44,10 +44,12 @@ export async function linkTelegramCodes(admin: SupabaseClient): Promise<number> 
   let maxUpdateId = 0;
   const now = new Date().toISOString();
   for (const update of updates) {
-    if (update.update_id > maxUpdateId) maxUpdateId = update.update_id;
     const message = update.message;
     const code = message ? parseStartCode(message.text ?? "") : null;
-    if (!code || !message) continue;
+    if (!code || !message) {
+      if (update.update_id > maxUpdateId) maxUpdateId = update.update_id;
+      continue;
+    }
     // Pick one candidate: a code must never link more than one profile.
     const { data: candidates } = await admin
       .from("profiles")
@@ -56,7 +58,10 @@ export async function linkTelegramCodes(admin: SupabaseClient): Promise<number> 
       .gt("telegram_link_expires_at", now)
       .limit(1);
     const targetId = candidates?.[0]?.id;
-    if (!targetId) continue;
+    if (!targetId) {
+      if (update.update_id > maxUpdateId) maxUpdateId = update.update_id;
+      continue;
+    }
     // Re-check code and expiry on update so a concurrent poll cannot re-link it.
     const { data, error } = await admin
       .from("profiles")
@@ -69,7 +74,12 @@ export async function linkTelegramCodes(admin: SupabaseClient): Promise<number> 
       .eq("telegram_link_code", code)
       .gt("telegram_link_expires_at", now)
       .select("id");
-    if (!error && data) links += data.length;
+    if (error) {
+      // Leave this and later updates queued for retry; never log chat data.
+      break;
+    }
+    if (data) links += data.length;
+    if (update.update_id > maxUpdateId) maxUpdateId = update.update_id;
   }
 
   if (maxUpdateId > 0) {

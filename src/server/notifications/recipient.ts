@@ -18,6 +18,7 @@ export async function resolveOutbound(
         .select("email_from")
         .eq("org_id", row.org_id)
         .maybeSingle();
+      if (branding.error) throw new Error("recipient_lookup_failed");
       if (branding.data?.email_from) outbound.from = branding.data.email_from;
     }
     return [outbound];
@@ -28,14 +29,16 @@ export async function resolveOutbound(
       .select("telegram_chat_id")
       .eq("id", row.recipient)
       .maybeSingle();
+    if (profile.error) throw new Error("recipient_lookup_failed");
     if (!profile.data?.telegram_chat_id) return [];
     return [{ channel, recipient: profile.data.telegram_chat_id, subject: row.subject, body: row.body }];
   }
   if (channel === "push") {
-    const { data } = await admin
+    const { data, error } = await admin
       .from("web_push_subscriptions")
       .select("endpoint,p256dh,auth")
       .eq("user_id", row.recipient);
+    if (error) throw new Error("recipient_lookup_failed");
     return (data ?? []).map((subscription) => ({
       channel,
       recipient: row.recipient,

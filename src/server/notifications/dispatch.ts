@@ -17,8 +17,14 @@ export async function dispatchPending(): Promise<DispatchCounts> {
   if (error) throw error;
   const counts: DispatchCounts = { claimed: rows.length, sent: 0, failed: 0, skipped: 0 };
   for (const row of rows) {
-    const messages = await resolveOutbound(row, admin);
-    if (messages.length === 0) {
+    let messages: Outbound[] = [];
+    let lookupError: string | null = null;
+    try {
+      messages = await resolveOutbound(row, admin);
+    } catch {
+      lookupError = "recipient_lookup_failed";
+    }
+    if (lookupError === null && messages.length === 0) {
       counts.skipped += 1;
       await admin
         .from("notification_outbox")
@@ -26,7 +32,7 @@ export async function dispatchPending(): Promise<DispatchCounts> {
         .eq("id", row.id);
       continue;
     }
-    const sendError = await sendAll(messages);
+    const sendError = lookupError ?? (await sendAll(messages));
     if (sendError === null) {
       counts.sent += 1;
       await admin

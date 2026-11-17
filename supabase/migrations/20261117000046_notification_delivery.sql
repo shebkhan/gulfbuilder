@@ -69,6 +69,11 @@ create policy "web_push_subscriptions_delete" on public.web_push_subscriptions
   for delete to authenticated
   using (org_id = auth_org() and user_id = auth.uid());
 
+create policy "web_push_subscriptions_update" on public.web_push_subscriptions
+  for update to authenticated
+  using (org_id = auth_org() and user_id = auth.uid())
+  with check (org_id = auth_org() and user_id = auth.uid());
+
 create trigger web_push_subscriptions_set_updated_at before update
   on public.web_push_subscriptions
   for each row execute function public.set_updated_at();
@@ -88,6 +93,7 @@ begin
     select id
     from public.notification_outbox
     where status = 'pending'
+      and scheduled_for <= now()
       and (claimed_at is null or claimed_at < now() - interval '5 minutes')
     order by scheduled_for
     for update skip locked

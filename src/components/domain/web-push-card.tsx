@@ -21,10 +21,7 @@ export function WebPushCard() {
   const publicKey = process.env.NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
   const [endpoint, setEndpoint] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [saveState, saveAction] = useActionState<SettingsState, FormData>(
-    savePushSubscriptionAction,
-    {},
-  );
+  const [saveError, setSaveError] = useState<string | undefined>();
   const [removeState, removeAction] = useActionState<SettingsState, FormData>(
     removePushSubscriptionAction,
     {},
@@ -48,10 +45,15 @@ export function WebPushCard() {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
       });
-      setEndpoint(subscription.endpoint);
       const formData = new FormData();
       formData.set("subscription", JSON.stringify(subscription));
-      saveAction(formData);
+      const result = await savePushSubscriptionAction({}, formData);
+      if (result.error) {
+        setSaveError(result.error);
+      } else {
+        setSaveError(undefined);
+        setEndpoint(subscription.endpoint);
+      }
     } catch {
       // Permission denied or subscribe failed; leave the current state unchanged.
     } finally {
@@ -76,7 +78,7 @@ export function WebPushCard() {
     }
   }
 
-  const error = saveState.error ?? removeState.error;
+  const error = saveError ?? removeState.error;
 
   return (
     <Card>

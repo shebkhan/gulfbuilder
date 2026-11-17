@@ -45,7 +45,7 @@
 ## Notification dispatch
 
 `POST /api/notifications/dispatch` drains queued `notification_outbox` rows across
-email, WhatsApp, SMS, Telegram and web push. It requires
+email, SMS, Telegram and web push. It requires
 `Authorization: Bearer $NOTIFICATION_CRON_SECRET` (set `NOTIFICATION_CRON_SECRET`
 in the environment); unauthenticated calls get 401. The recommended cadence is
 every minute. The cron caller is supplied by the owner — no Edge Function, pg_cron
