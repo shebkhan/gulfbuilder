@@ -34,3 +34,20 @@ test("related sections link buildings to tenants", async ({ page }) => {
   await strip.getByRole("link", { name: tenants }).click();
   await expect(page).toHaveURL(new RegExp(`/${locale}/tenants`));
 });
+
+test("lease form shows an inline error for empty rent", async ({ page }) => {
+  const locale = currentLocale();
+  await signIn(page);
+  await page.waitForURL(new RegExp(`/${locale}/(dashboard|mfa)`));
+  await page.goto(`/${locale}/leases/new`);
+
+  const rent = locale === "ar" ? "قيمة الإيجار" : "Rent";
+  const create = locale === "ar" ? "إنشاء العقد" : "Create lease";
+  const required = locale === "ar" ? "هذا الحقل مطلوب" : "This field is required";
+
+  await page.getByLabel(rent).fill("");
+  await page.getByRole("button", { name: create }).click();
+
+  await expect(page.getByText(required).first()).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/${locale}/leases/new`));
+});
