@@ -42,6 +42,7 @@
     "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
     "daysLeftHeader": "الأيام المتبقية",
     "relatedSections": "أقسام ذات صلة",
+    "back": "رجوع",
     "cancel": "إلغاء",
     "notifications": "الإشعارات",
     "collapseSidebar": "طي القائمة الجانبية",

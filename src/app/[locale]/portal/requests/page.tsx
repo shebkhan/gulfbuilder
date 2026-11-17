@@ -1,10 +1,11 @@
+import { Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell } from "@/components/domain/date-cell";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { TenantRequestForm } from "@/components/domain/tenant-request-form";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
 
@@ -31,9 +32,12 @@ export default async function PortalRequestsPage({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <FormDialog title={t("newTitle")} triggerLabel={t("newTitle")}>
-          <TenantRequestForm />
-        </FormDialog>
+        <Button asChild>
+          <Link href="/portal/requests/new">
+            <Plus aria-hidden />
+            {t("newTitle")}
+          </Link>
+        </Button>
       </div>
 
       <Card>

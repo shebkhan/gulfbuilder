@@ -1,10 +1,11 @@
+import { Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell } from "@/components/domain/date-cell";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { PaymentProofForm } from "@/components/domain/payment-proof-form";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
@@ -35,9 +36,12 @@ export default async function PortalPaymentsPage({
           <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
           <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
         </div>
-        <FormDialog title={t("uploadTitle")} triggerLabel={t("uploadTitle")}>
-          <PaymentProofForm locale={locale} />
-        </FormDialog>
+        <Button asChild>
+          <Link href="/portal/payments/upload">
+            <Plus aria-hidden />
+            {t("uploadTitle")}
+          </Link>
+        </Button>
       </div>
 
       <Card>

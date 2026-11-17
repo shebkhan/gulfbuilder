@@ -1,8 +1,7 @@
-import { Building2, Users } from "lucide-react";
+import { Building2, Plus, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { BuildingForm } from "@/components/domain/building-form";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { PageHeader } from "@/components/domain/page-header";
+import { Button } from "@/components/ui/button";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
@@ -79,22 +78,12 @@ export default async function BuildingsPage({
             </Link>
           ) : null}
           {writable && owners && owners.length > 0 ? (
-            <FormDialog title={t("new")} triggerLabel={t("new")}>
-              <BuildingForm
-                owners={owners}
-                labels={{
-                  code: t("code"),
-                  name: t("name"),
-                  owner: t("owner"),
-                  city: t("city"),
-                  create: t("create"),
-                  creating: t("creating"),
-                  created: t("created"),
-                  help: t.raw("help") as Record<string, string>,
-                  errors: t.raw("errors") as Record<string, string>,
-                }}
-              />
-            </FormDialog>
+            <Button asChild>
+              <Link href="/buildings/new">
+                <Plus aria-hidden />
+                {t("new")}
+              </Link>
+            </Button>
           ) : null}
           </div>
         }

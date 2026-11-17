@@ -1,12 +1,11 @@
+import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { FormDialog } from "@/components/domain/form-dialog";
-import { InviteForm } from "@/components/domain/invite-form";
+import { PageHeader } from "@/components/domain/page-header";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { can, isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { PageHeader } from "@/components/domain/page-header";
-
-const INVITABLE_ROLES = ["manager", "accountant", "caretaker", "owner", "tenant"] as const;
 
 export default async function UsersSettingsPage({
   params,
@@ -44,20 +43,12 @@ export default async function UsersSettingsPage({
         description={t("subtitle")}
         actions={
           <div className="flex flex-wrap items-center gap-3">
-        <FormDialog title={t("invite")} triggerLabel={t("invite")}>
-          <InviteForm
-            locale={locale}
-            labels={{
-              email: t("email"),
-              role: t("role"),
-              invite: t("invite"),
-              sending: t("sending"),
-              invited: t.raw("invited") as string,
-              errors: t.raw("errors") as Record<string, string>,
-            }}
-            roles={INVITABLE_ROLES.map((value) => ({ value, label: t(`roles.${value}`) }))}
-          />
-        </FormDialog>
+        <Button asChild>
+          <Link href="/settings/users/invite">
+            <Plus aria-hidden />
+            {t("invite")}
+          </Link>
+        </Button>
           </div>
         }
       />

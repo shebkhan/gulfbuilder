@@ -1,11 +1,11 @@
-import { FileText } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell, DaysLeft } from "@/components/domain/date-cell";
-import { DocumentUploadForm } from "@/components/domain/document-upload-form";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
@@ -29,25 +29,6 @@ export default async function DocumentsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const [{ data: leases }, { data: tenants }, { data: buildings }] = await Promise.all([
-    ctx.supabase
-      .from("leases")
-      .select("id, lease_no, tenants(full_name)")
-      .order("lease_no")
-      .limit(200),
-    ctx.supabase.from("tenants").select("id, full_name").order("full_name").limit(200),
-    ctx.supabase.from("buildings").select("id, code, name").order("code").limit(200),
-  ]);
-
-  const entities = [
-    ...(leases ?? []).map((l) => ({
-      id: l.id,
-      label: `${l.lease_no}${(l.tenants as unknown as { full_name: string } | null)?.full_name ? ` — ${(l.tenants as unknown as { full_name: string }).full_name}` : ""}`,
-    })),
-    ...(tenants ?? []).map((x) => ({ id: x.id, label: `${x.full_name} ${t("tenantTag")}` })),
-    ...(buildings ?? []).map((b) => ({ id: b.id, label: `${b.code} — ${b.name} ${t("buildingTag")}` })),
-  ];
-
   const { data: documents } = await ctx.supabase
     .from("documents")
     .select("id, entity_type, entity_id, kind, path, expires_on, created_at")
@@ -68,9 +49,12 @@ export default async function DocumentsPage({
         actions={
           <div className="flex flex-wrap items-center gap-3">
         {writable ? (
-          <FormDialog title={t("upload")} triggerLabel={t("upload")}>
-            <DocumentUploadForm entities={entities} />
-          </FormDialog>
+          <Button asChild>
+            <Link href="/documents/upload">
+              <Plus aria-hidden />
+              {t("upload")}
+            </Link>
+          </Button>
         ) : null}
           </div>
         }

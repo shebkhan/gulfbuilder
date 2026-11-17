@@ -1,10 +1,9 @@
-import { Building2, Eye, FileSignature, Mail, Phone, Users } from "lucide-react";
+import { Building2, Eye, FileSignature, Mail, Phone, Plus, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { TenantForm } from "@/components/domain/tenant-form";
 import { TenantSearch } from "@/components/domain/tenant-search";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
@@ -167,31 +166,12 @@ export default async function TenantsPage({
         actions={
           <div className="flex flex-wrap items-center gap-3">
             {writable ? (
-              <FormDialog title={t("new")} triggerLabel={t("new")}>
-                <TenantForm
-                  labels={{
-                    fullName: t("fullName"),
-                    kind: t("kind"),
-                    person: t("person"),
-                    company: t("company"),
-                    language: t("language"),
-                    arabic: t("arabic"),
-                    english: t("english"),
-                    idNumber: t("idNumber"),
-                    idNumberPlaceholder: t("idNumberPlaceholder"),
-                    phone: t("phone"),
-                    whatsapp: t("whatsapp"),
-                    email: t("email"),
-                    nationality: t("nationality"),
-                    employer: t("employer"),
-                    create: t("create"),
-                    creating: t("creating"),
-                    created: t("created"),
-                    help: t.raw("help") as Record<string, string>,
-                    errors: t.raw("errors") as Record<string, string>,
-                  }}
-                />
-              </FormDialog>
+              <Button asChild>
+                <Link href="/tenants/new">
+                  <Plus aria-hidden />
+                  {t("new")}
+                </Link>
+              </Button>
             ) : null}
           </div>
         }

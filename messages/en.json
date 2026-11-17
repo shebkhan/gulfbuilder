@@ -42,6 +42,7 @@
     "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
     "daysLeftHeader": "Days left",
     "relatedSections": "Related sections",
+    "back": "Back",
     "cancel": "Cancel",
     "notifications": "Notifications",
     "collapseSidebar": "Collapse sidebar",

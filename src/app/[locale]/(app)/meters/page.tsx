@@ -1,10 +1,9 @@
-import { Gauge } from "lucide-react";
+import { Gauge, Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell } from "@/components/domain/date-cell";
-import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
-import { MeterForms } from "@/components/domain/meter-form";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
@@ -28,12 +27,11 @@ export default async function MetersPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const [{ data: meters }, { data: buildings }, { data: readings }] = await Promise.all([
+  const [{ data: meters }, { data: readings }] = await Promise.all([
     ctx.supabase
       .from("meters")
       .select("id, kind, meter_no, building_id, unit_id, buildings(code, name)")
       .order("kind"),
-    ctx.supabase.from("buildings").select("id, code, name").order("code"),
     ctx.supabase
       .from("meter_readings")
       .select("id, meter_id, read_on, value")
@@ -48,15 +46,6 @@ export default async function MetersPage({
     readingsByMeter.set(r.meter_id, list);
   }
 
-  const buildingOptions = (buildings ?? []).map((b) => ({ id: b.id, label: `${b.code} — ${b.name}` }));
-  const meterOptions = (meters ?? []).map((m) => {
-    const building = m.buildings as unknown as { code: string } | null;
-    return {
-      id: m.id,
-      label: `${building?.code ?? "—"} · ${m.kind}${m.meter_no ? ` (${m.meter_no})` : ""}`,
-    };
-  });
-
   const paged = paginate(meters ?? [], Number(page ?? 1));
 
   return (
@@ -68,9 +57,12 @@ export default async function MetersPage({
         description={t("subtitle")}
         actions={
           <div className="flex flex-wrap items-center gap-3">
-        <FormDialog title={t("title")} triggerLabel={t("newMeter")} wide>
-          <MeterForms buildings={buildingOptions} meters={meterOptions} />
-        </FormDialog>
+        <Button asChild>
+          <Link href="/meters/new">
+            <Plus aria-hidden />
+            {t("newMeter")}
+          </Link>
+        </Button>
           </div>
         }
       />
