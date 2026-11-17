@@ -1,5 +1,6 @@
 import { CreditCard, Receipt, TrendingUp } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { PaymentForm } from "@/components/domain/payment-form";
 import { Badge } from "@/components/ui/badge";
@@ -203,11 +204,7 @@ export default async function PaymentsPage({
                         {p.reference || "—"}
                       </td>
                       <td className="p-4 text-on-surface-variant">
-                        {new Date(p.received_at).toLocaleDateString(locale, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        <DateCell date={p.received_at} locale={locale} />
                       </td>
                       <td className="p-4 text-end font-semibold text-on-surface">
                         {formatMoney(BigInt(p.amount_minor), p.currency, locale)}

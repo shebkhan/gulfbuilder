@@ -1,5 +1,12 @@
 import { AlertTriangle, Building2, DollarSign, TrendingUp } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  ChequeView,
+  CollectionView,
+  ExpiryView,
+  OccupancyView,
+  ReportFilters,
+} from "@/components/domain/report-parts";
 import { StatementGenerator } from "@/components/domain/statement-generator";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
@@ -7,14 +14,24 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import {
+  defaultReportFilters,
   fetchAgedReceivables,
+  fetchChequeReport,
+  fetchCollectionReport,
+  fetchExpiryReport,
+  fetchOccupancyReport,
   fetchPortfolioKpis,
+  fetchReportBuildings,
   fetchRentRoll,
 } from "@/server/actions/reports";
 import { getOrgContext } from "@/server/org-context";
 
 type SearchParams = Promise<{
   tab?: string;
+  from?: string;
+  to?: string;
+  building?: string;
+  page?: string;
 }>;
 
 export default async function ReportsPage({
@@ -30,19 +47,27 @@ export default async function ReportsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { tab = "overview" } = await searchParams;
+  const { tab = "overview", from, to, building, page } = await searchParams;
+  const filters = defaultReportFilters({ from, to, building });
   const t = await getTranslations("reports");
   const writable = can(ctx.role, "statements.write");
 
   // Fetch report data in parallel
-  const [kpis, rentRoll, agedReceivables, { data: rawStatements }, { data: rawOwners }, { data: rawBankAccounts }] =
-    await Promise.all([
-      fetchPortfolioKpis(),
-      fetchRentRoll(),
-      fetchAgedReceivables(),
-      ctx.supabase
-        .from("owner_statements")
-        .select(`
+  const [
+    kpis,
+    rentRoll,
+    agedReceivables,
+    { data: rawStatements },
+    { data: rawOwners },
+    { data: rawBankAccounts },
+  ] = await Promise.all([
+    fetchPortfolioKpis(),
+    fetchRentRoll(),
+    fetchAgedReceivables(),
+    ctx.supabase
+      .from("owner_statements")
+      .select(
+        `
           id,
           period_start,
           period_end,
@@ -51,17 +76,41 @@ export default async function ReportsPage({
           closing_minor,
           totals,
           owners ( id, name )
-        `)
-        .order("period_start", { ascending: false }),
-      ctx.supabase.from("owners").select("id, name").order("name"),
-      ctx.supabase.from("bank_accounts").select("id, name").order("name"),
+        `,
+      )
+      .order("period_start", { ascending: false }),
+    ctx.supabase.from("owners").select("id, name").order("name"),
+    ctx.supabase.from("bank_accounts").select("id, name").order("name"),
+  ]);
+
+  const [reportBuildings, occupancyReport, expiryReport, collectionReport, chequeReport] =
+    await Promise.all([
+      fetchReportBuildings(),
+      fetchOccupancyReport(filters),
+      fetchExpiryReport(filters),
+      fetchCollectionReport(filters),
+      fetchChequeReport(filters),
     ]);
 
   const ownerOptions = (rawOwners || []).map((o) => ({ id: o.id, name: o.name }));
   const bankOptions = (rawBankAccounts || []).map((b) => ({ id: b.id, name: b.name }));
 
+  const reportParams = {
+    tab,
+    from: filters.from,
+    to: filters.to,
+    building: filters.buildingId,
+  };
+  // next-intl's Link adds the locale prefix; the native GET form needs it explicitly.
+  const reportHref = "/reports";
+  const formAction = `/${locale}/reports`;
+
   const tabs = [
     { key: "overview", label: "Executive Summary" },
+    { key: "occupancy", label: t("occupancy") },
+    { key: "expiry", label: t("expiry") },
+    { key: "collections", label: t("collections") },
+    { key: "cheques", label: t("cheques") },
     { key: "rent_roll", label: t("rentRoll") },
     { key: "aged_receivables", label: t("agedReceivables") },
     { key: "statements", label: t("statements") },
@@ -88,11 +137,7 @@ export default async function ReportsPage({
           <p className="font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
         </div>
 
-        <StatementGenerator
-          owners={ownerOptions}
-          bankAccounts={bankOptions}
-          writable={writable}
-        />
+        <StatementGenerator owners={ownerOptions} bankAccounts={bankOptions} writable={writable} />
       </div>
 
       {/* KPI Cards */}
@@ -167,7 +212,15 @@ export default async function ReportsPage({
           return (
             <Link
               key={tb.key}
-              href={`/reports?tab=${tb.key}`}
+              href={{
+                pathname: "/reports",
+                query: {
+                  tab: tb.key,
+                  from: filters.from,
+                  to: filters.to,
+                  ...(filters.buildingId ? { building: filters.buildingId } : {}),
+                },
+              }}
               className={`rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors ${
                 isActive
                   ? "bg-primary text-on-primary"
@@ -179,6 +232,40 @@ export default async function ReportsPage({
           );
         })}
       </div>
+
+      <ReportFilters
+        action={formAction}
+        tab={tab}
+        from={filters.from}
+        to={filters.to}
+        building={filters.buildingId}
+        buildings={reportBuildings}
+      />
+
+      {tab === "occupancy" && occupancyReport ? (
+        <OccupancyView report={occupancyReport} locale={locale} />
+      ) : null}
+      {tab === "expiry" && expiryReport ? (
+        <ExpiryView
+          report={expiryReport}
+          locale={locale}
+          page={Number(page ?? 1)}
+          href={reportHref}
+          params={reportParams}
+        />
+      ) : null}
+      {tab === "collections" && collectionReport ? (
+        <CollectionView report={collectionReport} locale={locale} />
+      ) : null}
+      {tab === "cheques" && chequeReport ? (
+        <ChequeView
+          report={chequeReport}
+          locale={locale}
+          page={Number(page ?? 1)}
+          href={reportHref}
+          params={reportParams}
+        />
+      ) : null}
 
       {/* Overview Tab */}
       {tab === "overview" && (
@@ -192,7 +279,9 @@ export default async function ReportsPage({
               </Link>
             </div>
             {rentRoll.length === 0 ? (
-              <p className="font-body-md text-body-md text-on-surface-variant">{t("emptyRentRoll")}</p>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                {t("emptyRentRoll")}
+              </p>
             ) : (
               <div className="divide-y divide-hairline">
                 {rentRoll.slice(0, 5).map((r, idx) => (
@@ -302,9 +391,7 @@ export default async function ReportsPage({
       {tab === "aged_receivables" && (
         <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
           {agedReceivables.length === 0 ? (
-            <div className="p-12 text-center text-on-surface-variant">
-              {t("emptyReceivables")}
-            </div>
+            <div className="p-12 text-center text-on-surface-variant">{t("emptyReceivables")}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">
@@ -343,10 +430,8 @@ export default async function ReportsPage({
       {/* Statements Tab */}
       {tab === "statements" && (
         <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
-          {(!rawStatements || rawStatements.length === 0) ? (
-            <div className="p-12 text-center text-on-surface-variant">
-              {t("emptyStatements")}
-            </div>
+          {!rawStatements || rawStatements.length === 0 ? (
+            <div className="p-12 text-center text-on-surface-variant">{t("emptyStatements")}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">
@@ -372,10 +457,11 @@ export default async function ReportsPage({
                     };
 
                     return (
-                      <tr key={s.id} className="transition-colors hover:bg-surface-container-low/50">
-                        <td className="p-4 font-semibold text-on-surface">
-                          {owner?.name || "—"}
-                        </td>
+                      <tr
+                        key={s.id}
+                        className="transition-colors hover:bg-surface-container-low/50"
+                      >
+                        <td className="p-4 font-semibold text-on-surface">{owner?.name || "—"}</td>
                         <td className="p-4 text-on-surface-variant">
                           {s.period_start} to {s.period_end}
                         </td>

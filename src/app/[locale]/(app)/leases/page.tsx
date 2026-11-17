@@ -2,6 +2,7 @@ import { FileSignature, Filter } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
+import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
@@ -30,6 +31,7 @@ export default async function LeasesPage({
 
   const { page, status, buildingId, expiring } = await searchParams;
   const t = await getTranslations("leases");
+  const tc = await getTranslations("common");
   const writable = can(ctx.role, "leases.write");
 
   // Fetch buildings for filter
@@ -42,7 +44,8 @@ export default async function LeasesPage({
   // Fetch leases
   let query = ctx.supabase
     .from("leases")
-    .select(`
+    .select(
+      `
       id,
       lease_no,
       start_date,
@@ -54,7 +57,8 @@ export default async function LeasesPage({
       room_id,
       tenants!inner ( id, full_name ),
       units ( id, unit_no, building_id, buildings ( id, code, name ) )
-    `)
+    `,
+    )
     .order("start_date", { ascending: false });
 
   if (status && status !== "all") {
@@ -68,10 +72,7 @@ export default async function LeasesPage({
   if (expiring === "true") {
     const today = new Date().toISOString().slice(0, 10);
     const in30Days = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-    query = query
-      .eq("status", "active")
-      .gte("end_date", today)
-      .lte("end_date", in30Days);
+    query = query.eq("status", "active").gte("end_date", today).lte("end_date", in30Days);
   }
 
   const { data: leases } = await query;
@@ -114,7 +115,7 @@ export default async function LeasesPage({
           <select
             name="status"
             defaultValue={status ?? "all"}
-            className="h-10 rounded-xl bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface border border-hairline shadow-sm"
+            className="h-10 rounded-xl border border-hairline bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface shadow-sm"
           >
             <option value="all">{t("allStatuses")}</option>
             <option value="active">{t("statuses.active")}</option>
@@ -127,7 +128,7 @@ export default async function LeasesPage({
             <select
               name="buildingId"
               defaultValue={buildingId ?? "all"}
-              className="h-10 rounded-xl bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface border border-hairline shadow-sm"
+              className="h-10 rounded-xl border border-hairline bg-surface-container-lowest px-3 font-body-sm text-body-sm text-on-surface shadow-sm"
             >
               <option value="all">{t("allBuildings")}</option>
               {buildings.map((b) => (
@@ -149,10 +150,10 @@ export default async function LeasesPage({
 
         <Link
           href={`/leases?expiring=${expiring === "true" ? "false" : "true"}`}
-          className={`h-10 inline-flex items-center rounded-xl px-3 font-label-sm text-label-sm border transition-colors ${
+          className={`inline-flex h-10 items-center rounded-xl border px-3 font-label-sm text-label-sm transition-colors ${
             expiring === "true"
-              ? "bg-primary-fixed/40 border-primary text-on-surface font-semibold"
-              : "bg-surface-container-lowest border-hairline text-on-surface-variant hover:text-on-surface"
+              ? "border-primary bg-primary-fixed/40 font-semibold text-on-surface"
+              : "border-hairline bg-surface-container-lowest text-on-surface-variant hover:text-on-surface"
           }`}
         >
           {t("expiringSoon")}
@@ -169,6 +170,7 @@ export default async function LeasesPage({
                   <th className="p-4 text-start font-medium">{t("tenant")}</th>
                   <th className="p-4 text-start font-medium">{t("unit")}</th>
                   <th className="p-4 text-start font-medium">{t("endDate")}</th>
+                  <th className="p-4 text-start font-medium">{tc("daysLeftHeader")}</th>
                   <th className="p-4 text-end font-medium">{t("rent")}</th>
                   <th className="p-4 text-center font-medium">{t("filterStatus")}</th>
                 </tr>
@@ -190,7 +192,7 @@ export default async function LeasesPage({
                       <td className="p-4 font-medium text-on-surface">
                         <Link
                           href={`/leases/${lease.id}`}
-                          className="text-primary hover:underline underline-offset-4"
+                          className="text-primary underline-offset-4 hover:underline"
                         >
                           {lease.lease_no}
                         </Link>
@@ -198,7 +200,10 @@ export default async function LeasesPage({
                       <td className="p-4 text-on-surface">{tenantName}</td>
                       <td className="p-4 text-on-surface-variant">{unitLabel}</td>
                       <td className="p-4 text-on-surface-variant">
-                        <DateCell date={lease.end_date} locale={locale} remaining />
+                        <DateCell date={lease.end_date} locale={locale} />
+                      </td>
+                      <td className="p-4 text-on-surface-variant">
+                        <DaysLeft date={lease.end_date} />
                       </td>
                       <td className="p-4 text-end font-medium text-on-surface">
                         {formatMoney(BigInt(lease.rent_minor), lease.currency)}
@@ -232,4 +237,3 @@ export default async function LeasesPage({
     </div>
   );
 }
-

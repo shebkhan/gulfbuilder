@@ -33,7 +33,8 @@
     "loading": "جارٍ التنفيذ…",
     "today": "اليوم",
     "daysLeft": "{count, plural, zero {اليوم} one {يوم واحد متبقٍ} two {يومان متبقيان} few {# أيام متبقية} many {# يوماً متبقياً} other {# يوم متبقي}}",
-    "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}"
+    "daysAgo": "{count, plural, zero {اليوم} one {يوم واحد مضى} two {يومان مضيا} few {# أيام مضت} many {# يوماً مضى} other {# يوم مضى}}",
+    "daysLeftHeader": "الأيام المتبقية"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -495,7 +496,8 @@
       "failed": "حدث خطأ أثناء حفظ العقد.",
       "not_found": "العقد غير موجود.",
       "unit_already_leased": "الوحدة مؤجرة بالفعل."
-    }
+    },
+    "openLease": "فتح العقد"
   },
   "payments": {
     "title": "المدفوعات والإيصالات",
@@ -690,11 +692,41 @@
     "emptyStatements": "لم يتم إصدار كشوف حسابات ملاك بعد.",
     "owner": "المالك",
     "period": "الفترة",
-    "collections": "التحصيلات",
+    "collections": "تقرير التحصيل",
     "expenses": "المصروفات",
     "managementFee": "أتعاب الإدارة",
     "netPayable": "صافي المستحق للمالك",
-    "issued": "تم الإصدار"
+    "issued": "تم الإصدار",
+    "from": "من",
+    "to": "إلى",
+    "building": "المبنى",
+    "allBuildings": "كل المباني",
+    "apply": "تطبيق",
+    "occupancy": "الإشغال والشغور",
+    "expiry": "انتهاء العقود والتجديد",
+    "cheques": "مسار الشيكات",
+    "gpr": "الإيجار المحتمل الإجمالي",
+    "vacancyLoss": "فقدان الإيجار بسبب الشغور",
+    "vacantUnits": "الوحدات الشاغرة",
+    "egiHint": "صافي الإيجار الفعلي بعد الشغور",
+    "expiring30": "تنتهي خلال 30 يومًا",
+    "expiring60": "31–60 يومًا",
+    "expiring90": "61–90 يومًا",
+    "renewalRate": "معدل التجديد",
+    "endDate": "تاريخ الانتهاء",
+    "billed": "المفوتر",
+    "collected": "المحصل",
+    "outstanding": "المتبقي",
+    "averageDaysToPay": "متوسط أيام السداد",
+    "collectionRate": "معدل التحصيل",
+    "dueThisWeek": "يستحق هذا الأسبوع",
+    "dueThisMonth": "يستحق هذا الشهر",
+    "atRisk": "المبلغ المعرض للخطر",
+    "cheque": "شيك",
+    "bank": "البنك",
+    "date": "التاريخ",
+    "noReportData": "لا توجد بيانات لهذه الفترة.",
+    "ownerSubtitle": "إشغال مبانيك وانتهاء عقودك وتحصيلاتك وشيكاتك."
   },
   "portal": {
     "nav": {

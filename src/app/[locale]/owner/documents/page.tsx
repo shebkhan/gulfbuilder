@@ -1,8 +1,10 @@
 import { FileText } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DaysLeft } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDate } from "@/lib/dates";
 import { paginate } from "@/lib/pagination";
 import { getOwnerDocuments, getOwnerScope } from "@/server/queries/owner-portal";
 
@@ -20,6 +22,7 @@ export default async function OwnerDocumentsPage({
 
   const { page } = await searchParams;
   const t = await getTranslations("owner.documents");
+  const tc = await getTranslations("common");
   const scope = await getOwnerScope();
   if (!scope) return null;
 
@@ -49,13 +52,18 @@ export default async function OwnerDocumentsPage({
                     {d.kind}
                   </span>
                   {d.expires_on && (
-                    <Badge
-                      variant={
-                        d.expires_on < new Date().toISOString().slice(0, 10) ? "danger" : "warning"
-                      }
-                    >
-                      {t("expiresOn", { date: d.expires_on })}
-                    </Badge>
+                    <span className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          d.expires_on < new Date().toISOString().slice(0, 10) ? "danger" : "warning"
+                        }
+                      >
+                        {t("expiresOn", { date: formatDate(d.expires_on, locale) })}
+                      </Badge>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">
+                        {tc("daysLeftHeader")}: <DaysLeft date={d.expires_on} />
+                      </span>
+                    </span>
                   )}
                 </li>
               ))}

@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { PaymentProofForm } from "@/components/domain/payment-proof-form";
@@ -55,7 +56,7 @@ export default async function PortalPaymentsPage({
                       {t(`methods.${p.method}` as never)}
                     </span>
                     <span className="font-body-sm text-body-sm text-on-surface-variant">
-                      {new Date(p.received_at).toLocaleDateString(locale)}
+                      <DateCell date={p.received_at} locale={locale} />
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>
                   </div>

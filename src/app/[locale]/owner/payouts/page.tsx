@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
@@ -53,7 +54,9 @@ export default async function OwnerPayoutsPage({
                 <tbody className="divide-y divide-hairline">
                   {paged.rows.map((p) => (
                     <tr key={p.id}>
-                      <td className="p-3 text-on-surface">{p.paid_on}</td>
+                      <td className="p-3 text-on-surface">
+                        <DateCell date={p.paid_on} locale={locale} />
+                      </td>
                       <td className="p-3 text-on-surface-variant">{p.method}</td>
                       <td className="p-3 font-mono text-xs text-on-surface-variant">
                         {p.reference ?? "—"}

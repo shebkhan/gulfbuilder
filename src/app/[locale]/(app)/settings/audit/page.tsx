@@ -43,7 +43,9 @@ export default async function AuditSettingsPage({
     <div className="flex flex-col gap-space-lg pt-2">
       <div className="flex flex-col gap-1">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">{t("title")}</h1>
-        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">{t("subtitle")}</p>
+        <p className="max-w-xl font-body-md text-body-md text-on-surface-variant">
+          {t("subtitle")}
+        </p>
       </div>
 
       <SettingsNav />
@@ -76,8 +78,11 @@ export default async function AuditSettingsPage({
                       <td className="p-3">
                         <Badge variant="neutral">{row.action}</Badge>
                       </td>
-                      <td className="p-3 font-mono text-xs text-on-surface-variant">
-                        {row.row_id ?? "—"}
+                      <td className="p-3 text-on-surface-variant">
+                        {/* Row ids are internal GUIDs; they stay out of the table. */}
+                        <span className="font-body-sm text-body-sm text-on-surface-variant/60">
+                          —
+                        </span>
                       </td>
                     </tr>
                   ))}

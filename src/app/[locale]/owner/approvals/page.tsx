@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ApprovalDecisionButtons } from "@/components/domain/approval-decision-buttons";
+import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +64,11 @@ export default async function OwnerApprovalsPage({
                         </span>
                         <span className="font-body-sm text-body-sm text-on-surface-variant">
                           {expense?.category ?? "—"} · {expense?.buildings?.code ?? "—"} ·{" "}
-                          {expense?.expense_date ?? ""}
+                          {expense?.expense_date ? (
+                            <DateCell date={expense.expense_date} locale={locale} />
+                          ) : (
+                            ""
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">

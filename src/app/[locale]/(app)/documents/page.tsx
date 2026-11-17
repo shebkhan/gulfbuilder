@@ -1,5 +1,6 @@
 import { FileText } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { DocumentUploadForm } from "@/components/domain/document-upload-form";
 import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
@@ -23,6 +24,7 @@ export default async function DocumentsPage({
 
   const { page } = await searchParams;
   const t = await getTranslations("documents");
+  const tc = await getTranslations("common");
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
@@ -87,6 +89,7 @@ export default async function DocumentsPage({
                     <th className="p-3 text-start">{t("kind")}</th>
                     <th className="p-3 text-start">{t("entityType")}</th>
                     <th className="p-3 text-start">{t("expiresOn")}</th>
+                    <th className="p-3 text-start">{tc("daysLeftHeader")}</th>
                     <th className="p-3 text-start">{t("uploadedOn")}</th>
                   </tr>
                 </thead>
@@ -108,14 +111,17 @@ export default async function DocumentsPage({
                                 : "warning"
                             }
                           >
-                            {d.expires_on}
+                            <DateCell date={d.expires_on} locale={locale} />
                           </Badge>
                         ) : (
                           "—"
                         )}
                       </td>
                       <td className="p-3 text-on-surface-variant">
-                        {new Date(d.created_at).toLocaleDateString(locale)}
+                        {d.expires_on ? <DaysLeft date={d.expires_on} /> : "—"}
+                      </td>
+                      <td className="p-3 text-on-surface-variant">
+                        <DateCell date={d.created_at} locale={locale} />
                       </td>
                     </tr>
                   ))}

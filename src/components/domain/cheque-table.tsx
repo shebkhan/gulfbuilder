@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowRightLeft, Landmark, Plus, X } from "lucide-react";
+import { ArrowRightLeft, Landmark, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import {
@@ -319,148 +320,142 @@ export function ChequeTable({
       </div>
 
       {/* Register Modal */}
-      {openRegister && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-hairline pb-4">
-              <h2 className="font-headline-sm text-headline-sm text-on-surface">
-                {t("register")}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setOpenRegister(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
+      <Dialog open={openRegister} onOpenChange={setOpenRegister}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("register")}</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleRegister} className="mt-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("tenant")} *
+              </label>
+              <select
+                required
+                value={selectedTenant}
+                onChange={(e) => {
+                  setSelectedTenant(e.target.value);
+                  setSelectedLease("");
+                }}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
               >
-                <X className="size-5" />
-              </button>
+                <option value="">Select tenant</option>
+                {tenants.map((ten) => (
+                  <option key={ten.id} value={ten.id}>
+                    {ten.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <form onSubmit={handleRegister} className="mt-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("lease")} *
+              </label>
+              <select
+                required
+                value={selectedLease}
+                onChange={(e) => setSelectedLease(e.target.value)}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              >
+                <option value="">Select lease</option>
+                {filteredLeases.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.lease_no}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("tenant")} *
+                  {t("chequeNo")} *
                 </label>
-                <select
+                <input
                   required
-                  value={selectedTenant}
-                  onChange={(e) => {
-                    setSelectedTenant(e.target.value);
-                    setSelectedLease("");
-                  }}
+                  type="text"
+                  value={chequeNo}
+                  onChange={(e) => setChequeNo(e.target.value)}
+                  placeholder="000123"
                   className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Select tenant</option>
-                  {tenants.map((ten) => (
-                    <option key={ten.id} value={ten.id}>
-                      {ten.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("lease")} *
+                  {t("bank")} *
                 </label>
-                <select
+                <input
                   required
-                  value={selectedLease}
-                  onChange={(e) => setSelectedLease(e.target.value)}
+                  type="text"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                  placeholder="QNB / CBQ / QIB"
                   className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Select lease</option>
-                  {filteredLeases.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.lease_no}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("chequeNo")} *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={chequeNo}
-                    onChange={(e) => setChequeNo(e.target.value)}
-                    placeholder="000123"
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("bank")} *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={bankName}
-                    onChange={(e) => setBankName(e.target.value)}
-                    placeholder="QNB / CBQ / QIB"
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("amount")} (QAR) *
+                </label>
+                <input
+                  required
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                />
               </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("dueDate")} *
+                </label>
+                <input
+                  required
+                  type="date"
+                  value={chequeDate}
+                  onChange={(e) => setChequeDate(e.target.value)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                />
+              </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("amount")} (QAR) *
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("dueDate")} *
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    value={chequeDate}
-                    onChange={(e) => setChequeDate(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setOpenRegister(false)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {t("registerCheque")}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpenRegister(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {t("registerCheque")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Bounce Reason Modal */}
       {bounceTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <h2 className="font-headline-sm text-headline-sm text-on-surface">
-              Mark Cheque #{bounceTarget.cheque_no} as Bounced
-            </h2>
+        <Dialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setBounceTarget(null);
+          }}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Mark Cheque #{bounceTarget.cheque_no} as Bounced</DialogTitle>
+            </DialogHeader>
             <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
@@ -488,8 +483,8 @@ export function ChequeTable({
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Replace Cheque Modal */}

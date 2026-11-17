@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ export default async function PortalStatementPage({
 
   const { page } = await searchParams;
   const t = await getTranslations("portal.statement");
+  const tc = await getTranslations("common");
   const data = await getTenantPortalData();
   if (!data) return null;
 
@@ -85,7 +87,8 @@ export default async function PortalStatementPage({
                       {t(`types.${c.type}` as never)}
                     </span>
                     <span className="font-body-sm text-body-sm text-on-surface-variant">
-                      {t("dueOn")}: {c.due_date}
+                      {t("dueOn")}: <DateCell date={c.due_date} locale={locale} /> ·{" "}
+                      {tc("daysLeftHeader")}: <DaysLeft date={c.due_date} />
                     </span>
                   </div>
                   <div className="flex flex-col items-end gap-1">
@@ -136,7 +139,7 @@ export default async function PortalStatementPage({
                       {t(`methods.${p.method}` as never)}
                     </span>
                     <span className="font-body-sm text-body-sm text-on-surface-variant">
-                      {new Date(p.received_at).toLocaleDateString(locale)}
+                      <DateCell date={p.received_at} locale={locale} />
                     </span>
                   </div>
                   <div className="flex flex-col items-end gap-1">

@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { TenantRequestForm } from "@/components/domain/tenant-request-form";
@@ -55,7 +56,7 @@ export default async function PortalRequestsPage({
                     </Badge>
                   </div>
                   <span className="font-body-sm text-body-sm text-on-surface-variant">
-                    {new Date(r.opened_at).toLocaleDateString(locale)} ·{" "}
+                    <DateCell date={r.opened_at} locale={locale} /> ·{" "}
                     {t(`priorities.${r.priority}` as never)}
                   </span>
                   {r.description && (

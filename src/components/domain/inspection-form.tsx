@@ -1,10 +1,11 @@
 "use client";
 
-import { CheckCircle2, ClipboardCheck, Plus, X } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import {
@@ -199,88 +200,84 @@ export function InspectionForm({
       </div>
 
       {/* Create Inspection Modal */}
-      {openCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-hairline pb-4">
-              <h2 className="font-headline-sm text-headline-sm text-on-surface">
-                {t("newInspection")}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setOpenCreate(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
+      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("newInspection")}</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateSubmit} className="mt-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                Lease *
+              </label>
+              <select
+                required
+                value={leaseId}
+                onChange={(e) => setLeaseId(e.target.value)}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
               >
-                <X className="size-5" />
-              </button>
+                <option value="">Select lease</option>
+                {leases.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.lease_no} — {l.tenant_name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Lease *
-                </label>
-                <select
-                  required
-                  value={leaseId}
-                  onChange={(e) => setLeaseId(e.target.value)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="">Select lease</option>
-                  {leases.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.lease_no} — {l.tenant_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("kind")} *
+              </label>
+              <select
+                value={kind}
+                onChange={(e) => setKind(e.target.value as never)}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              >
+                <option value="move_in">{t("moveIn")}</option>
+                <option value="move_out">{t("moveOut")}</option>
+              </select>
+            </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("kind")} *
-                </label>
-                <select
-                  value={kind}
-                  onChange={(e) => setKind(e.target.value as never)}
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                >
-                  <option value="move_in">{t("moveIn")}</option>
-                  <option value="move_out">{t("moveOut")}</option>
-                </select>
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                Notes
+              </label>
+              <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  Notes
-                </label>
-                <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setOpenCreate(false)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {t("newInspection")}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpenCreate(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {t("newInspection")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Complete Inspection Modal */}
-      {completeTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <h2 className="font-headline-sm text-headline-sm text-on-surface">
-              {t("complete")}: {completeTarget.lease?.lease_no} ({completeTarget.kind})
-            </h2>
+      {completeTarget ? (
+        <Dialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setCompleteTarget(null);
+          }}
+        >
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>
+                {t("complete")}: {completeTarget.lease?.lease_no} ({completeTarget.kind})
+              </DialogTitle>
+            </DialogHeader>
 
             <form onSubmit={handleCompleteSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-2 rounded-xl bg-surface-container-low p-3">
@@ -381,9 +378,9 @@ export function InspectionForm({
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </>
   );
 }

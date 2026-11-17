@@ -1,5 +1,6 @@
 import { Gauge } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { FormDialog } from "@/components/domain/form-dialog";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { MeterForms } from "@/components/domain/meter-form";
@@ -95,7 +96,13 @@ export default async function MetersPage({
                       </span>
                       <span className="font-body-sm text-body-sm text-on-surface-variant">
                         {m.meter_no ?? "—"}
-                        {latest ? ` · ${t("lastReading")}: ${latest.value} (${latest.read_on})` : ""}
+                        {latest ? (
+                          <>
+                            {" · "}
+                            {t("lastReading")}: {latest.value} ({" "}
+                            <DateCell date={latest.read_on} locale={locale} />)
+                          </>
+                        ) : null}
                       </span>
                     </div>
                     {consumption !== null && (

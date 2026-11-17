@@ -33,7 +33,8 @@
     "loading": "Working…",
     "today": "Today",
     "daysLeft": "{count, plural, one {# day left} other {# days left}}",
-    "daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+    "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
+    "daysLeftHeader": "Days left"
   },
   "auth": {
     "signIn": "Sign in",
@@ -495,7 +496,8 @@
       "failed": "An error occurred while saving the lease.",
       "not_found": "Lease not found.",
       "unit_already_leased": "The unit is already leased."
-    }
+    },
+    "openLease": "Open lease"
   },
   "payments": {
     "title": "Payments & Receipts",
@@ -690,11 +692,41 @@
     "emptyStatements": "No owner statements generated yet.",
     "owner": "Owner",
     "period": "Period",
-    "collections": "Collections",
+    "collections": "Collection report",
     "expenses": "Expenses",
     "managementFee": "Management fee",
     "netPayable": "Net payable",
-    "issued": "Issued"
+    "issued": "Issued",
+    "from": "From",
+    "to": "To",
+    "building": "Building",
+    "allBuildings": "All buildings",
+    "apply": "Apply",
+    "occupancy": "Occupancy & vacancy",
+    "expiry": "Lease expiry & renewals",
+    "cheques": "Cheque pipeline",
+    "gpr": "Gross potential rent",
+    "vacancyLoss": "Vacancy loss",
+    "vacantUnits": "Vacant units",
+    "egiHint": "Effective gross income below vacancy",
+    "expiring30": "Expiring in 30 days",
+    "expiring60": "31–60 days",
+    "expiring90": "61–90 days",
+    "renewalRate": "Renewal rate",
+    "endDate": "End date",
+    "billed": "Billed",
+    "collected": "Collected",
+    "outstanding": "Outstanding",
+    "averageDaysToPay": "Avg. days to pay",
+    "collectionRate": "Collection rate",
+    "dueThisWeek": "Due this week",
+    "dueThisMonth": "Due this month",
+    "atRisk": "Amount at risk",
+    "cheque": "Cheque",
+    "bank": "Bank",
+    "date": "Date",
+    "noReportData": "No data for this period.",
+    "ownerSubtitle": "Your buildings' occupancy, lease expiries, collections and cheques."
   },
   "portal": {
     "nav": {

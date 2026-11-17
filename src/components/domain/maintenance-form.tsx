@@ -1,10 +1,11 @@
 "use client";
 
-import { Plus, Wrench, X } from "lucide-react";
+import { Plus, Wrench } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { formatMoney } from "@/lib/money";
 import {
@@ -248,128 +249,31 @@ export function MaintenanceForm({
       </div>
 
       {/* Create Request Modal */}
-      {openCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-hairline pb-4">
-              <h2 className="font-headline-sm text-headline-sm text-on-surface">
-                {t("createRequest")}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setOpenCreate(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
+      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("createRequest")}</DialogTitle>
+          </DialogHeader>
 
-            <form onSubmit={handleCreateSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("property")} *
-                  </label>
-                  <select
-                    required
-                    value={buildingId}
-                    onChange={(e) => {
-                      setBuildingId(e.target.value);
-                      setUnitId("");
-                    }}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="">Select building</option>
-                    {buildings.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.code} - {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("unit")}
-                  </label>
-                  <select
-                    value={unitId}
-                    onChange={(e) => setUnitId(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="">Common area</option>
-                    {filteredUnits.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        Unit {u.unit_no}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
+          <form onSubmit={handleCreateSubmit} className="mt-4 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("requestTitle")} *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Water leakage in master bathroom"
-                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("category")} *
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="plumbing">Plumbing</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="hvac">HVAC / Air Conditioning</option>
-                    <option value="carpentry">Carpentry</option>
-                    <option value="painting">Painting</option>
-                    <option value="general">General</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("priority")} *
-                  </label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as never)}
-                    className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
-                  >
-                    <option value="low">{t("priorities.low")}</option>
-                    <option value="normal">{t("priorities.normal")}</option>
-                    <option value="high">{t("priorities.high")}</option>
-                    <option value="urgent">{t("priorities.urgent")}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("assignedVendor")}
+                  {t("property")} *
                 </label>
                 <select
-                  value={vendorId}
-                  onChange={(e) => setVendorId(e.target.value)}
+                  required
+                  value={buildingId}
+                  onChange={(e) => {
+                    setBuildingId(e.target.value);
+                    setUnitId("");
+                  }}
                   className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 >
-                  <option value="">Unassigned</option>
-                  {vendors.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
+                  <option value="">Select building</option>
+                  {buildings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.code} - {b.name}
                     </option>
                   ))}
                 </select>
@@ -377,40 +281,133 @@ export function MaintenanceForm({
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("description")}
+                  {t("unit")}
                 </label>
-                <Textarea
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
+                <select
+                  value={unitId}
+                  onChange={(e) => setUnitId(e.target.value)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                >
+                  <option value="">Common area</option>
+                  {filteredUnits.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      Unit {u.unit_no}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("requestTitle")} *
+              </label>
+              <input
+                required
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Water leakage in master bathroom"
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("category")} *
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+                >
+                  <option value="plumbing">Plumbing</option>
+                  <option value="electrical">Electrical</option>
+                  <option value="hvac">HVAC / Air Conditioning</option>
+                  <option value="carpentry">Carpentry</option>
+                  <option value="painting">Painting</option>
+                  <option value="general">General</option>
+                </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setOpenCreate(false)}
-                  disabled={isPending}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                  {t("priority")} *
+                </label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as never)}
+                  className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
                 >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {t("createRequest")}
-                </Button>
+                  <option value="low">{t("priorities.low")}</option>
+                  <option value="normal">{t("priorities.normal")}</option>
+                  <option value="high">{t("priorities.high")}</option>
+                  <option value="urgent">{t("priorities.urgent")}</option>
+                </select>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("assignedVendor")}
+              </label>
+              <select
+                value={vendorId}
+                onChange={(e) => setVendorId(e.target.value)}
+                className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface"
+              >
+                <option value="">Unassigned</option>
+                {vendors.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-sm text-label-sm font-semibold text-on-surface">
+                {t("description")}
+              </label>
+              <Textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpenCreate(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {t("createRequest")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Update Status Modal */}
-      {statusTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
-            <h2 className="font-headline-sm text-headline-sm text-on-surface">
-              {t("updateStatus")}: {statusTarget.title}
-            </h2>
+      {statusTarget ? (
+        <Dialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setStatusTarget(null);
+          }}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {t("updateStatus")}: {statusTarget.title}
+              </DialogTitle>
+            </DialogHeader>
             <form onSubmit={handleStatusSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-label-sm text-label-sm font-semibold text-on-surface">
@@ -471,9 +468,9 @@ export function MaintenanceForm({
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </>
   );
 }

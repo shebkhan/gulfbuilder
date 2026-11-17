@@ -1,8 +1,8 @@
-import { ArrowLeft, ArrowRight, FileSignature } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, FileSignature } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { TenantIdReveal } from "@/components/domain/tenant-id-reveal";
-import { DateCell } from "@/components/domain/date-cell";
+import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -31,6 +31,7 @@ export default async function TenantDetailPage({
 
   const t = await getTranslations("tenants");
   const tl = await getTranslations("leases");
+  const tc = await getTranslations("common");
   const isRtl = locale === "ar";
   const BackIcon = isRtl ? ArrowRight : ArrowLeft;
 
@@ -198,11 +199,11 @@ export default async function TenantDetailPage({
                 <table className="w-full min-w-[40rem] text-start font-body-sm text-body-sm">
                   <thead>
                     <tr className="border-b border-hairline text-on-surface-variant">
-                      <th className="py-2 text-start font-medium">{tl("leaseNo")}</th>
                       <th className="py-2 text-start font-medium">{tl("building")}</th>
                       <th className="py-2 text-start font-medium">{tl("unit")}</th>
                       <th className="py-2 text-start font-medium">{tl("startDate")}</th>
                       <th className="py-2 text-start font-medium">{tl("endDate")}</th>
+                      <th className="py-2 text-start font-medium">{tc("daysLeftHeader")}</th>
                       <th className="py-2 text-end font-medium">{tl("rent")}</th>
                       <th className="py-2 text-center font-medium">{tl("filterStatus")}</th>
                     </tr>
@@ -217,14 +218,6 @@ export default async function TenantDetailPage({
 
                       return (
                         <tr key={lease.id} className="hover:bg-surface-container-low/40">
-                          <td className="py-2.5">
-                            <Link
-                              href={`/leases/${lease.id}`}
-                              className="font-medium text-primary underline-offset-4 hover:underline"
-                            >
-                              {lease.lease_no}
-                            </Link>
-                          </td>
                           <td className="py-2.5 text-on-surface">
                             {building ? (
                               <Link
@@ -237,7 +230,7 @@ export default async function TenantDetailPage({
                               "—"
                             )}
                           </td>
-                          <td className="py-2.5 text-on-surface-variant">
+                          <td className="py-2.5 pe-6 text-on-surface-variant">
                             {unit ? (
                               <Link
                                 href={`/units/${unit.id}`}
@@ -253,23 +246,36 @@ export default async function TenantDetailPage({
                             <DateCell date={lease.start_date} locale={locale} />
                           </td>
                           <td className="py-2.5 text-on-surface-variant">
-                            <DateCell date={lease.end_date} locale={locale} remaining />
+                            <DateCell date={lease.end_date} locale={locale} />
+                          </td>
+                          <td className="py-2.5">
+                            <DaysLeft date={lease.end_date} />
                           </td>
                           <td className="py-2.5 text-end font-medium text-on-surface">
                             {formatMoney(lease.rent_minor, lease.currency)}
                           </td>
                           <td className="py-2.5 text-center">
-                            <Badge
-                              variant={
-                                lease.status === "active"
-                                  ? "success"
-                                  : lease.status === "draft"
-                                    ? "info"
-                                    : "neutral"
-                              }
-                            >
-                              {tl(`statuses.${lease.status}`)}
-                            </Badge>
+                            <span className="flex items-center justify-center gap-1.5">
+                              <Badge
+                                variant={
+                                  lease.status === "active"
+                                    ? "success"
+                                    : lease.status === "draft"
+                                      ? "info"
+                                      : "neutral"
+                                }
+                              >
+                                {tl(`statuses.${lease.status}`)}
+                              </Badge>
+                              <Link
+                                href={`/leases/${lease.id}`}
+                                title={tl("openLease")}
+                                aria-label={tl("openLease")}
+                                className="text-primary underline-offset-4 hover:underline"
+                              >
+                                <ExternalLink className="size-3.5" aria-hidden />
+                              </Link>
+                            </span>
                           </td>
                         </tr>
                       );

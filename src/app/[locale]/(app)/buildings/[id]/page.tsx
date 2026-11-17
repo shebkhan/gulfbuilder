@@ -66,7 +66,7 @@ export default async function BuildingPage({
   ]);
 
   const nameOf = (userId: string) =>
-    profiles?.find((profile) => profile.id === userId)?.full_name ?? userId.slice(0, 8);
+    profiles?.find((profile) => profile.id === userId)?.full_name ?? "—";
 
   const staff = (staffRows ?? []).map((row) => ({ id: row.user_id, name: nameOf(row.user_id) }));
   const access = (accessRows ?? []).map((row) => ({

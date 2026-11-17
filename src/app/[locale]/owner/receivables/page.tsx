@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
@@ -84,7 +85,9 @@ export default async function OwnerReceivablesPage({
                     <tr key={`${r.tenant_name}-${r.due_date}-${i}`}>
                       <td className="p-3 font-medium text-on-surface">{r.tenant_name}</td>
                       <td className="p-3 text-on-surface-variant">{r.building_code ?? "—"}</td>
-                      <td className="p-3 text-on-surface-variant">{r.due_date}</td>
+                      <td className="p-3 text-on-surface-variant">
+                        <DateCell date={r.due_date} locale={locale} />
+                      </td>
                       <td className="p-3 text-end text-on-surface-variant">{r.days_overdue}</td>
                       <td className="p-3 text-end font-semibold text-on-surface">
                         {formatMoney(BigInt(r.amount_minor), r.currency, locale)}

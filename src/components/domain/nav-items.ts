@@ -35,7 +35,12 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/deposits", labelKey: "deposits", icon: PiggyBank, capability: "finance.read" },
   { href: "/expenses", labelKey: "expenses", icon: Receipt, capability: "expenses.write" },
   { href: "/maintenance", labelKey: "maintenance", icon: Wrench, capability: "maintenance.write" },
-  { href: "/inspections", labelKey: "inspections", icon: ClipboardCheck, capability: "maintenance.write" },
+  {
+    href: "/inspections",
+    labelKey: "inspections",
+    icon: ClipboardCheck,
+    capability: "maintenance.write",
+  },
   { href: "/reports", labelKey: "reports", icon: BarChart3, capability: "reports.read" },
   { href: "/documents", labelKey: "documents", icon: FileText, capability: "properties.read" },
   { href: "/meters", labelKey: "meters", icon: Gauge, capability: "maintenance.write" },
@@ -61,6 +66,7 @@ export const OWNER_NAV: NavItem[] = [
     icon: CreditCard,
     capability: "reports.read",
   },
+  { href: "/owner/reports", labelKey: "reports", icon: BarChart3, capability: "reports.read" },
   { href: "/owner/statements", labelKey: "statements", icon: Receipt, capability: "reports.read" },
   { href: "/owner/payouts", labelKey: "payouts", icon: Banknote, capability: "reports.read" },
   {

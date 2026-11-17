@@ -283,16 +283,16 @@ const MAINTENANCE_TITLES = [
 ];
 
 const EXPENSE_TITLES = [
-  ["Lift maintenance contract", "Maintenance and Repairs"],
-  ["Chiller servicing", "Maintenance and Repairs"],
-  ["Electricity - DEWA style bulk bill", "Utilities"],
-  ["Water - bulk supply", "Utilities"],
-  ["Building insurance premium", "Insurance"],
-  ["Security guard wages", "General and Administrative"],
-  ["Common area cleaning", "General and Administrative"],
-  ["Generator fuel", "Utilities"],
-  ["Landscaping and gardening", "General and Administrative"],
-  ["Repainting of service corridors", "Maintenance and Repairs"],
+  ["Lift maintenance contract", "maintenance"],
+  ["Chiller servicing", "maintenance"],
+  ["Electricity - DEWA style bulk bill", "utilities"],
+  ["Water - bulk supply", "utilities"],
+  ["Building insurance premium", "insurance"],
+  ["Security guard wages", "other"],
+  ["Common area cleaning", "other"],
+  ["Generator fuel", "utilities"],
+  ["Landscaping and gardening", "other"],
+  ["Repainting of service corridors", "maintenance"],
 ];
 
 const METHODS = ["cash", "bank_transfer", "cheque", "online"];
@@ -925,7 +925,7 @@ async function main() {
       org_id: ORG_ID,
       vendor_id: vendors?.[0]?.id ?? null,
       building_id: approvalBuilding.id,
-      category: "Maintenance and Repairs",
+      category: "maintenance",
       description: "Full lift replacement — Capital works",
       amount_minor: 8_500_00,
       currency: CURRENCY,
@@ -1180,9 +1180,10 @@ async function main() {
   }
 
   const expenseAccountFor = (category) => {
-    if (category.includes("Maintenance")) return A.maintenance;
-    if (category.includes("Utilities")) return A.utilities;
-    if (category.includes("Insurance")) return A.insurance;
+    const value = category.toLowerCase();
+    if (value.includes("maintenance")) return A.maintenance;
+    if (value.includes("utilities")) return A.utilities;
+    if (value.includes("insurance")) return A.insurance;
     return A.admin;
   };
   for (const expense of expenses ?? []) {

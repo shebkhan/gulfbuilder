@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
@@ -13,6 +14,7 @@ export default async function OwnerRentRollPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("owner.rentRoll");
+  const tc = await getTranslations("common");
   const scope = await getOwnerScope();
   if (!scope) return null;
 
@@ -40,6 +42,7 @@ export default async function OwnerRentRollPage({
                     <th className="p-3 text-start">{t("unit")}</th>
                     <th className="p-3 text-start">{t("tenant")}</th>
                     <th className="p-3 text-start">{t("period")}</th>
+                    <th className="p-3 text-start">{tc("daysLeftHeader")}</th>
                     <th className="p-3 text-end">{t("rent")}</th>
                     <th className="p-3 text-end">{t("deposit")}</th>
                     <th className="p-3 text-end">{t("paidToDate")}</th>
@@ -55,7 +58,11 @@ export default async function OwnerRentRollPage({
                       </td>
                       <td className="p-3 text-on-surface">{r.tenant_name}</td>
                       <td className="p-3 text-on-surface-variant">
-                        {r.start_date} → {r.end_date}
+                        <DateCell date={r.start_date} locale={locale} /> →{" "}
+                        <DateCell date={r.end_date} locale={locale} />
+                      </td>
+                      <td className="p-3 text-on-surface-variant">
+                        <DaysLeft date={r.end_date} />
                       </td>
                       <td className="p-3 text-end text-on-surface">
                         {formatMoney(BigInt(r.rent_minor), r.currency, locale)}

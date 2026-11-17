@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,7 +60,8 @@ export default async function OwnerStatementsPage({
                           href={`/owner/statements/${s.id}`}
                           className="font-medium text-primary hover:underline"
                         >
-                          {s.period_start} → {s.period_end}
+                          <DateCell date={s.period_start} locale={locale} /> →{" "}
+                          <DateCell date={s.period_end} locale={locale} />
                         </Link>
                       </td>
                       <td className="p-3">

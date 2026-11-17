@@ -31,6 +31,15 @@ export type ExpenseItem = {
 type VendorOption = { id: string; name: string };
 type BuildingOption = { id: string; name: string; code: string };
 
+/** The category column is free text: seeded rows hold labels, new rows hold keys. */
+const CATEGORY_KEYS: Record<string, string> = {
+  "Maintenance and Repairs": "maintenance",
+  Utilities: "utilities",
+  Insurance: "insurance",
+  Cleaning: "cleaning",
+  "General and Administrative": "other",
+};
+
 export function ExpenseForm({
   expenses,
   vendors,
@@ -165,57 +174,64 @@ export function ExpenseForm({
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
-                {expenses.map((exp) => (
-                  <tr key={exp.id} className="transition-colors hover:bg-surface-container-low/50">
-                    <td className="p-4 text-on-surface-variant">{exp.expense_date}</td>
-                    <td className="p-4 font-medium text-on-surface">
-                      {t(`categories.${exp.category}` as never) || exp.category}
-                    </td>
-                    <td className="p-4 text-on-surface">{exp.description}</td>
-                    <td className="p-4 text-on-surface-variant">{exp.vendor?.name || "—"}</td>
-                    <td className="p-4 text-on-surface-variant">
-                      {exp.building ? `${exp.building.code} - ${exp.building.name}` : "—"}
-                    </td>
-                    <td className="p-4">
-                      <Badge variant={getStatusVariant(exp.status)}>
-                        {t(`statuses.${exp.status}` as never)}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-end font-semibold text-on-surface">
-                      {formatMoney(BigInt(exp.amount_minor), exp.currency, locale)}
-                    </td>
-                    {(canApprove || canPay) && (
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          {exp.status === "submitted" && canApprove && (
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={() => handleApprove(exp.id)}
-                              disabled={isPending}
-                              className="flex items-center gap-1"
-                            >
-                              <CheckCircle2 className="size-3.5" />
-                              {t("approve")}
-                            </Button>
-                          )}
-                          {exp.status === "approved" && canPay && (
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => handlePay(exp.id)}
-                              disabled={isPending}
-                              className="flex items-center gap-1"
-                            >
-                              <CreditCard className="size-3.5" />
-                              {t("pay")}
-                            </Button>
-                          )}
-                        </div>
+                {expenses.map((exp) => {
+                  const categoryKey = CATEGORY_KEYS[exp.category] ?? exp.category;
+                  const category = t.has(`categories.${categoryKey}` as never)
+                    ? t(`categories.${categoryKey}` as never)
+                    : exp.category;
+                  return (
+                    <tr
+                      key={exp.id}
+                      className="transition-colors hover:bg-surface-container-low/50"
+                    >
+                      <td className="p-4 text-on-surface-variant">{exp.expense_date}</td>
+                      <td className="p-4 font-medium text-on-surface">{category}</td>
+                      <td className="p-4 text-on-surface">{exp.description}</td>
+                      <td className="p-4 text-on-surface-variant">{exp.vendor?.name || "—"}</td>
+                      <td className="p-4 text-on-surface-variant">
+                        {exp.building ? `${exp.building.code} - ${exp.building.name}` : "—"}
                       </td>
-                    )}
-                  </tr>
-                ))}
+                      <td className="p-4">
+                        <Badge variant={getStatusVariant(exp.status)}>
+                          {t(`statuses.${exp.status}` as never)}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-end font-semibold text-on-surface">
+                        {formatMoney(BigInt(exp.amount_minor), exp.currency, locale)}
+                      </td>
+                      {(canApprove || canPay) && (
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            {exp.status === "submitted" && canApprove && (
+                              <Button
+                                size="sm"
+                                variant="primary"
+                                onClick={() => handleApprove(exp.id)}
+                                disabled={isPending}
+                                className="flex items-center gap-1"
+                              >
+                                <CheckCircle2 className="size-3.5" />
+                                {t("approve")}
+                              </Button>
+                            )}
+                            {exp.status === "approved" && canPay && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => handlePay(exp.id)}
+                                disabled={isPending}
+                                className="flex items-center gap-1"
+                              >
+                                <CreditCard className="size-3.5" />
+                                {t("pay")}
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
