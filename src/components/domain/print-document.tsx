@@ -2,6 +2,7 @@
 
 import { Printer } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
 export type PrintLine = { label: string; detail?: string; value?: string };
@@ -35,14 +36,10 @@ export function PrintDocument({
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="print-no-print flex items-center gap-3 self-stretch">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="ms-auto flex items-center gap-2 rounded-full bg-primary px-4 py-2 font-label-md text-label-md text-on-primary shadow-sm"
-        >
-          <Printer className="size-4" aria-hidden />
+        <Button type="button" onClick={() => window.print()} className="ms-auto">
+          <Printer aria-hidden />
           {t("print")}
-        </button>
+        </Button>
       </div>
 
       <article className="print-sheet w-full max-w-[210mm] border border-black/20 bg-white p-10 text-black shadow-sm">

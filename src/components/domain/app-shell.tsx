@@ -1,5 +1,6 @@
 import { Bell, LogOut } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { Button } from "@/components/ui/button";
 import type { Role } from "@/lib/rbac";
 import { signOutAction } from "@/server/actions/auth";
 import { LocaleSwitcher } from "./locale-switcher";
@@ -71,14 +72,16 @@ export async function AppShell({
 
             <div className="flex items-center gap-3">
               <LocaleSwitcher />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 aria-label={t("common.notifications")}
-                className="relative rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+                className="relative"
               >
-                <Bell className="size-5" />
+                <Bell />
                 <span className="absolute end-2 top-2 size-2 rounded-full bg-primary" />
-              </button>
+              </Button>
               <div className="flex items-center gap-2">
                 <div className="flex size-8 items-center justify-center rounded-full bg-surface-container font-label-md font-medium text-on-surface">
                   {userName.slice(0, 1).toUpperCase()}
@@ -94,14 +97,15 @@ export async function AppShell({
               </div>
               <form action={signOutAction}>
                 <input type="hidden" name="locale" value={locale} />
-                <button
+                <Button
                   type="submit"
+                  variant="ghost"
+                  size="icon"
                   title={t("common.signOut")}
                   aria-label={t("common.signOut")}
-                  className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
                 >
-                  <LogOut className="size-[18px]" />
-                </button>
+                  <LogOut />
+                </Button>
               </form>
             </div>
           </header>

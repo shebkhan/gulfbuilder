@@ -2,6 +2,7 @@ import { FileSignature, Filter } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import {
   Select,
@@ -164,13 +165,10 @@ export default async function LeasesPage({
             </Select>
           ) : null}
 
-          <button
-            type="submit"
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-hairline bg-surface-container-low px-3.5 font-label-sm text-label-sm text-on-surface hover:bg-surface-container"
-          >
-            <Filter className="h-4 w-4" />
+          <Button type="submit" variant="secondary" className="rounded-xl px-3.5 font-label-sm">
+            <Filter />
             <span>{t("filter")}</span>
-          </button>
+          </Button>
         </form>
 
         <Link

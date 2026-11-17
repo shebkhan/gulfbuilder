@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/money";
 import { getCashFlowForecast, ForecastInput, ForecastResponse } from "@/server/actions/forecast";
@@ -167,13 +168,12 @@ export default function CashFlowForecastPage() {
                     {t("whatIf.renewalRate")} ({renewalRate}%)
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={renewalRate}
-                  onChange={(e) => setRenewalRate(Number(e.target.value))}
-                  className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
+                <Slider
+                  min={0}
+                  max={100}
+                  value={[renewalRate]}
+                  onValueChange={([value = 0]) => setRenewalRate(value)}
+                  aria-label={t("whatIf.renewalRate")}
                 />
               </div>
               <div>
@@ -182,13 +182,12 @@ export default function CashFlowForecastPage() {
                     {t("whatIf.chequeClearance")} ({chequeClearance}%)
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={chequeClearance}
-                  onChange={(e) => setChequeClearance(Number(e.target.value))}
-                  className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
+                <Slider
+                  min={0}
+                  max={100}
+                  value={[chequeClearance]}
+                  onValueChange={([value = 0]) => setChequeClearance(value)}
+                  aria-label={t("whatIf.chequeClearance")}
                 />
               </div>
             </div>

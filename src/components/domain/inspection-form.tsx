@@ -19,6 +19,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -252,7 +253,7 @@ export function InspectionForm({
 
       {/* Create Inspection Modal */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[33.6rem]">
           <DialogHeader>
             <DialogTitle>{t("newInspection")}</DialogTitle>
           </DialogHeader>
@@ -362,7 +363,7 @@ export function InspectionForm({
             if (!next) setCompleteTarget(null);
           }}
         >
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-[38.4rem]">
             <DialogHeader>
               <DialogTitle>
                 {t("complete")}: {completeTarget.lease?.lease_no} ({completeTarget.kind})
@@ -379,18 +380,20 @@ export function InspectionForm({
                     {help.checklist}
                   </p>
                   {CHECKLIST_ITEMS.map((item) => (
-                    <label
+                    <Label
                       key={item.key}
-                      className="flex items-center gap-2 text-sm text-on-surface"
+                      htmlFor={`check-${item.key}`}
+                      className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface"
                     >
                       <Checkbox
+                        id={`check-${item.key}`}
                         checked={checklist[item.key]}
                         onCheckedChange={(checked) =>
                           setChecklist((prev) => ({ ...prev, [item.key]: checked === true }))
                         }
                       />
                       {t(item.label as never)}
-                    </label>
+                    </Label>
                   ))}
                 </div>
 

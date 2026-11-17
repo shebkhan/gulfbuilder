@@ -142,7 +142,7 @@ export function PaymentForm({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-[43.2rem]">
         <DialogHeader>
           <DialogTitle>{t("recordPayment")}</DialogTitle>
         </DialogHeader>

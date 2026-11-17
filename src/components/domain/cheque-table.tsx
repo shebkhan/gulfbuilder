@@ -18,6 +18,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -355,7 +356,7 @@ export function ChequeTable({
 
       {/* Register modal */}
       <Dialog open={openRegister} onOpenChange={setOpenRegister}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[38.4rem]">
           <DialogHeader>
             <DialogTitle>{t("register")}</DialogTitle>
           </DialogHeader>
@@ -509,16 +510,15 @@ export function ChequeTable({
       {/* Bounce reason modal */}
       {bounceTarget ? (
         <Dialog open onOpenChange={(next) => !next && setBounceTarget(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-[33.6rem]">
             <DialogHeader>
               <DialogTitle>{t("bounceTitle", { no: bounceTarget.cheque_no })}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("bounceReason")}
-                </label>
+                <Label htmlFor="bounce-reason">{t("bounceReason")}</Label>
                 <Input
+                  id="bounce-reason"
                   value={bounceReason}
                   onChange={(event) => setBounceReason(event.target.value)}
                   placeholder={t("bounceReasonPlaceholder")}

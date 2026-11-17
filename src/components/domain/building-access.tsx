@@ -89,13 +89,15 @@ export function BuildingAccess({
               <form action={revokeBuildingAccessAction}>
                 <input type="hidden" name="buildingId" value={buildingId} />
                 <input type="hidden" name="userId" value={entry.userId} />
-                <button
+                <Button
                   type="submit"
+                  variant="ghost"
+                  size="sm"
                   aria-label={`${labels.revoke} ${entry.name}`}
-                  className="rounded-full px-2 py-1 font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+                  className="h-7 px-2 font-label-sm"
                 >
                   ×
-                </button>
+                </Button>
               </form>
             </li>
           ))

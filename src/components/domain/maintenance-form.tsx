@@ -271,7 +271,7 @@ export function MaintenanceForm({
 
       {/* Create Request Modal */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[38.4rem]">
           <DialogHeader>
             <DialogTitle>{t("createRequest")}</DialogTitle>
           </DialogHeader>
@@ -495,7 +495,7 @@ export function MaintenanceForm({
             if (!next) setStatusTarget(null);
           }}
         >
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-[33.6rem]">
             <DialogHeader>
               <DialogTitle>
                 {t("updateStatus")}: {statusTarget.title}

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -46,21 +47,15 @@ export async function ReportFilters({ action, tab, from, to, building, buildings
     >
       <input type="hidden" name="tab" value={tab} />
       <div className="flex flex-col gap-1.5">
-        <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="from">
-          {t("from")}
-        </label>
+        <Label htmlFor="from">{t("from")}</Label>
         <Input id="from" name="from" type="date" defaultValue={from} className={field} />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="to">
-          {t("to")}
-        </label>
+        <Label htmlFor="to">{t("to")}</Label>
         <Input id="to" name="to" type="date" defaultValue={to} className={field} />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="building">
-          {t("building")}
-        </label>
+        <Label htmlFor="building">{t("building")}</Label>
         <Select name="building" defaultValue={building}>
           <SelectTrigger id="building" className={`${field} min-w-48`}>
             <SelectValue placeholder={t("allBuildings")} />

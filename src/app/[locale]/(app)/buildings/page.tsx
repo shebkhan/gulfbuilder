@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+import { Building2, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BuildingForm } from "@/components/domain/building-form";
 import { FormDialog } from "@/components/domain/form-dialog";
@@ -166,6 +166,13 @@ export default async function BuildingsPage({
                         {t("vacant")} {occupancy.vacant}
                       </span>
                     </div>
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between border-t border-hairline pt-3">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                      <Users className="size-3.5" />
+                      <span>{t("viewTenants")}</span>
+                    </span>
                   </div>
                 </Link>
               );

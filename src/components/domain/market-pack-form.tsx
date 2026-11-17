@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { updateMarketPackAction, type PlatformState } from "@/server/actions/platform";
 
 export type MarketPackOption = {
@@ -57,13 +58,13 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
       </div>
       <div>
         <Label htmlFor={`rules-${initial?.countryCode ?? "new"}`}>{t("marketPack.rules")}</Label>
-        <textarea
+        <Textarea
           id={`rules-${initial?.countryCode ?? "new"}`}
           name="rules"
           rows={6}
           dir="ltr"
           defaultValue={JSON.stringify(initial?.rules ?? {}, null, 2)}
-          className="w-full rounded-xl bg-surface-container-lowest px-3.5 py-2.5 font-mono text-body-sm text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed"
+          className="font-mono"
           required
         />
       </div>

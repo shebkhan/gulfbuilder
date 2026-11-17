@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/domain/locale-switcher";
+import { Button } from "@/components/ui/button";
 import { PortalBottomNav } from "@/components/domain/portal-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { signOutAction } from "@/server/actions/auth";
@@ -59,14 +60,15 @@ export default async function PortalLayout({
             <LocaleSwitcher />
             <form action={signOutAction}>
               <input type="hidden" name="locale" value={locale} />
-              <button
+              <Button
                 type="submit"
+                variant="ghost"
+                size="icon"
                 title={t("signOut")}
                 aria-label={t("signOut")}
-                className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
               >
-                <LogOut className="size-[18px]" />
-              </button>
+                <LogOut />
+              </Button>
             </form>
           </div>
         </div>

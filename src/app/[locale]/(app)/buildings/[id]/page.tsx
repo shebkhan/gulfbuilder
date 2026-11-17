@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BuildingAccess } from "@/components/domain/building-access";
@@ -121,12 +122,21 @@ export default async function BuildingPage({
         section="buildings"
         role={ctx.role}
         actions={
-          <Link
-            href="/buildings"
-            className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
-          >
-            ← {t("title")}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/buildings"
+              className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
+            >
+              ← {t("title")}
+            </Link>
+            <Link
+              href={`/tenants?buildingId=${id}`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-surface-container-low px-3 py-1 font-label-sm text-xs font-medium text-on-surface hover:border-primary hover:text-primary"
+            >
+              <Users className="size-3.5" />
+              <span>{t("viewTenants")}</span>
+            </Link>
+          </div>
         }
         title={building.name}
         description={

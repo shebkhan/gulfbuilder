@@ -15,6 +15,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -267,15 +268,15 @@ export function LeaseForm({
               }}
               className="flex flex-wrap items-center gap-4"
             >
-              <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-                <RadioGroupItem value="unit" />
+              <Label htmlFor="target-unit" className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface">
+                <RadioGroupItem value="unit" id="target-unit" />
                 {labels.unit}
-              </label>
+              </Label>
               {rooms.length > 0 ? (
-                <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-                  <RadioGroupItem value="room" />
+                <Label htmlFor="target-room" className="mb-0 flex items-center gap-2 font-body-sm normal-case tracking-normal text-on-surface">
+                  <RadioGroupItem value="room" id="target-room" />
                   {labels.room}
-                </label>
+                </Label>
               ) : null}
             </RadioGroup>
           </div>

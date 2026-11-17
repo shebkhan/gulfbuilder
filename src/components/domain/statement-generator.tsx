@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -123,27 +124,27 @@ export function StatementGenerator({
       {/* Generate Statement Modal */}
       {openStatement && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
+          <div className="w-full max-w-[33.6rem] rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-hairline pb-4">
               <h2 className="font-headline-sm text-headline-sm text-on-surface">
                 {t("generateStatement")}
               </h2>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={tCommon("cancel")}
                 onClick={() => setOpenStatement(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
               >
-                <X className="size-5" />
-              </button>
+                <X />
+              </Button>
             </div>
 
             <form onSubmit={handleStatementSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("owner")} *
-                </label>
+                <Label htmlFor="statement-owner">{t("owner")} *</Label>
                 <Select required value={statementOwner} onValueChange={setStatementOwner}>
-                  <SelectTrigger>
+                  <SelectTrigger id="statement-owner">
                     <SelectValue placeholder={t("selectOwner")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -158,10 +159,9 @@ export function StatementGenerator({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("periodStart")} *
-                  </label>
+                  <Label htmlFor="statement-from">{t("periodStart")} *</Label>
                   <Input
+                    id="statement-from"
                     required
                     type="date"
                     value={periodStart}
@@ -170,10 +170,9 @@ export function StatementGenerator({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                    {t("periodEnd")} *
-                  </label>
+                  <Label htmlFor="statement-to">{t("periodEnd")} *</Label>
                   <Input
+                    id="statement-to"
                     required
                     type="date"
                     value={periodEnd}
@@ -203,27 +202,27 @@ export function StatementGenerator({
       {/* Record Payout Modal */}
       {openPayout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
+          <div className="w-full max-w-[33.6rem] rounded-2xl bg-surface-container-lowest p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-hairline pb-4">
               <h2 className="font-headline-sm text-headline-sm text-on-surface">
                 {t("recordPayout")}
               </h2>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={tCommon("cancel")}
                 onClick={() => setOpenPayout(false)}
-                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high"
               >
-                <X className="size-5" />
-              </button>
+                <X />
+              </Button>
             </div>
 
             <form onSubmit={handlePayoutSubmit} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("owner")} *
-                </label>
+                <Label htmlFor="payout-owner">{t("owner")} *</Label>
                 <Select required value={payoutOwner} onValueChange={setPayoutOwner}>
-                  <SelectTrigger>
+                  <SelectTrigger id="payout-owner">
                     <SelectValue placeholder={t("selectOwner")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -237,10 +236,9 @@ export function StatementGenerator({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("amountQar")} *
-                </label>
+                <Label htmlFor="payout-amount">{t("amountQar")} *</Label>
                 <Input
+                  id="payout-amount"
                   required
                   type="number"
                   step="0.01"
@@ -252,11 +250,9 @@ export function StatementGenerator({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("disbursingBank")}
-                </label>
+                <Label htmlFor="payout-bank">{t("disbursingBank")}</Label>
                 <Select value={bankAccountId} onValueChange={setBankAccountId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="payout-bank">
                     <SelectValue placeholder={t("defaultOperatingAccount")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -270,10 +266,9 @@ export function StatementGenerator({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm font-semibold text-on-surface">
-                  {t("bankReference")}
-                </label>
+                <Label htmlFor="payout-ref">{t("bankReference")}</Label>
                 <Input
+                  id="payout-ref"
                   type="text"
                   value={payoutRef}
                   onChange={(e) => setPayoutRef(e.target.value)}

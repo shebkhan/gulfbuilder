@@ -57,7 +57,7 @@ export function FormDialog({ title, description, triggerLabel, children, wide }:
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent ref={contentRef} className={wide ? "max-w-3xl" : undefined}>
+      <DialogContent ref={contentRef} className={wide ? "max-w-[57.6rem]" : undefined}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? <DialogDescription>{description}</DialogDescription> : null}

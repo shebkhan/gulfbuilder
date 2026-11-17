@@ -4,8 +4,16 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   createOrganizationAction,
   impersonateAction,
@@ -18,10 +26,6 @@ type PlanOption = {
   code: string;
   name: string;
 };
-
-const inputClass =
-  "h-11 w-full rounded-xl bg-surface-container-lowest px-3.5 font-body-md text-body-md text-on-surface shadow-sm outline-none focus:ring-[3px] focus:ring-primary-fixed";
-const selectClass = inputClass;
 
 function Feedback({ state, ok }: { state: PlatformState; ok: string }) {
   const t = useTranslations("platform");
@@ -102,23 +106,33 @@ export function OrganizationPlanForm({
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <Label htmlFor="planCode">{t("plan.plan")}</Label>
-          <select id="planCode" name="planCode" defaultValue={current.planCode ?? plans[0]?.code} className={selectClass} required>
-            {plans.map((plan) => (
-              <option key={plan.code} value={plan.code}>
-                {plan.name || plan.code}
-              </option>
-            ))}
-          </select>
+          <Select name="planCode" defaultValue={current.planCode ?? plans[0]?.code} required>
+            <SelectTrigger id="planCode">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {plans.map((plan) => (
+                <SelectItem key={plan.code} value={plan.code}>
+                  {plan.name || plan.code}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="status">{t("plan.status")}</Label>
-          <select id="status" name="status" defaultValue={current.status ?? "active"} className={selectClass} required>
-            {["active", "trialing", "past_due", "cancelled"].map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <Select name="status" defaultValue={current.status ?? "active"} required>
+            <SelectTrigger id="status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {["active", "trialing", "past_due", "cancelled"].map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="periodEnd">{t("plan.periodEnd")}</Label>
@@ -132,16 +146,17 @@ export function OrganizationPlanForm({
       <fieldset className="flex flex-wrap gap-x-6 gap-y-2">
         <legend className="font-label-md text-label-md font-medium text-on-surface">{t("plan.features")}</legend>
         {features.map((feature) => (
-          <label key={feature} className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-            <input
-              type="checkbox"
+          <div key={feature} className="flex items-center gap-2">
+            <Checkbox
+              id={`feature-${feature}`}
               name="features"
               value={feature}
               defaultChecked={currentFeatures[feature] === true}
-              className="size-4 accent-primary"
             />
-            {feature}
-          </label>
+            <Label htmlFor={`feature-${feature}`} className="mb-0 font-body-sm normal-case tracking-normal text-on-surface">
+              {feature}
+            </Label>
+          </div>
         ))}
       </fieldset>
       <Feedback state={state} ok={t("plan.saved")} />

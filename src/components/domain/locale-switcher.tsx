@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
@@ -28,20 +29,22 @@ export function LocaleSwitcher() {
       )}
     >
       {routing.locales.map((option) => (
-        <button
+        <Button
           key={option}
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => switchTo(option)}
           aria-current={option === locale ? "true" : undefined}
           className={cn(
-            "rounded-full px-2 py-0.5 transition-colors",
+            "h-auto px-2 py-0.5 font-label-sm",
             option === locale
               ? "bg-surface-container-lowest font-medium text-on-surface shadow-sm"
               : "text-on-surface-variant hover:text-on-surface",
           )}
         >
           {option === "en" ? "EN" : "العربية"}
-        </button>
+        </Button>
       ))}
     </div>
   );

@@ -4,6 +4,15 @@ import { Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createTenantRequestAction, type PortalState } from "@/server/actions/portal";
 
@@ -44,60 +53,48 @@ export function TenantRequestForm() {
         </p>
       )}
 
-      <label className="flex flex-col gap-1.5">
-        <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-          {t("title")}
-        </span>
-        <input
-          required
-          name="title"
-          type="text"
-          maxLength={120}
-          className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </label>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="request-title">{t("title")}</Label>
+        <Input id="request-title" required name="title" type="text" maxLength={120} />
+      </div>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-          {t("description")}
-        </span>
-        <Textarea name="description" rows={3} maxLength={1000} />
-      </label>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="request-description">{t("description")}</Label>
+        <Textarea id="request-description" name="description" rows={3} maxLength={1000} />
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5">
-          <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-            {t("category")}
-          </span>
-          <select
-            name="category"
-            defaultValue="general"
-            className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="general">{t("categories.general")}</option>
-            <option value="plumbing">{t("categories.plumbing")}</option>
-            <option value="electrical">{t("categories.electrical")}</option>
-            <option value="air_conditioning">{t("categories.air_conditioning")}</option>
-            <option value="appliance">{t("categories.appliance")}</option>
-            <option value="other">{t("categories.other")}</option>
-          </select>
-        </label>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="request-category">{t("category")}</Label>
+          <Select name="category" defaultValue="general">
+            <SelectTrigger id="request-category">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="general">{t("categories.general")}</SelectItem>
+              <SelectItem value="plumbing">{t("categories.plumbing")}</SelectItem>
+              <SelectItem value="electrical">{t("categories.electrical")}</SelectItem>
+              <SelectItem value="air_conditioning">{t("categories.air_conditioning")}</SelectItem>
+              <SelectItem value="appliance">{t("categories.appliance")}</SelectItem>
+              <SelectItem value="other">{t("categories.other")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <label className="flex flex-col gap-1.5">
-          <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-            {t("priority")}
-          </span>
-          <select
-            name="priority"
-            defaultValue="normal"
-            className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="low">{t("priorities.low")}</option>
-            <option value="normal">{t("priorities.normal")}</option>
-            <option value="high">{t("priorities.high")}</option>
-            <option value="urgent">{t("priorities.urgent")}</option>
-          </select>
-        </label>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="request-priority">{t("priority")}</Label>
+          <Select name="priority" defaultValue="normal">
+            <SelectTrigger id="request-priority">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">{t("priorities.low")}</SelectItem>
+              <SelectItem value="normal">{t("priorities.normal")}</SelectItem>
+              <SelectItem value="high">{t("priorities.high")}</SelectItem>
+              <SelectItem value="urgent">{t("priorities.urgent")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Button type="submit" disabled={isPending} className="flex items-center justify-center gap-2">

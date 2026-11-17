@@ -442,7 +442,8 @@
       "failed": "تعذّر حفظ التغيير."
     },
     "occupied": "مشغول",
-    "vacant": "شاغر"
+    "vacant": "شاغر",
+    "viewTenants": "عرض المستأجرين"
   },
   "tenants": {
     "title": "المستأجرون",
@@ -494,7 +495,22 @@
       "not_authorised": "ليس لديك صلاحية لإدارة المستأجرين.",
       "failed": "حدث خطأ أثناء حفظ المستأجر.",
       "not_found": "المستأجر غير موجود."
-    }
+    },
+    "advancedSearch": "بحث متقدم",
+    "filterByBuilding": "تصفية حسب المبنى",
+    "allBuildings": "جميع المباني",
+    "clearFilters": "مسح الفلاتر",
+    "applyFilters": "تطبيق الفلاتر",
+    "searchByName": "البحث بالاسم",
+    "searchByEmail": "البحث بالبريد الإلكتروني",
+    "searchByPhone": "البحث برقم الهاتف",
+    "searchById": "البحث برقم الهوية / الجواز",
+    "activeFilters": "الفلاتر النشطة",
+    "tenant": "المستأجر",
+    "contact": "معلومات الاتصال",
+    "building": "المبنى",
+    "actions": "الإجراءات",
+    "view": "عرض"
   },
   "leases": {
     "title": "عقود الإيجار",

@@ -266,7 +266,7 @@ export function ExpenseForm({
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[38.4rem]">
           <DialogHeader>
             <DialogTitle>{t("createExpense")}</DialogTitle>
           </DialogHeader>

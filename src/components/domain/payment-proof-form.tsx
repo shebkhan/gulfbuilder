@@ -4,6 +4,15 @@ import { Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { submitPaymentProofAction, type PortalState } from "@/server/actions/portal";
 
 export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
@@ -42,76 +51,63 @@ export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5">
-          <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-            {t("amount")} (QAR)
-          </span>
-          <input
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="proof-amount">{t("amount")} (QAR)</Label>
+          <Input
+            id="proof-amount"
             required
             name="amount"
             type="number"
             step="0.01"
             min="0.01"
             inputMode="decimal"
-            className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
           />
-        </label>
+        </div>
 
-        <label className="flex flex-col gap-1.5">
-          <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-            {t("method")}
-          </span>
-          <select
-            name="method"
-            defaultValue="bank_transfer"
-            className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="bank_transfer">{t("methods.bank_transfer")}</option>
-            <option value="cash">{t("methods.cash")}</option>
-            <option value="cheque">{t("methods.cheque")}</option>
-            <option value="card">{t("methods.card")}</option>
-            <option value="online">{t("methods.online")}</option>
-          </select>
-        </label>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="proof-method">{t("method")}</Label>
+          <Select name="method" defaultValue="bank_transfer">
+            <SelectTrigger id="proof-method">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="bank_transfer">{t("methods.bank_transfer")}</SelectItem>
+              <SelectItem value="cash">{t("methods.cash")}</SelectItem>
+              <SelectItem value="cheque">{t("methods.cheque")}</SelectItem>
+              <SelectItem value="card">{t("methods.card")}</SelectItem>
+              <SelectItem value="online">{t("methods.online")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-          {t("date")}
-        </span>
-        <input
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="proof-date">{t("date")}</Label>
+        <Input
+          id="proof-date"
           required
           name="receivedOn"
           type="date"
           defaultValue={new Date().toISOString().slice(0, 10)}
-          className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
         />
-      </label>
+      </div>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-          {t("note")}
-        </span>
-        <input
-          name="note"
-          type="text"
-          placeholder={t("notePlaceholder")}
-          className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </label>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="proof-note">{t("note")}</Label>
+        <Input id="proof-note" name="note" type="text" placeholder={t("notePlaceholder")} />
+      </div>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="font-label-sm text-label-sm font-semibold text-on-surface">
-          {t("proof")}
-        </span>
-        <input
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="proof-file">{t("proof")}</Label>
+        <Input
+          id="proof-file"
           required
           name="proof"
           type="file"
           accept="image/png,image/jpeg,image/webp,application/pdf"
-          className="rounded-xl border border-hairline bg-surface-container-low px-3 py-2 font-body-sm text-body-sm text-on-surface file:me-3 file:rounded-full file:border-0 file:bg-surface-container-high file:px-3 file:py-1 file:font-label-sm file:text-label-sm"
+          className="py-2 font-body-sm text-body-sm file:me-3 file:rounded-full file:border-0 file:bg-surface-container-high file:px-3 file:py-1 file:font-label-sm file:text-label-sm"
         />
-      </label>
+      </div>
 
       <Button type="submit" disabled={isPending} className="flex items-center justify-center gap-2">
         <Upload className="size-4" />

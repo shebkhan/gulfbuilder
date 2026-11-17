@@ -442,7 +442,8 @@
       "failed": "The change could not be saved."
     },
     "occupied": "Occupied",
-    "vacant": "Vacant"
+    "vacant": "Vacant",
+    "viewTenants": "View Tenants"
   },
   "tenants": {
     "title": "Tenants",
@@ -494,7 +495,22 @@
       "not_authorised": "You do not have permission to manage tenants.",
       "failed": "An error occurred while saving the tenant.",
       "not_found": "Tenant not found."
-    }
+    },
+    "advancedSearch": "Advanced Search",
+    "filterByBuilding": "Filter by building",
+    "allBuildings": "All buildings",
+    "clearFilters": "Clear filters",
+    "applyFilters": "Apply filters",
+    "searchByName": "Search by name",
+    "searchByEmail": "Search by email",
+    "searchByPhone": "Search by phone",
+    "searchById": "Search by QID / Passport",
+    "activeFilters": "Active filters",
+    "tenant": "Tenant",
+    "contact": "Contact",
+    "building": "Building",
+    "actions": "Actions",
+    "view": "View"
   },
   "leases": {
     "title": "Leases",
