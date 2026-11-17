@@ -2,8 +2,9 @@ import { CalendarClock, Home, Receipt, Wallet, Wrench } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui/card";
+import CountUp from "@/components/ui/count-up";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { exponentOf, formatMoney, toDecimal } from "@/lib/money";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
 
 export default async function PortalHomePage({
@@ -45,17 +46,24 @@ export default async function PortalHomePage({
         <Card>
           <CardBody className="flex flex-col gap-1 p-4">
             <KpiLabel>{t("outstanding")}</KpiLabel>
-            <span className="font-headline-md text-headline-md font-bold text-on-surface">
-              {formatMoney(outstandingMinor, currency, locale)}
-            </span>
+            <CountUp
+              to={Number(toDecimal(outstandingMinor, currency))}
+              decimals={exponentOf(currency)}
+              prefix={`${currency} `}
+              separator=","
+              replayOnHover
+              className="font-headline-md text-headline-md font-bold text-on-surface"
+            />
           </CardBody>
         </Card>
         <Card>
           <CardBody className="flex flex-col gap-1 p-4">
             <KpiLabel>{t("openRequests")}</KpiLabel>
-            <span className="font-headline-md text-headline-md font-bold text-on-surface">
-              {openRequests.length}
-            </span>
+            <CountUp
+              to={openRequests.length}
+              replayOnHover
+              className="font-headline-md text-headline-md font-bold text-on-surface"
+            />
           </CardBody>
         </Card>
       </div>

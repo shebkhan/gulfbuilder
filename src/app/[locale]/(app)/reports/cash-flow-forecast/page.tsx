@@ -125,7 +125,7 @@ export default function CashFlowForecastPage() {
                   <RadioGroupItem value="base" id="base" />
                   <Label
                     htmlFor="base"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {t("scenarios.base")}
                   </Label>
@@ -134,7 +134,7 @@ export default function CashFlowForecastPage() {
                   <RadioGroupItem value="conservative" id="conservative" />
                   <Label
                     htmlFor="conservative"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {t("scenarios.conservative")}
                   </Label>
@@ -143,7 +143,7 @@ export default function CashFlowForecastPage() {
                   <RadioGroupItem value="optimistic" id="optimistic" />
                   <Label
                     htmlFor="optimistic"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {t("scenarios.optimistic")}
                   </Label>

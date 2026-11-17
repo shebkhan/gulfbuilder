@@ -116,6 +116,9 @@ const config: Config = {
         // Master canvas + cards, from the mockups' inline styles.
         canvas:
           "0 24px 48px -12px rgba(49,48,46,0.08), 0 12px 24px -6px rgba(49,48,46,0.04), 0 0 0 1px rgba(210,197,180,0.25)",
+        // Warm frame shadow that reads against the photo behind authenticated shells.
+        frame:
+          "0 28px 64px -16px rgba(78,56,24,0.38), 0 12px 28px -8px rgba(78,56,24,0.22), 0 0 0 1px rgba(201,161,90,0.45)",
         card: "0 8px 24px -4px rgba(49,48,46,0.08), 0 2px 6px -1px rgba(49,48,46,0.04)",
         // DESIGN.md "ambient diffusion" for raised overlays.
         ambient:

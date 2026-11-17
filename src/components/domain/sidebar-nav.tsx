@@ -48,7 +48,7 @@ const ICONS: Record<string, LucideIcon> = {
 
 export type SidebarItem = { href: string; label: string; icon: string };
 
-export function SidebarNav({ items }: { items: SidebarItem[] }) {
+export function SidebarNav({ items, compact = false }: { items: SidebarItem[]; compact?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -63,15 +63,18 @@ export function SidebarNav({ items }: { items: SidebarItem[] }) {
             href={item.href}
             prefetch={true}
             aria-current={isActive ? "page" : undefined}
+            aria-label={compact ? item.label : undefined}
+            title={compact ? item.label : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md transition-all",
+              "flex items-center rounded-lg py-2 font-label-md text-label-md transition-all",
+              compact ? "justify-center px-2" : "gap-3 px-3",
               isActive
                 ? "bg-surface-container font-medium text-on-surface"
                 : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface",
             )}
           >
             <Icon className="size-[18px] shrink-0" aria-hidden />
-            <span>{item.label}</span>
+            {compact ? null : <span>{item.label}</span>}
           </Link>
         );
       })}

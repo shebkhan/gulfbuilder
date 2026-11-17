@@ -140,7 +140,7 @@ test("an owner without a factor is walked through MFA enrolment", async ({ page 
 
   const enrol = page.getByRole("button", { name: /authenticator|set up|إعداد/i });
   // The form starts in a loading state; wait for the button or the code field.
-  await expect(page.locator("#code").or(enrol)).toBeVisible();
+  await expect(page.locator("#code-0").or(enrol)).toBeVisible();
 
   if (await enrol.isVisible()) {
     await enrol.click();
@@ -151,7 +151,9 @@ test("an owner without a factor is walked through MFA enrolment", async ({ page 
     // A code can straddle a 30 second window, so try the current one and the next one.
     for (const code of totpCandidates(secret)) {
       if (!page.url().includes(`/${locale}/mfa`)) break;
-      await page.fill("#code", code);
+      for (const [index, digit] of [...code].entries()) {
+        await page.fill(`#code-${index}`, digit);
+      }
       await page.click("button[type=submit]");
       await page.waitForTimeout(1500);
       if (!page.url().includes(`/${locale}/mfa`)) break;

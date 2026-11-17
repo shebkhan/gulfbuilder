@@ -201,10 +201,8 @@ export default async function TenantsPage({
         {/* Advanced Search & Filtering Component */}
         <TenantSearch
           buildings={buildings}
-          currentParams={{ q, name, email, phone, idNumber, buildingId }}
+          currentParams={{ name, email, phone, idNumber, buildingId }}
           labels={{
-            search: t("search"),
-            searchPlaceholder: t("searchPlaceholder"),
             advancedSearch: t("advancedSearch"),
             searchByName: t("searchByName"),
             searchByEmail: t("searchByEmail"),

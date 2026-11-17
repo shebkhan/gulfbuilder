@@ -18,7 +18,27 @@
 
   body {
     overscroll-behavior: none;
-    @apply bg-surface-container-low font-body-md text-body-md text-on-surface antialiased;
+    @apply bg-black font-body-md text-body-md text-on-surface antialiased;
+  }
+
+  /* Blurred photo behind authenticated shells only; auth screens keep the plain surface. */
+  .auth-backdrop {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .auth-backdrop::before {
+    content: "";
+    position: fixed;
+    inset: -2rem;
+    z-index: -1;
+    background-image: url("/images/auth-backdrop.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    filter: blur(22px) saturate(0.9);
+    pointer-events: none;
   }
 
   /* Financial figures, dates and areas must align in columns (DESIGN.md typography rules). */

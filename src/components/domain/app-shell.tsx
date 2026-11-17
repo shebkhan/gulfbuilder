@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import type { Role } from "@/lib/rbac";
 import { signOutAction } from "@/server/actions/auth";
+import { CollapsibleSidebar } from "./collapsible-sidebar";
 import { LocaleSwitcher } from "./locale-switcher";
 import { FOOTER_NAV, NAV_ITEMS, visibleNav, type NavItem } from "./nav-items";
-import { SidebarNav, type SidebarItem } from "./sidebar-nav";
+import { type SidebarItem } from "./sidebar-nav";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -42,23 +43,17 @@ export async function AppShell({
   const footer = toItems(visibleNav(role, footerItems ?? FOOTER_NAV));
 
   return (
-    <div className="min-h-screen bg-surface-container-low p-margin-mobile lg:p-margin">
+    <div className="auth-backdrop min-h-screen p-margin-mobile lg:p-margin">
       {/* Master canvas: 28px radius, warm ambient shadow, hairline perimeter. */}
-      <div className="flex min-h-[calc(100vh-2rem)] overflow-hidden rounded-frame bg-surface-container-lowest shadow-canvas lg:min-h-[calc(100vh-4rem)]">
-        <aside className="hidden w-[210px] shrink-0 flex-col justify-between border-e border-surface-container-high px-3 py-6 lg:flex">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col px-3 pb-2">
-              <span className="truncate font-headline-sm text-label-md leading-tight font-semibold tracking-tight text-on-surface">
-                {orgName}
-              </span>
-              <span className="font-section-kicker text-[9px] uppercase tracking-widest text-on-surface-variant">
-                {t("common.appTagline")}
-              </span>
-            </div>
-            <SidebarNav items={nav} />
-          </div>
-          {footer.length > 0 && <SidebarNav items={footer} />}
-        </aside>
+      <div className="flex min-h-[calc(100vh-2rem)] overflow-hidden rounded-frame bg-gradient-to-br from-surface-container-lowest/95 via-surface-container-lowest/85 to-surface-container/65 shadow-frame lg:min-h-[calc(100vh-4rem)]">
+        <CollapsibleSidebar
+          orgName={orgName}
+          tagline={t("common.appTagline")}
+          nav={nav}
+          footer={footer}
+          collapseLabel={t("common.collapseSidebar")}
+          expandLabel={t("common.expandSidebar")}
+        />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-16 items-center justify-between gap-4 px-6">

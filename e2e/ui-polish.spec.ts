@@ -13,26 +13,25 @@ async function signIn(page: Page): Promise<void> {
   await page.click("button[type=submit]");
 }
 
-test("related sections link buildings to tenants", async ({ page }) => {
+test("sidebar collapses to an icon rail and remembers the choice", async ({ page }) => {
   const locale = currentLocale();
   await signIn(page);
   await page.waitForURL(new RegExp(`/${locale}/(dashboard|mfa)`));
-  await page.goto(`/${locale}/buildings`);
+  await page.goto(`/${locale}/dashboard`);
 
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  const subtitle =
-    locale === "ar"
-      ? "المباني والطوابق والوحدات في محفظتك."
-      : "Buildings, floors and units across your portfolio.";
-  await expect(page.getByText(subtitle)).toBeVisible();
+  const aside = page.locator("aside").first();
+  await expect(aside).toBeVisible();
+  expect((await aside.boundingBox())?.width ?? 0).toBeGreaterThan(150);
 
-  const stripLabel = locale === "ar" ? "أقسام ذات صلة" : "Related sections";
-  const strip = page.getByText(stripLabel).locator("..");
-  await expect(strip).toBeVisible();
+  const collapseLabel = locale === "ar" ? "طي القائمة الجانبية" : "Collapse sidebar";
+  await page.getByRole("button", { name: collapseLabel }).click();
+  await expect(aside).toHaveClass(/w-16/);
+  await expect.poll(async () => (await aside.boundingBox())?.width ?? 0).toBeLessThan(100);
 
-  const tenants = locale === "ar" ? "المستأجرون" : "Tenants";
-  await strip.getByRole("link", { name: tenants }).click();
-  await expect(page).toHaveURL(new RegExp(`/${locale}/tenants`));
+  await page.reload();
+  const persisted = page.locator("aside").first();
+  await expect(persisted).toHaveClass(/w-16/);
+  await expect.poll(async () => (await persisted.boundingBox())?.width ?? 0).toBeLessThan(100);
 });
 
 test("lease form shows an inline error for empty rent", async ({ page }) => {

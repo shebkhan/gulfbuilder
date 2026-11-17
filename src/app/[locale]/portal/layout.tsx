@@ -50,7 +50,7 @@ export default async function PortalLayout({
   const t = await getTranslations("common");
 
   return (
-    <div className="min-h-dvh bg-surface-container-low">
+    <div className="auth-backdrop min-h-dvh">
       <header className="sticky top-0 z-40 border-b border-hairline bg-surface-container-lowest px-4 py-3">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
           <span className="truncate font-headline-sm text-headline-sm font-semibold text-on-surface">

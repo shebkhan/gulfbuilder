@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,9 @@ export function MfaForm({ next, labels }: Props) {
   const [factorId, setFactorId] = useState<string>();
   const [qr, setQr] = useState<string>();
   const [secret, setSecret] = useState<string>();
-  const [code, setCode] = useState("");
+  const [digits, setDigits] = useState<string[]>(() => Array(6).fill(""));
+  const inputs = useRef<Array<HTMLInputElement | null>>([]);
+  const code = digits.join("");
   const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
 
@@ -56,6 +58,46 @@ export function MfaForm({ next, labels }: Props) {
     setQr(data.totp.qr_code);
     setSecret(data.totp.secret);
     setStep("verify");
+  }
+
+  function setDigit(index: number, value: string) {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    setDigits((prev) => {
+      const next = [...prev];
+      next[index] = digit;
+      return next;
+    });
+    if (digit && index < 5) inputs.current[index + 1]?.focus();
+  }
+
+  function handleKeyDown(index: number, event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      if (digits[index]) {
+        setDigit(index, "");
+      } else if (index > 0) {
+        setDigit(index - 1, "");
+        inputs.current[index - 1]?.focus();
+      }
+    } else if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      inputs.current[index - 1]?.focus();
+    } else if (event.key === "ArrowRight" && index < 5) {
+      event.preventDefault();
+      inputs.current[index + 1]?.focus();
+    }
+  }
+
+  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    event.preventDefault();
+    const next = Array(6).fill("") as string[];
+    [...pasted].forEach((digit, index) => {
+      next[index] = digit;
+    });
+    setDigits(next);
+    inputs.current[Math.min(pasted.length, 5)]?.focus();
   }
 
   async function verify(event: React.FormEvent) {
@@ -112,17 +154,27 @@ export function MfaForm({ next, labels }: Props) {
           ) : null}
 
           <div>
-            <Label htmlFor="code">{labels.code}</Label>
-            <Input
-              id="code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              required
-            />
+            <Label htmlFor="code-0">{labels.code}</Label>
+            <div className="flex gap-2" dir="ltr" role="group" aria-label={labels.code}>
+              {digits.map((digit, index) => (
+                <Input
+                  key={index}
+                  id={`code-${index}`}
+                  ref={(node) => {
+                    inputs.current[index] = node;
+                  }}
+                  value={digit}
+                  onChange={(event) => setDigit(index, event.target.value)}
+                  onKeyDown={(event) => handleKeyDown(index, event)}
+                  onPaste={handlePaste}
+                  inputMode="numeric"
+                  autoComplete={index === 0 ? "one-time-code" : "off"}
+                  maxLength={1}
+                  aria-label={`${labels.code} ${index + 1}`}
+                  className="h-12 w-11 text-center font-metric-num-sm text-body-md tabular"
+                />
+              ))}
+            </div>
           </div>
 
           {error ? (

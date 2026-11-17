@@ -14,8 +14,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/domain/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui/card";
+import CountUp from "@/components/ui/count-up";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { exponentOf, formatMoney, toDecimal } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { fetchPortfolioKpis } from "@/server/actions/reports";
 import { getOrgContext } from "@/server/org-context";
@@ -156,9 +157,12 @@ export default async function DashboardPage({
             </div>
             <div className="flex flex-col">
               <KpiLabel>{t("occupancy")}</KpiLabel>
-              <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {kpis?.occupancy_pct ?? 0}%
-              </span>
+              <CountUp
+                to={kpis?.occupancy_pct ?? 0}
+                suffix="%"
+                replayOnHover
+                className="font-headline-md text-headline-md font-bold text-on-surface"
+              />
               <span className="text-xs text-on-surface-variant">
                 {kpis?.occupied_units ?? 0} / {kpis?.total_units ?? 0} {t("units")}
               </span>
@@ -173,9 +177,14 @@ export default async function DashboardPage({
             </div>
             <div className="flex flex-col">
               <KpiLabel>{t("monthlyRentRoll")}</KpiLabel>
-              <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(BigInt(kpis?.monthly_rent_roll ?? 0), "QAR", locale)}
-              </span>
+              <CountUp
+                to={Number(toDecimal(BigInt(kpis?.monthly_rent_roll ?? 0), "QAR"))}
+                decimals={exponentOf("QAR")}
+                prefix="QAR "
+                separator=","
+                replayOnHover
+                className="font-headline-md text-headline-md font-bold text-on-surface"
+              />
               <span className="text-xs text-on-surface-variant">{t("activeLeasePipeline")}</span>
             </div>
           </CardBody>
@@ -188,9 +197,14 @@ export default async function DashboardPage({
             </div>
             <div className="flex flex-col">
               <KpiLabel>{t("netOperatingIncome")}</KpiLabel>
-              <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(BigInt(kpis?.net_operating_income ?? 0), "QAR", locale)}
-              </span>
+              <CountUp
+                to={Number(toDecimal(BigInt(kpis?.net_operating_income ?? 0), "QAR"))}
+                decimals={exponentOf("QAR")}
+                prefix="QAR "
+                separator=","
+                replayOnHover
+                className="font-headline-md text-headline-md font-bold text-on-surface"
+              />
               <span className="text-xs text-on-surface-variant">{t("ytdCollections")}</span>
             </div>
           </CardBody>
@@ -203,9 +217,11 @@ export default async function DashboardPage({
             </div>
             <div className="flex flex-col">
               <KpiLabel>{t("activeWorkOrders")}</KpiLabel>
-              <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {openMaintCount ?? 0}
-              </span>
+              <CountUp
+                to={openMaintCount ?? 0}
+                replayOnHover
+                className="font-headline-md text-headline-md font-bold text-on-surface"
+              />
               <span className="text-xs text-on-surface-variant">
                 <Link href="/maintenance" className="underline hover:text-on-surface">
                   {t("viewQueue")}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +23,6 @@ interface BuildingOption {
 interface TenantSearchProps {
   buildings: BuildingOption[];
   currentParams: {
-    q?: string;
     name?: string;
     email?: string;
     phone?: string;
@@ -31,8 +30,6 @@ interface TenantSearchProps {
     buildingId?: string;
   };
   labels: {
-    search: string;
-    searchPlaceholder: string;
     advancedSearch: string;
     searchByName: string;
     searchByEmail: string;
@@ -49,16 +46,6 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
   const router = useRouter();
   const pathname = usePathname();
 
-  const hasAdvancedFilters = Boolean(
-    currentParams.name ||
-      currentParams.email ||
-      currentParams.phone ||
-      currentParams.idNumber ||
-      (currentParams.buildingId && currentParams.buildingId !== "all"),
-  );
-
-  const [isOpen, setIsOpen] = useState(hasAdvancedFilters);
-  const [q, setQ] = useState(currentParams.q ?? "");
   const [name, setName] = useState(currentParams.name ?? "");
   const [email, setEmail] = useState(currentParams.email ?? "");
   const [phone, setPhone] = useState(currentParams.phone ?? "");
@@ -76,11 +63,6 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
     return queryString ? `${pathname}?${queryString}` : pathname;
   };
 
-  const handleQuickSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push(buildQuery({ q, buildingId: buildingId !== "all" ? buildingId : undefined }));
-  };
-
   const handleAdvancedSearch = (e: React.FormEvent) => {
     e.preventDefault();
     router.push(
@@ -95,7 +77,6 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
   };
 
   const handleClear = () => {
-    setQ("");
     setName("");
     setEmail("");
     setPhone("");
@@ -105,7 +86,6 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
   };
 
   const activeFiltersCount = [
-    currentParams.q,
     currentParams.name,
     currentParams.email,
     currentParams.phone,
@@ -115,42 +95,69 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-hairline bg-surface-container-lowest p-4 shadow-sm">
-      {/* Top Search bar with Quick Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <form onSubmit={handleQuickSearch} className="flex flex-1 items-center gap-2 sm:max-w-md">
-          <div className="relative w-full">
-            <Search className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" />
-            <Input
-              name="q"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={labels.searchPlaceholder}
-              className="ps-9"
-              aria-label={labels.search}
-            />
-          </div>
-          <Button type="submit" variant="secondary" className="shrink-0">
-            {labels.search}
-          </Button>
-        </form>
+      <span className="font-section-kicker text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant">
+        {labels.advancedSearch}
+      </span>
+      <form
+        onSubmit={handleAdvancedSearch}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+      >
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs text-on-surface-variant">{labels.searchByName}</Label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. John Doe"
+          />
+        </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setIsOpen((prev) => !prev)}
-            className="flex items-center gap-1.5"
-          >
-            <Filter className="size-4" />
-            <span>{labels.advancedSearch}</span>
-            {activeFiltersCount > 0 && (
-              <span className="flex size-5 items-center justify-center rounded-full bg-primary font-label-sm text-xs font-semibold text-on-primary">
-                {activeFiltersCount}
-              </span>
-            )}
-          </Button>
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs text-on-surface-variant">{labels.searchByEmail}</Label>
+          <Input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="e.g. tenant@example.com"
+          />
+        </div>
 
-          {activeFiltersCount > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs text-on-surface-variant">{labels.searchByPhone}</Label>
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="e.g. +974..."
+            dir="ltr"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs text-on-surface-variant">{labels.searchById}</Label>
+          <Input
+            value={idNumber}
+            onChange={(e) => setIdNumber(e.target.value)}
+            placeholder="e.g. 28863451234"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs text-on-surface-variant">{labels.filterByBuilding}</Label>
+          <Select value={buildingId} onValueChange={setBuildingId}>
+            <SelectTrigger>
+              <SelectValue placeholder={labels.allBuildings} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{labels.allBuildings}</SelectItem>
+              {buildings.map((b) => (
+                <SelectItem key={b.id} value={b.id}>
+                  {b.code} — {b.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="col-span-full flex items-center justify-between gap-2 pt-2">
+          {activeFiltersCount > 0 ? (
             <Button
               type="button"
               variant="ghost"
@@ -160,81 +167,12 @@ export function TenantSearch({ buildings, currentParams, labels }: TenantSearchP
               <X className="size-4" />
               <span>{labels.clearFilters}</span>
             </Button>
+          ) : (
+            <span />
           )}
+          <Button type="submit">{labels.applyFilters}</Button>
         </div>
-      </div>
-
-      {/* Advanced Filter Panel */}
-      {isOpen && (
-        <form
-          onSubmit={handleAdvancedSearch}
-          className="mt-2 grid grid-cols-1 gap-4 border-t border-hairline pt-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
-        >
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium text-on-surface-variant">{labels.searchByName}</Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. John Doe"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium text-on-surface-variant">{labels.searchByEmail}</Label>
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. tenant@example.com"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium text-on-surface-variant">{labels.searchByPhone}</Label>
-            <Input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="e.g. +974..."
-              dir="ltr"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium text-on-surface-variant">{labels.searchById}</Label>
-            <Input
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
-              placeholder="e.g. 28863451234"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium text-on-surface-variant">{labels.filterByBuilding}</Label>
-            <Select value={buildingId} onValueChange={setBuildingId}>
-              <SelectTrigger>
-                <SelectValue placeholder={labels.allBuildings} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{labels.allBuildings}</SelectItem>
-                {buildings.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
-                    {b.code} — {b.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="col-span-full flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={handleClear}>
-              {labels.clearFilters}
-            </Button>
-            <Button type="submit">
-              {labels.applyFilters}
-            </Button>
-          </div>
-        </form>
-      )}
+      </form>
     </div>
   );
 }
-
