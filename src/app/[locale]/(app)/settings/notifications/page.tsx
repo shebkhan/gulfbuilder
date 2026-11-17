@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { NotificationTemplateForm } from "@/components/domain/notification-template-form";
+import { SendNowButton } from "@/components/domain/send-now-button";
 import { SettingsNav } from "@/components/domain/settings-nav";
 import { TelegramLinkCard } from "@/components/domain/telegram-link-card";
+import { WebPushCard } from "@/components/domain/web-push-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { can, isRole } from "@/lib/rbac";
@@ -71,6 +73,8 @@ export default async function NotificationSettingsPage({
 
       <TelegramLinkCard linked={Boolean(profile?.telegram_chat_id)} code={telegramCode} />
 
+      <WebPushCard />
+
       <NotificationTemplateForm />
 
       <Card>
@@ -107,7 +111,8 @@ export default async function NotificationSettingsPage({
         <CardHeader className="pb-2">
           <CardTitle>{t("outbox")}</CardTitle>
         </CardHeader>
-        <CardBody className="pt-0">
+        <CardBody className="flex flex-col gap-4 pt-0">
+          <SendNowButton />
           {!outbox || outbox.length === 0 ? (
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (

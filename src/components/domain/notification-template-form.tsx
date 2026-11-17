@@ -28,7 +28,7 @@ export function NotificationTemplateForm() {
         <div>
           <Label htmlFor="channel">{t("channel")}</Label>
           <select id="channel" name="channel" defaultValue="email" className={selectClass}>
-            {(["email", "whatsapp", "sms", "in_app", "web_push"] as const).map((channel) => (
+            {(["email", "sms", "telegram", "push"] as const).map((channel) => (
               <option key={channel} value={channel}>
                 {t(`channels.${channel}` as never)}
               </option>

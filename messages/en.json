@@ -253,18 +253,26 @@
       "unlink": "Unlink",
       "codeGenerated": "Code generated. It expires in 10 minutes.",
       "unlinked": "Telegram unlinked.",
+      "pushTitle": "Web push",
+      "pushSubtitle": "Enable browser notifications so alerts reach you even when the app is closed.",
+      "enablePush": "Enable push notifications",
+      "disablePush": "Disable push notifications",
+      "sendNow": "Send now",
+      "sendNowHint": "Immediately send all pending notifications in the queue.",
+      "dispatched": "Pending notifications dispatched.",
       "channels": {
         "email": "Email",
         "whatsapp": "WhatsApp",
         "sms": "SMS",
         "in_app": "In-app",
-        "web_push": "Push",
+        "push": "Push",
         "telegram": "Telegram"
       },
       "errors": {
         "not_authorised": "Only organization admins can edit templates.",
         "invalid_input": "Check the details and try again.",
-        "failed": "Could not save. Try again."
+        "failed": "Could not save. Try again.",
+        "no_recipient": "No recipient is linked for this channel."
       }
     },
     "audit": {

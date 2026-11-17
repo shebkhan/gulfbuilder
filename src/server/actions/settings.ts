@@ -5,6 +5,7 @@ import { z } from "zod";
 import { randomInt } from "node:crypto";
 import { toMinor } from "@/lib/money";
 import { can } from "@/lib/rbac";
+import { dispatchPending } from "@/server/notifications/dispatch";
 import { getOrgContext } from "@/server/org-context";
 
 export type SettingsState = {
@@ -51,10 +52,15 @@ const brandingSchema = z.object({
 
 const templateSchema = z.object({
   event: z.string().trim().min(2).max(60),
-  channel: z.enum(["email", "whatsapp", "sms", "in_app", "web_push"]),
+  channel: z.enum(["email", "sms", "telegram", "push"]),
   locale: z.enum(["en", "ar"]),
   subject: z.string().trim().max(160).optional().or(z.literal("")),
   body: z.string().trim().min(1).max(4000),
+});
+
+const pushSubscriptionSchema = z.object({
+  endpoint: z.string(),
+  keys: z.object({ p256dh: z.string(), auth: z.string() }),
 });
 
 function fail(error: string): SettingsState {
@@ -297,6 +303,73 @@ export async function unlinkTelegramAction(
 
   revalidatePath("/settings/notifications");
   return { ok: "unlinked" };
+}
+
+export async function savePushSubscriptionAction(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(formData.get("subscription") ?? ""));
+  } catch {
+    return fail("invalid_input");
+  }
+  const parsed = pushSubscriptionSchema.safeParse(raw);
+  if (!parsed.success) return fail("invalid_input");
+
+  const { error } = await ctx.supabase.from("web_push_subscriptions").upsert(
+    {
+      org_id: ctx.orgId,
+      user_id: ctx.userId,
+      endpoint: parsed.data.endpoint,
+      p256dh: parsed.data.keys.p256dh,
+      auth: parsed.data.keys.auth,
+      created_by: ctx.userId,
+    },
+    { onConflict: "endpoint" },
+  );
+  if (error) return fail("failed");
+
+  revalidatePath("/settings/notifications");
+  return { ok: "saved" };
+}
+
+export async function removePushSubscriptionAction(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  const endpoint = String(formData.get("endpoint") ?? "");
+  if (!endpoint) return fail("invalid_input");
+
+  const { error } = await ctx.supabase
+    .from("web_push_subscriptions")
+    .delete()
+    .eq("user_id", ctx.userId)
+    .eq("endpoint", endpoint);
+  if (error) return fail("failed");
+
+  revalidatePath("/settings/notifications");
+  return { ok: "unsubscribed" };
+}
+
+export async function sendNotificationsNowAction(
+  _prev: SettingsState,
+  _formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return fail("not_authorised");
+
+  await dispatchPending();
+
+  revalidatePath("/settings/notifications");
+  return { ok: "dispatched" };
 }
 
 export async function closePeriodAction(
