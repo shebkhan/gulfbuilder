@@ -17,13 +17,21 @@ export type MarketPackOption = {
 
 export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
   const t = useTranslations("platform");
-  const [state, action, pending] = useActionState<PlatformState, FormData>(updateMarketPackAction, {});
+  const [state, action, pending] = useActionState<PlatformState, FormData>(
+    updateMarketPackAction,
+    {},
+  );
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-2xl bg-surface-container-lowest p-5 shadow-sm">
-      <div className="grid gap-3 sm:grid-cols-3">
+    <form
+      action={action}
+      className="flex flex-col gap-3 rounded-2xl bg-surface-container-lowest p-5 shadow-sm"
+    >
+      <div className="grid gap-x-3 gap-y-6 sm:grid-cols-3">
         <div>
-          <Label htmlFor={`country-${initial?.countryCode ?? "new"}`}>{t("marketPack.country")}</Label>
+          <Label htmlFor={`country-${initial?.countryCode ?? "new"}`}>
+            {t("marketPack.country")}
+          </Label>
           <Input
             id={`country-${initial?.countryCode ?? "new"}`}
             name="countryCode"
@@ -35,7 +43,9 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
           />
         </div>
         <div>
-          <Label htmlFor={`from-${initial?.countryCode ?? "new"}`}>{t("marketPack.effectiveFrom")}</Label>
+          <Label htmlFor={`from-${initial?.countryCode ?? "new"}`}>
+            {t("marketPack.effectiveFrom")}
+          </Label>
           <Input
             id={`from-${initial?.countryCode ?? "new"}`}
             name="effectiveFrom"
@@ -45,7 +55,9 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
           />
         </div>
         <div>
-          <Label htmlFor={`version-${initial?.countryCode ?? "new"}`}>{t("marketPack.version")}</Label>
+          <Label htmlFor={`version-${initial?.countryCode ?? "new"}`}>
+            {t("marketPack.version")}
+          </Label>
           <Input
             id={`version-${initial?.countryCode ?? "new"}`}
             name="version"
@@ -69,7 +81,10 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
         />
       </div>
       {state.error ? (
-        <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+        <p
+          role="alert"
+          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+        >
           {t(`errors.${state.error}` as never)}
         </p>
       ) : null}

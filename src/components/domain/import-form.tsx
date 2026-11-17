@@ -57,7 +57,7 @@ export function ImportForm({ labels }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <Form {...form}>
-        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
           <FormField
             control={form.control}
             name="file"

@@ -137,7 +137,7 @@ export function MfaForm({ next, labels }: Props) {
       ) : null}
 
       {step === "verify" ? (
-        <form onSubmit={verify} className="flex flex-col gap-4">
+        <form onSubmit={verify} className="flex flex-col gap-6">
           {qr ? (
             <div className="flex flex-col gap-2 rounded-xl border border-hairline bg-surface-container-low p-4">
               <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -171,14 +171,17 @@ export function MfaForm({ next, labels }: Props) {
                   autoComplete={index === 0 ? "one-time-code" : "off"}
                   maxLength={1}
                   aria-label={`${labels.code} ${index + 1}`}
-                  className="h-12 w-11 text-center font-metric-num-sm text-body-md tabular"
+                  className="tabular h-12 w-11 text-center font-metric-num-sm text-body-md"
                 />
               ))}
             </div>
           </div>
 
           {error ? (
-            <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+            <p
+              role="alert"
+              className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+            >
               {error}
             </p>
           ) : null}

@@ -37,7 +37,7 @@ export function AuthForm({
   const isNotice = state.error === "check_email";
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form action={formAction} className="flex flex-col gap-6">
       {hidden
         ? Object.entries(hidden).map(([name, value]) => (
             <input key={name} type="hidden" name={name} value={value} />

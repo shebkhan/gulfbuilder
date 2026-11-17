@@ -68,7 +68,7 @@ export function DocumentUploadForm({
         noValidate
         className="flex max-w-xl flex-col gap-4"
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="entityType"
@@ -122,7 +122,7 @@ export function DocumentUploadForm({
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="kind"

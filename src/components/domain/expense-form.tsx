@@ -268,9 +268,9 @@ export function ExpenseForm({
             <form
               onSubmit={form.handleSubmit((values) => createDispatch(toFormData(values)))}
               noValidate
-              className="mt-4 flex flex-col gap-4"
+              className="mt-4 flex flex-col gap-6"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={form.control}
                   name="category"
@@ -334,7 +334,7 @@ export function ExpenseForm({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={form.control}
                   name="amount"

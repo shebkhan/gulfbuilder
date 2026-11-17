@@ -280,9 +280,9 @@ export function MaintenanceForm({
             <form
               onSubmit={createForm.handleSubmit((values) => createDispatch(toFormData(values)))}
               noValidate
-              className="mt-4 flex flex-col gap-4"
+              className="mt-4 flex flex-col gap-6"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={createForm.control}
                   name="buildingId"
@@ -358,7 +358,7 @@ export function MaintenanceForm({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={createForm.control}
                   name="category"
@@ -498,7 +498,7 @@ export function MaintenanceForm({
               <form
                 onSubmit={statusForm.handleSubmit((values) => statusDispatch(toFormData(values)))}
                 noValidate
-                className="mt-4 flex flex-col gap-4"
+                className="mt-4 flex flex-col gap-6"
               >
                 <FormField
                   control={statusForm.control}

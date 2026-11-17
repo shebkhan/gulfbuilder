@@ -362,7 +362,7 @@ export function ChequeTable({
             <form
               onSubmit={registerForm.handleSubmit((values) => registerDispatch(toFormData(values)))}
               noValidate
-              className="mt-4 flex flex-col gap-4"
+              className="mt-4 flex flex-col gap-6"
             >
               <FormField
                 control={registerForm.control}
@@ -408,7 +408,7 @@ export function ChequeTable({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={registerForm.control}
                   name="chequeNo"
@@ -437,7 +437,7 @@ export function ChequeTable({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                 <FormField
                   control={registerForm.control}
                   name="amount"
@@ -497,7 +497,7 @@ export function ChequeTable({
             <DialogHeader>
               <DialogTitle>{t("bounceTitle", { no: bounceTarget.cheque_no })}</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-4">
+            <form onSubmit={handleBounceSubmit} className="mt-4 flex flex-col gap-6">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="bounce-reason">{t("bounceReason")}</Label>
                 <Input
@@ -536,7 +536,7 @@ export function ChequeTable({
               <form
                 onSubmit={replaceForm.handleSubmit((values) => replaceDispatch(toFormData(values)))}
                 noValidate
-                className="mt-4 flex flex-col gap-4"
+                className="mt-4 flex flex-col gap-6"
               >
                 <FormField
                   control={replaceForm.control}
@@ -569,7 +569,7 @@ export function ChequeTable({
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                   <FormField
                     control={replaceForm.control}
                     name="amount"

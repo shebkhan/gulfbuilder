@@ -35,7 +35,7 @@ export function TenantRequestForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-xl border border-hairline bg-surface-container-lowest p-4"
+      className="flex flex-col gap-6 rounded-xl border border-hairline bg-surface-container-lowest p-4"
     >
       <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("newTitle")}</h2>
 
@@ -63,7 +63,7 @@ export function TenantRequestForm() {
         <Textarea id="request-description" name="description" rows={3} maxLength={1000} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="request-category">{t("category")}</Label>
           <Select name="category" defaultValue="general">

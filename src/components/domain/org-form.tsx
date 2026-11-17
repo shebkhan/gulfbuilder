@@ -65,7 +65,7 @@ export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: P
           dispatch(formData);
         })}
         noValidate
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-6"
       >
         <FormField
           control={form.control}
@@ -95,7 +95,7 @@ export function OrgForm({ locale, pendingLabel, labels, markets, currencies }: P
           )}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-x-4 gap-y-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="countryCode"

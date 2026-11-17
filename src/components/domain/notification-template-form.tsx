@@ -6,13 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -57,7 +51,7 @@ export function NotificationTemplateForm() {
         noValidate
         className="flex max-w-2xl flex-col gap-4"
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
           <FormField
             control={form.control}
             name="event"

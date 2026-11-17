@@ -206,7 +206,7 @@ export function LeaseForm({
         onSubmit={form.handleSubmit((data) => dispatch(toFormData(data)))}
         className="flex flex-col gap-6"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-x-4 gap-y-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="tenantId"

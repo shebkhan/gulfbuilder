@@ -91,9 +91,9 @@ export function FloorsForm({ buildingId, labels }: { buildingId: string; labels:
           <form
             onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
             noValidate
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-6"
           >
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-6">
               <FormField
                 control={form.control}
                 name="from"
@@ -167,7 +167,7 @@ export function UnitsForm({
           <form
             onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
             noValidate
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-6"
           >
             <FormField
               control={form.control}
@@ -193,7 +193,7 @@ export function UnitsForm({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-6">
               <FormField
                 control={form.control}
                 name="prefix"

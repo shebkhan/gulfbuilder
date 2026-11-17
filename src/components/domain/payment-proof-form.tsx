@@ -34,7 +34,7 @@ export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-xl border border-hairline bg-surface-container-lowest p-4"
+      className="flex flex-col gap-6 rounded-xl border border-hairline bg-surface-container-lowest p-4"
     >
       <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("uploadTitle")}</h2>
       <p className="font-body-sm text-body-sm text-on-surface-variant">{t("uploadHint")}</p>
@@ -50,7 +50,7 @@ export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
         </p>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="proof-amount">{t("amount")} (QAR)</Label>
           <Input

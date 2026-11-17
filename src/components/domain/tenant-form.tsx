@@ -76,7 +76,7 @@ export function TenantForm({ labels }: Props) {
       <form
         onSubmit={form.handleSubmit((values) => dispatch(toFormData(values)))}
         noValidate
-        className="grid gap-4 sm:grid-cols-2"
+        className="grid gap-x-4 gap-y-6 sm:grid-cols-2"
       >
         <FormField
           control={form.control}

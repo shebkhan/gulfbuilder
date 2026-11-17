@@ -142,7 +142,7 @@ export function PaymentForm({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={onSubmit} noValidate className="mt-4 flex flex-col gap-4">
+          <form onSubmit={onSubmit} noValidate className="mt-4 flex flex-col gap-6">
             <FormField
               control={form.control}
               name="tenantId"
@@ -186,7 +186,7 @@ export function PaymentForm({
               />
             ) : null}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="amount"
@@ -231,7 +231,7 @@ export function PaymentForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="receivedAt"

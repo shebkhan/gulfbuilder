@@ -32,12 +32,18 @@ function Feedback({ state, ok }: { state: PlatformState; ok: string }) {
   return (
     <>
       {state.error ? (
-        <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+        <p
+          role="alert"
+          className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container"
+        >
           {t(`errors.${state.error}` as never)}
         </p>
       ) : null}
       {state.ok ? (
-        <p role="status" className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container">
+        <p
+          role="status"
+          className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container"
+        >
           {ok}
         </p>
       ) : null}
@@ -47,32 +53,58 @@ function Feedback({ state, ok }: { state: PlatformState; ok: string }) {
 
 export function CreateOrganizationForm() {
   const t = useTranslations("platform");
-  const [state, action, pending] = useActionState<PlatformState, FormData>(createOrganizationAction, {});
+  const [state, action, pending] = useActionState<PlatformState, FormData>(
+    createOrganizationAction,
+    {},
+  );
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-6">
       <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("createOrg")}</h2>
       <div>
         <Label htmlFor="orgName">{t("orgName")}</Label>
         <Input id="orgName" name="name" required minLength={2} />
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-x-3 gap-y-6 sm:grid-cols-3">
         <div>
           <Label htmlFor="orgSlug">{t("orgSlug")}</Label>
-          <Input id="orgSlug" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?" dir="ltr" />
+          <Input
+            id="orgSlug"
+            name="slug"
+            required
+            pattern="[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?"
+            dir="ltr"
+          />
         </div>
         <div>
           <Label htmlFor="orgCountry">{t("country")}</Label>
-          <Input id="orgCountry" name="countryCode" defaultValue="QA" maxLength={2} dir="ltr" required />
+          <Input
+            id="orgCountry"
+            name="countryCode"
+            defaultValue="QA"
+            maxLength={2}
+            dir="ltr"
+            required
+          />
         </div>
         <div>
           <Label htmlFor="orgCurrency">{t("currency")}</Label>
-          <Input id="orgCurrency" name="baseCurrency" defaultValue="QAR" maxLength={3} dir="ltr" required />
+          <Input
+            id="orgCurrency"
+            name="baseCurrency"
+            defaultValue="QAR"
+            maxLength={3}
+            dir="ltr"
+            required
+          />
         </div>
       </div>
       <Feedback state={state} ok={state.orgId ? t("created") : ""} />
       {state.orgId ? (
-        <Link href={`/platform/organizations/${state.orgId}`} className="font-body-sm text-body-sm text-primary underline">
+        <Link
+          href={`/platform/organizations/${state.orgId}`}
+          className="font-body-sm text-body-sm text-primary underline"
+        >
           {t("openOrg")}
         </Link>
       ) : null}
@@ -95,15 +127,18 @@ export function OrganizationPlanForm({
   currentFeatures: Record<string, boolean>;
 }) {
   const t = useTranslations("platform");
-  const [state, action, pending] = useActionState<PlatformState, FormData>(setOrganizationPlanAction, {});
+  const [state, action, pending] = useActionState<PlatformState, FormData>(
+    setOrganizationPlanAction,
+    {},
+  );
   const features = ["owner_portal", "tenant_portal", "analytics", "custom_domain"] as const;
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="orgId" value={orgId} />
       <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("plan.title")}</h2>
       <p className="font-body-sm text-body-sm text-on-surface-variant">{t("plan.hint")}</p>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-x-3 gap-y-6 sm:grid-cols-3">
         <div>
           <Label htmlFor="planCode">{t("plan.plan")}</Label>
           <Select name="planCode" defaultValue={current.planCode ?? plans[0]?.code} required>
@@ -136,15 +171,29 @@ export function OrganizationPlanForm({
         </div>
         <div>
           <Label htmlFor="periodEnd">{t("plan.periodEnd")}</Label>
-          <Input id="periodEnd" name="periodEnd" type="date" defaultValue={current.periodEnd?.slice(0, 10) ?? ""} />
+          <Input
+            id="periodEnd"
+            name="periodEnd"
+            type="date"
+            defaultValue={current.periodEnd?.slice(0, 10) ?? ""}
+          />
         </div>
       </div>
       <div>
         <Label htmlFor="maxUnits">{t("plan.maxUnits")}</Label>
-        <Input id="maxUnits" name="maxUnits" type="number" min={0} defaultValue={0} className="max-w-xs" />
+        <Input
+          id="maxUnits"
+          name="maxUnits"
+          type="number"
+          min={0}
+          defaultValue={0}
+          className="max-w-xs"
+        />
       </div>
       <fieldset className="flex flex-wrap gap-x-6 gap-y-2">
-        <legend className="font-label-md text-label-md font-medium text-on-surface">{t("plan.features")}</legend>
+        <legend className="font-label-md text-label-md font-medium text-on-surface">
+          {t("plan.features")}
+        </legend>
         {features.map((feature) => (
           <div key={feature} className="flex items-center gap-2">
             <Checkbox
@@ -153,7 +202,10 @@ export function OrganizationPlanForm({
               value={feature}
               defaultChecked={currentFeatures[feature] === true}
             />
-            <Label htmlFor={`feature-${feature}`} className="mb-0 font-body-sm normal-case tracking-normal text-on-surface">
+            <Label
+              htmlFor={`feature-${feature}`}
+              className="mb-0 font-body-sm normal-case tracking-normal text-on-surface"
+            >
               {feature}
             </Label>
           </div>
@@ -169,13 +221,16 @@ export function OrganizationPlanForm({
 
 export function UsageSnapshotForm({ orgId }: { orgId: string }) {
   const t = useTranslations("platform");
-  const [state, action, pending] = useActionState<PlatformState, FormData>(recordUsageSnapshotAction, {});
+  const [state, action, pending] = useActionState<PlatformState, FormData>(
+    recordUsageSnapshotAction,
+    {},
+  );
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="orgId" value={orgId} />
       <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("usage.record")}</h2>
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="grid gap-x-3 gap-y-6 sm:grid-cols-4">
         <div>
           <Label htmlFor="takenOn">{t("usage.date")}</Label>
           <Input id="takenOn" name="takenOn" type="date" required />
@@ -223,7 +278,11 @@ export function ImpersonateButton({
       <Button type="submit" variant="ghost" size="sm" disabled={pending} title={state.error ?? ""}>
         {pending ? t("working") : t("impersonate")}
       </Button>
-      {state.ok ? <span role="status" className="font-body-sm text-body-sm text-secondary">{t("impersonated")}</span> : null}
+      {state.ok ? (
+        <span role="status" className="font-body-sm text-body-sm text-secondary">
+          {t("impersonated")}
+        </span>
+      ) : null}
       <span className="sr-only">{name}</span>
     </form>
   );

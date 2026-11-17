@@ -238,7 +238,7 @@ export function DepositCard({
               <form
                 onSubmit={deductForm.handleSubmit((values) => deductDispatch(toFormData(values)))}
                 noValidate
-                className="mt-4 flex flex-col gap-4"
+                className="mt-4 flex flex-col gap-6"
               >
                 <FormField
                   control={deductForm.control}
@@ -305,7 +305,7 @@ export function DepositCard({
               <form
                 onSubmit={refundForm.handleSubmit((values) => refundDispatch(toFormData(values)))}
                 noValidate
-                className="mt-4 flex flex-col gap-4"
+                className="mt-4 flex flex-col gap-6"
               >
                 <FormField
                   control={refundForm.control}
