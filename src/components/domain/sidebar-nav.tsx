@@ -42,6 +42,8 @@ const ICONS: Record<string, LucideIcon> = {
   approvals: ClipboardCheck,
   documents: FileText,
   meters: Gauge,
+  platform: Building2,
+  marketPacks: FileText,
 };
 
 export type SidebarItem = { href: string; label: string; icon: string };

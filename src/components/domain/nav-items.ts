@@ -72,6 +72,17 @@ export const OWNER_NAV: NavItem[] = [
   { href: "/owner/documents", labelKey: "documents", icon: FileText, capability: "reports.read" },
 ];
 
+/** Platform console (SPEC §8): super-admin only, no organization membership required. */
+export const PLATFORM_NAV: NavItem[] = [
+  { href: "/platform", labelKey: "platform", icon: LayoutDashboard, capability: "platform.admin" },
+  {
+    href: "/platform/market-packs",
+    labelKey: "marketPacks",
+    icon: FileText,
+    capability: "platform.admin",
+  },
+];
+
 export function visibleNav(role: Role | null, items: NavItem[] = NAV_ITEMS): NavItem[] {
   return items.filter((item) => can(role, item.capability));
 }

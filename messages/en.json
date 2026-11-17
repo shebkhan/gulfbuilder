@@ -20,7 +20,9 @@
     "payouts": "Payouts",
     "approvals": "Approvals",
     "documents": "Documents",
-    "meters": "Meters"
+    "meters": "Meters",
+    "platform": "Platform",
+    "marketPacks": "Market packs"
   },
   "common": {
     "appName": "Gulf Property",
@@ -1043,6 +1045,72 @@
       "invalid_input": "Check the details and try again.",
       "invalid_value": "Enter the meter value as a number.",
       "failed": "Could not save. Try again."
+    }
+  },
+  "platform": {
+    "title": "Platform console",
+    "subtitle": "Organizations, plans, usage and market packs",
+    "organizations": "Organizations",
+    "empty": "No organizations yet.",
+    "createOrg": "Create organization",
+    "orgName": "Organization name",
+    "orgSlug": "Slug",
+    "country": "Country code",
+    "currency": "Currency",
+    "create": "Create",
+    "created": "Organization created.",
+    "openOrg": "Open organization",
+    "working": "Working…",
+    "save": "Save",
+    "impersonate": "Switch active org",
+    "members": "Members",
+    "emptyMembers": "No members yet.",
+    "member": "Member",
+    "role": "Role",
+    "actions": "Actions",
+    "summary": {
+      "organizations": "Organizations",
+      "mrr": "Monthly recurring revenue",
+      "units": "Units",
+      "users": "Users"
+    },
+    "plan": {
+      "title": "Plan and feature flags",
+      "hint": "Feature flags belong to the plan, so every organization on this plan is affected.",
+      "plan": "Plan",
+      "status": "Status",
+      "periodEnd": "Period ends",
+      "maxUnits": "Unit limit",
+      "features": "Features",
+      "saved": "Plan saved."
+    },
+    "usage": {
+      "title": "Usage snapshots",
+      "empty": "No snapshots recorded yet.",
+      "record": "Record snapshot",
+      "date": "Date",
+      "units": "Units",
+      "users": "Users",
+      "storage": "Storage (MB)",
+      "saved": "Snapshot saved."
+    },
+    "marketPack": {
+      "title": "Market packs",
+      "subtitle": "Rules JSON per country, effective from a given date.",
+      "country": "Country code",
+      "effectiveFrom": "Effective from",
+      "version": "Version",
+      "rules": "Rules (JSON)",
+      "saved": "Market pack saved."
+    },
+    "errors": {
+      "not_authorised": "You are not allowed to use the platform console.",
+      "invalid_input": "Check the details and try again.",
+      "invalid_slug": "Use lowercase letters, numbers and dashes.",
+      "slug_taken": "That slug is already taken.",
+      "failed": "Could not save. Try again.",
+      "plan_not_found": "Unknown plan.",
+      "invalid_rules": "Rules must be valid JSON."
     }
   },
   "pagination": {
