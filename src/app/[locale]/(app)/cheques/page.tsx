@@ -29,6 +29,7 @@ export default async function ChequesPage({
 
   const { status, page } = await searchParams;
   const t = await getTranslations("cheques");
+  const tCommon = await getTranslations("common");
   const writable = ["org_admin", "manager", "accountant"].includes(ctx.role);
 
   // Fetch cheques
@@ -99,7 +100,7 @@ export default async function ChequesPage({
   }));
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "received", label: t("statuses.received") },
     { key: "deposited", label: t("statuses.deposited") },
     { key: "cleared", label: t("statuses.cleared") },

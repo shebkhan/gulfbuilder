@@ -107,7 +107,7 @@ export default async function ReportsPage({
   const formAction = `/${locale}/reports`;
 
   const tabs = [
-    { key: "overview", label: "Executive Summary" },
+    { key: "overview", label: t("executiveSummary") },
     { key: "occupancy", label: t("occupancy") },
     { key: "expiry", label: t("expiry") },
     { key: "collections", label: t("collections") },
@@ -158,7 +158,7 @@ export default async function ReportsPage({
                 {kpis?.occupancy_pct ?? 0}%
               </span>
               <span className="text-xs text-on-surface-variant">
-                {kpis?.occupied_units ?? 0} of {kpis?.total_units ?? 0} units
+                {t("unitsSummary", { occupied: kpis?.occupied_units ?? 0, total: kpis?.total_units ?? 0 })}
               </span>
             </div>
           </CardBody>
@@ -280,7 +280,7 @@ export default async function ReportsPage({
             <div className="flex items-center justify-between">
               <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("rentRoll")}</h2>
               <Link href="/reports?tab=rent_roll" className="text-xs text-primary hover:underline">
-                View all
+                {t("viewAll")}
               </Link>
             </div>
             {rentRoll.length === 0 ? (
@@ -293,7 +293,7 @@ export default async function ReportsPage({
                   <div key={idx} className="flex items-center justify-between py-2.5 text-sm">
                     <div className="flex flex-col">
                       <span className="font-medium text-on-surface">
-                        {r.building_code} — Unit {r.unit_no}
+                        {r.building_code} — {t("unit")} {r.unit_no}
                       </span>
                       <span className="text-xs text-on-surface-variant">{r.tenant_name}</span>
                     </div>
@@ -316,7 +316,7 @@ export default async function ReportsPage({
                 href="/reports?tab=aged_receivables"
                 className="text-xs text-primary hover:underline"
               >
-                View all
+                {t("viewAll")}
               </Link>
             </div>
             {agedReceivables.length === 0 ? (
@@ -330,7 +330,7 @@ export default async function ReportsPage({
                     <div className="flex flex-col">
                       <span className="font-medium text-on-surface">{a.tenant_name}</span>
                       <span className="text-xs text-on-surface-variant">
-                        {a.days_overdue} days overdue (Due: {a.due_date})
+                        {t("overdueDue", { days: a.days_overdue, date: a.due_date })}
                       </span>
                     </div>
                     <span className="font-semibold text-error">
@@ -373,7 +373,7 @@ export default async function ReportsPage({
                       <td className="p-4 text-on-surface">{r.tenant_name}</td>
                       <td className="p-4 font-mono text-primary">{r.lease_no}</td>
                       <td className="p-4 text-on-surface-variant">
-                        {r.start_date} to {r.end_date}
+                        {r.start_date} {t("to")} {r.end_date}
                       </td>
                       <td className="p-4">
                         <Badge variant={r.status === "active" ? "success" : "neutral"}>
@@ -414,10 +414,10 @@ export default async function ReportsPage({
                     <tr key={idx} className="transition-colors hover:bg-surface-container-low/50">
                       <td className="p-4 font-medium text-on-surface">{a.tenant_name}</td>
                       <td className="p-4 font-mono text-primary">{a.lease_no}</td>
-                      <td className="p-4 text-on-surface-variant">{a.days_overdue} days</td>
+                      <td className="p-4 text-on-surface-variant">{a.days_overdue} {t("days")}</td>
                       <td className="p-4">
                         <Badge variant={getAgingBadgeVariant(a.bucket)}>
-                          {a.bucket.replace("_", "-")} days
+                          {a.bucket.replace("_", "-")} {t("days")}
                         </Badge>
                       </td>
                       <td className="p-4 text-end font-semibold text-error">
@@ -468,7 +468,7 @@ export default async function ReportsPage({
                       >
                         <td className="p-4 font-semibold text-on-surface">{owner?.name || "—"}</td>
                         <td className="p-4 text-on-surface-variant">
-                          {s.period_start} to {s.period_end}
+                          {s.period_start} {t("to")} {s.period_end}
                         </td>
                         <td className="p-4">
                           <Badge variant={s.status === "issued" ? "success" : "neutral"}>

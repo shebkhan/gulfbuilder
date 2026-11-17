@@ -31,6 +31,7 @@ export default async function ExpensesPage({
 
   const { page, status, category } = await searchParams;
   const t = await getTranslations("expenses");
+  const tCommon = await getTranslations("common");
 
   const canWrite = can(ctx.role, "expenses.write");
   const canApprove = can(ctx.role, "expenses.approve");
@@ -110,7 +111,7 @@ export default async function ExpensesPage({
   const paged = paginate(transformedExpenses, Number(page ?? 1));
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "submitted", label: t("statuses.submitted") },
     { key: "approved", label: t("statuses.approved") },
     { key: "paid", label: t("statuses.paid") },

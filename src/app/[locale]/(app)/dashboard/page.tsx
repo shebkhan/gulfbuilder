@@ -453,7 +453,7 @@ export default async function DashboardPage({
                   {rawMaintRequests.map((req) => {
                     const building = req.buildings as unknown as { code: string } | null;
                     const unit = req.units as unknown as { unit_no: string } | null;
-                    const location = [building?.code, unit?.unit_no ? `Unit ${unit.unit_no}` : "Common Area"]
+                    const location = [building?.code, unit?.unit_no ? t("unitLabel", { no: unit.unit_no }) : t("commonArea")]
                       .filter(Boolean)
                       .join(" · ");
 

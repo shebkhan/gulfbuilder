@@ -30,6 +30,7 @@ export default async function MaintenancePage({
 
   const { page, status, priority } = await searchParams;
   const t = await getTranslations("maintenance");
+  const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
   // Fetch requests
@@ -120,7 +121,7 @@ export default async function MaintenancePage({
   const paged = paginate(transformedRequests, Number(page ?? 1));
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "open", label: t("statuses.open") },
     { key: "in_progress", label: t("statuses.in_progress") },
     { key: "waiting_parts", label: t("statuses.waiting_parts") },

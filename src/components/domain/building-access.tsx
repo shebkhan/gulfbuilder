@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -66,6 +66,13 @@ export function BuildingAccess({
     grantBuildingAccessAction,
     {},
   );
+
+  // Revalidation removes the just-granted user; keep the select on a still-available one.
+  useEffect(() => {
+    if (!available.some((member) => member.id === form.getValues("userId"))) {
+      form.setValue("userId", available[0]?.id ?? "", { shouldValidate: true });
+    }
+  }, [available, form]);
 
   return (
     <div className="flex flex-col gap-4">

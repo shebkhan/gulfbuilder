@@ -215,7 +215,7 @@ export default async function LeaseDetailPage({
               <div className="flex justify-between py-2">
                 <span className="font-body-sm text-body-sm text-on-surface-variant">{t("isSublet")}</span>
                 <Badge variant={lease.sublet_approved_by ? "success" : "warning"}>
-                  {lease.sublet_approved_by ? t("subletApproved") : "Pending Approval"}
+                  {lease.sublet_approved_by ? t("subletApproved") : t("pendingApproval")}
                 </Badge>
               </div>
             ) : null}

@@ -37,7 +37,9 @@
     "daysLeftHeader": "Days left",
     "relatedSections": "Related sections",
     "cancel": "Cancel",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "all": "All",
+    "unknown": "Unknown"
   },
   "validation": {
     "required": "This field is required",
@@ -105,6 +107,8 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "unitLabel": "Unit {no}",
+    "commonArea": "Common Area",
     "empty": "Portfolio overview, operational alerts, and real-time financial metrics.",
     "orgCreated": "Organization created",
     "expiringLeases": "Leases expiring soon",
@@ -489,6 +493,7 @@
   },
   "leases": {
     "title": "Leases",
+    "pendingApproval": "Pending Approval",
     "subtitle": "Active, draft and past tenancy agreements.",
     "new": "New lease",
     "leaseNo": "Lease number",
@@ -948,6 +953,11 @@
   "reports": {
     "title": "Reports & Financial Analytics",
     "subtitle": "Portfolio KPIs, rent roll, aged receivables, and owner distribution statements.",
+    "executiveSummary": "Executive Summary",
+    "viewAll": "View all",
+    "unitsSummary": "{occupied} of {total} units",
+    "overdueDue": "{days} days overdue (Due: {date})",
+    "days": "days",
     "rentRoll": "Rent Roll",
     "agedReceivables": "Aged Receivables",
     "statements": "Owner Statements",
@@ -1298,6 +1308,8 @@
   },
   "documents": {
     "title": "Document vault",
+    "tenantTag": "(tenant)",
+    "buildingTag": "(building)",
     "subtitle": "Contracts, IDs, receipts and photos for every entity.",
     "list": "Files",
     "empty": "No documents yet.",

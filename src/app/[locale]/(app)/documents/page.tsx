@@ -44,8 +44,8 @@ export default async function DocumentsPage({
       id: l.id,
       label: `${l.lease_no}${(l.tenants as unknown as { full_name: string } | null)?.full_name ? ` — ${(l.tenants as unknown as { full_name: string }).full_name}` : ""}`,
     })),
-    ...(tenants ?? []).map((x) => ({ id: x.id, label: `${x.full_name} (tenant)` })),
-    ...(buildings ?? []).map((b) => ({ id: b.id, label: `${b.code} — ${b.name} (building)` })),
+    ...(tenants ?? []).map((x) => ({ id: x.id, label: `${x.full_name} ${t("tenantTag")}` })),
+    ...(buildings ?? []).map((b) => ({ id: b.id, label: `${b.code} — ${b.name} ${t("buildingTag")}` })),
   ];
 
   const { data: documents } = await ctx.supabase

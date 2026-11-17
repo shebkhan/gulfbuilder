@@ -39,4 +39,21 @@ describe("completeInspectionSchema", () => {
       "validation.required",
     );
   });
+
+  it("requires a reason when a deduction amount is positive", () => {
+    expect(
+      messages(completeInspectionSchema, {
+        ...validComplete,
+        deductAmount: "150.00",
+        deductReason: "",
+      }),
+    ).toContain("validation.required");
+  });
+
+  it("allows an empty reason when there is no deduction", () => {
+    expect(
+      completeInspectionSchema.safeParse({ ...validComplete, deductAmount: "", deductReason: "" })
+        .success,
+    ).toBe(true);
+  });
 });

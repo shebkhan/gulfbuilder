@@ -29,6 +29,7 @@ export default async function InspectionsPage({
 
   const { kind, page } = await searchParams;
   const t = await getTranslations("inspections");
+  const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
   // Fetch inspections
@@ -68,7 +69,7 @@ export default async function InspectionsPage({
     return {
       id: l.id,
       lease_no: l.lease_no,
-      tenant_name: tenant?.full_name || "Unknown",
+      tenant_name: tenant?.full_name || tCommon("unknown"),
     };
   });
 
@@ -104,7 +105,7 @@ export default async function InspectionsPage({
   });
 
   const filterTabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: tCommon("all") },
     { key: "move_in", label: t("moveIn") },
     { key: "move_out", label: t("moveOut") },
   ];
