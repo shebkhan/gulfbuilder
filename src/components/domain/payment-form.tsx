@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -196,7 +198,7 @@ export function PaymentForm({
                       {t("amount")} ({tCommon("currency")})
                     </FormLabel>
                     <FormControl>
-                      <Input type="number" step="any" {...field} dir="ltr" />
+                      <NumberField step="any" {...field} dir="ltr" />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -239,7 +241,7 @@ export function PaymentForm({
                   <FormItem>
                     <FormLabel description={help.date}>{t("date")}</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} dir="ltr" />
+                      <DatePicker {...field} dir="ltr" />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import {
   Select,
   SelectContent,
@@ -534,8 +535,7 @@ export function MaintenanceForm({
                         {t("cost")} ({tCommon("currency")})
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
+                        <NumberField
                           step="0.01"
                           min="0"
                           {...field}

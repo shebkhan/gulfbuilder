@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -447,7 +449,7 @@ export function ChequeTable({
                         {t("amount")} ({tCommon("currency")})
                       </FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} dir="ltr" />
+                        <NumberField step="any" {...field} dir="ltr" />
                       </FormControl>
                       <LocalizedFormMessage />
                     </FormItem>
@@ -460,7 +462,7 @@ export function ChequeTable({
                     <FormItem>
                       <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} dir="ltr" />
+                        <DatePicker {...field} dir="ltr" />
                       </FormControl>
                       <LocalizedFormMessage />
                     </FormItem>
@@ -579,7 +581,7 @@ export function ChequeTable({
                           {t("amount")} ({tCommon("currency")})
                         </FormLabel>
                         <FormControl>
-                          <Input type="number" step="any" {...field} dir="ltr" />
+                          <NumberField step="any" {...field} dir="ltr" />
                         </FormControl>
                         <LocalizedFormMessage />
                       </FormItem>
@@ -592,7 +594,7 @@ export function ChequeTable({
                       <FormItem>
                         <FormLabel description={help.chequeDate}>{t("dueDate")}</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} dir="ltr" />
+                          <DatePicker {...field} dir="ltr" />
                         </FormControl>
                         <LocalizedFormMessage />
                       </FormItem>

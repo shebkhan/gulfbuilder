@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MonthPicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   closePeriodAction,
@@ -33,7 +34,7 @@ export function PeriodControls() {
         <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("closePeriod")}</h2>
         <div>
           <Label htmlFor="closeMonth">{t("month")}</Label>
-          <Input id="closeMonth" name="month" type="month" required />
+          <MonthPicker id="closeMonth" name="month" required />
         </div>
         {closeState.error ? (
           <p
@@ -60,7 +61,7 @@ export function PeriodControls() {
         <h2 className="font-headline-sm text-headline-sm text-on-surface">{t("reopenPeriod")}</h2>
         <div>
           <Label htmlFor="reopenMonth">{t("month")}</Label>
-          <Input id="reopenMonth" name="month" type="month" required />
+          <MonthPicker id="reopenMonth" name="month" required />
         </div>
         <div>
           <Label htmlFor="reason">{t("reason")}</Label>

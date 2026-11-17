@@ -9,6 +9,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -164,7 +165,7 @@ export function DocumentUploadForm({
               <FormItem>
                 <FormLabel description={help.expiresOn}>{t("expiresOn")}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value ?? ""} dir="ltr" />
+                  <DatePicker {...field} value={field.value ?? ""} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>

@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -396,8 +397,7 @@ export function InspectionForm({
                         <FormItem>
                           <FormLabel description={help.deductAmount}>{t("deductAmount")}</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
+                            <NumberField
                               step="0.01"
                               min="0"
                               {...field}

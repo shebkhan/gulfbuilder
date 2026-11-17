@@ -8,6 +8,8 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -207,7 +209,7 @@ export function MeterForms({
               <FormItem>
                 <FormLabel description={help.readOn}>{t("readOn")}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} dir="ltr" />
+                  <DatePicker {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -221,7 +223,7 @@ export function MeterForms({
               <FormItem>
                 <FormLabel description={help.value}>{t("value")}</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.001" min="0" {...field} dir="ltr" />
+                  <NumberField step="0.001" min="0" {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>

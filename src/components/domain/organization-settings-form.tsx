@@ -8,6 +8,7 @@ import { LocalizedFormMessage } from "@/components/domain/localized-form-message
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import {
   Select,
   SelectContent,
@@ -175,7 +176,7 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
               <FormItem>
                 <FormLabel>{t("graceDays")}</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" min={0} max={90} />
+                  <NumberField {...field} min={0} max={90} />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -225,7 +226,7 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
               <FormItem>
                 <FormLabel>{t("lateFeePercent")}</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" min={0} max={100} step="0.01" />
+                  <NumberField {...field} min={0} max={100} step="0.01" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -239,7 +240,7 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
               <FormItem>
                 <FormLabel>{t("taxRate")}</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" min={0} max={100} step="0.01" />
+                  <NumberField {...field} min={0} max={100} step="0.01" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -253,7 +254,7 @@ export function OrganizationSettingsForm({ values }: { values: OrganizationSetti
               <FormItem>
                 <FormLabel>{t("reminderDays")}</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" min={0} max={60} />
+                  <NumberField {...field} min={0} max={60} />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>

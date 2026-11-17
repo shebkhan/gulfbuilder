@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -53,11 +55,10 @@ export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
       <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="proof-amount">{t("amount")} (QAR)</Label>
-          <Input
+          <NumberField
             id="proof-amount"
             required
             name="amount"
-            type="number"
             step="0.01"
             min="0.01"
             inputMode="decimal"
@@ -83,11 +84,10 @@ export function PaymentProofForm({ locale = "en" }: { locale?: string }) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="proof-date">{t("date")}</Label>
-        <Input
+        <DatePicker
           id="proof-date"
           required
           name="receivedOn"
-          type="date"
           defaultValue={new Date().toISOString().slice(0, 10)}
         />
       </div>

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -333,7 +335,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel>{labels.startDate}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} dir="ltr" />
+                  <DatePicker {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -347,7 +349,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel>{labels.endDate}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} dir="ltr" />
+                  <DatePicker {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -361,7 +363,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel description={labels.rentHint}>{labels.rent}</FormLabel>
                 <FormControl>
-                  <Input type="number" step="any" {...field} dir="ltr" />
+                  <NumberField step="any" {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -414,7 +416,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel>{labels.installments}</FormLabel>
                 <FormControl>
-                  <Input type="number" min={1} max={60} {...field} dir="ltr" />
+                  <NumberField min={1} max={60} {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -428,7 +430,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel description={labels.dueDayHint}>{labels.dueDay}</FormLabel>
                 <FormControl>
-                  <Input type="number" min={1} max={28} {...field} dir="ltr" />
+                  <NumberField min={1} max={28} {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -442,7 +444,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel description={labels.depositHint}>{labels.deposit}</FormLabel>
                 <FormControl>
-                  <Input type="number" step="any" {...field} value={field.value ?? ""} dir="ltr" />
+                  <NumberField step="any" {...field} value={field.value ?? ""} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>
@@ -456,7 +458,7 @@ export function LeaseForm({
               <FormItem>
                 <FormLabel description={labels.noticeDaysHint}>{labels.noticeDays}</FormLabel>
                 <FormControl>
-                  <Input type="number" min={0} {...field} dir="ltr" />
+                  <NumberField min={0} {...field} dir="ltr" />
                 </FormControl>
                 <LocalizedFormMessage />
               </FormItem>

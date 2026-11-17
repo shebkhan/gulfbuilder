@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -48,11 +48,11 @@ export async function ReportFilters({ action, tab, from, to, building, buildings
       <input type="hidden" name="tab" value={tab} />
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="from">{t("from")}</Label>
-        <Input id="from" name="from" type="date" defaultValue={from} className={field} />
+        <DatePicker id="from" name="from" defaultValue={from} className={field} />
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="to">{t("to")}</Label>
-        <Input id="to" name="to" type="date" defaultValue={to} className={field} />
+        <DatePicker id="to" name="to" defaultValue={to} className={field} />
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="building">{t("building")}</Label>

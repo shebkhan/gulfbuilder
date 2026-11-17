@@ -6,6 +6,8 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -171,24 +173,16 @@ export function OrganizationPlanForm({
         </div>
         <div>
           <Label htmlFor="periodEnd">{t("plan.periodEnd")}</Label>
-          <Input
+          <DatePicker
             id="periodEnd"
             name="periodEnd"
-            type="date"
             defaultValue={current.periodEnd?.slice(0, 10) ?? ""}
           />
         </div>
       </div>
       <div>
         <Label htmlFor="maxUnits">{t("plan.maxUnits")}</Label>
-        <Input
-          id="maxUnits"
-          name="maxUnits"
-          type="number"
-          min={0}
-          defaultValue={0}
-          className="max-w-xs"
-        />
+        <NumberField id="maxUnits" name="maxUnits" min={0} defaultValue={0} className="max-w-xs" />
       </div>
       <fieldset className="flex flex-wrap gap-x-6 gap-y-2">
         <legend className="font-label-md text-label-md font-medium text-on-surface">
@@ -233,19 +227,19 @@ export function UsageSnapshotForm({ orgId }: { orgId: string }) {
       <div className="grid gap-x-3 gap-y-6 sm:grid-cols-4">
         <div>
           <Label htmlFor="takenOn">{t("usage.date")}</Label>
-          <Input id="takenOn" name="takenOn" type="date" required />
+          <DatePicker id="takenOn" name="takenOn" required />
         </div>
         <div>
           <Label htmlFor="units">{t("usage.units")}</Label>
-          <Input id="units" name="units" type="number" min={0} defaultValue={0} required />
+          <NumberField id="units" name="units" min={0} defaultValue={0} required />
         </div>
         <div>
           <Label htmlFor="users">{t("usage.users")}</Label>
-          <Input id="users" name="users" type="number" min={0} defaultValue={0} required />
+          <NumberField id="users" name="users" min={0} defaultValue={0} required />
         </div>
         <div>
           <Label htmlFor="storageMb">{t("usage.storage")}</Label>
-          <Input id="storageMb" name="storageMb" type="number" min={0} defaultValue={0} required />
+          <NumberField id="storageMb" name="storageMb" min={0} defaultValue={0} required />
         </div>
       </div>
       <Feedback state={state} ok={t("usage.saved")} />

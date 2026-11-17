@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import { toFormData } from "@/lib/form-data";
@@ -247,7 +248,7 @@ export function DepositCard({
                     <FormItem>
                       <FormLabel description={help.deductAmount}>{t("amount")}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} dir="ltr" />
+                        <NumberField step="any" {...field} dir="ltr" />
                       </FormControl>
                       <LocalizedFormMessage />
                     </FormItem>
@@ -314,7 +315,7 @@ export function DepositCard({
                     <FormItem>
                       <FormLabel description={help.refundAmount}>{t("amount")}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} dir="ltr" />
+                        <NumberField step="any" {...field} dir="ltr" />
                       </FormControl>
                       <LocalizedFormMessage />
                     </FormItem>

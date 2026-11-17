@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateMarketPackAction, type PlatformState } from "@/server/actions/platform";
@@ -46,10 +48,9 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
           <Label htmlFor={`from-${initial?.countryCode ?? "new"}`}>
             {t("marketPack.effectiveFrom")}
           </Label>
-          <Input
+          <DatePicker
             id={`from-${initial?.countryCode ?? "new"}`}
             name="effectiveFrom"
-            type="date"
             defaultValue={initial?.effectiveFrom?.slice(0, 10) ?? ""}
             required
           />
@@ -58,10 +59,9 @@ export function MarketPackForm({ initial }: { initial?: MarketPackOption }) {
           <Label htmlFor={`version-${initial?.countryCode ?? "new"}`}>
             {t("marketPack.version")}
           </Label>
-          <Input
+          <NumberField
             id={`version-${initial?.countryCode ?? "new"}`}
             name="version"
-            type="number"
             min={1}
             defaultValue={initial?.version ?? 1}
             required

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import {
   Select,
   SelectContent,
@@ -101,7 +102,7 @@ export function FloorsForm({ buildingId, labels }: { buildingId: string; labels:
                   <FormItem>
                     <FormLabel description={labels.help.from}>{labels.from}</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <NumberField {...field} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -114,7 +115,7 @@ export function FloorsForm({ buildingId, labels }: { buildingId: string; labels:
                   <FormItem>
                     <FormLabel description={labels.help.to}>{labels.to}</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <NumberField {...field} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -214,7 +215,7 @@ export function UnitsForm({
                   <FormItem>
                     <FormLabel description={labels.help.count}>{labels.count}</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <NumberField {...field} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -227,7 +228,7 @@ export function UnitsForm({
                   <FormItem>
                     <FormLabel description={labels.help.start}>{labels.start}</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <NumberField {...field} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -240,7 +241,7 @@ export function UnitsForm({
                   <FormItem>
                     <FormLabel description={labels.help.pad}>{labels.pad}</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <NumberField {...field} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
@@ -266,7 +267,7 @@ export function UnitsForm({
                   <FormItem>
                     <FormLabel description={labels.help.areaSqm}>{labels.area}</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
+                      <NumberField step="0.01" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <LocalizedFormMessage />
                   </FormItem>
