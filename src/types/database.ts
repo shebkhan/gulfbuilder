@@ -3461,6 +3461,7 @@ export type Database = {
           title: string
           unit_id: string
           unit_type: string | null
+          whatsapp: string | null
           zone: string | null
         }
         Relationships: []
@@ -3786,6 +3787,7 @@ export type Database = {
       is_empty: { Args: { "": string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
       is_publicly_listed: { Args: { p_unit: string }; Returns: boolean }
+      public_listing_org: { Args: { p_unit: string }; Returns: string }
       is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
       issue_owner_statement: {

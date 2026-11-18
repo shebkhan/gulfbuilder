@@ -13,6 +13,7 @@ const PROTECTED = [
   "/mfa",
   "/buildings",
   "/units",
+  "/listings",
   "/owners",
   "/tenants",
   "/leases",

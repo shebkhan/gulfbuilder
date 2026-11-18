@@ -68,6 +68,15 @@ $$;
 revoke all on function is_publicly_listed(uuid) from public;
 grant execute on function is_publicly_listed(uuid) to anon, authenticated;
 
+-- The anon insert policy needs the unit's org without reading `units` as anon
+-- (units has no anon SELECT policy), so resolve it through a definer too.
+create or replace function public_listing_org(p_unit uuid) returns uuid
+language sql stable security definer set search_path = public as $$
+  select u.org_id from units u where u.id = p_unit;
+$$;
+revoke all on function public_listing_org(uuid) from public;
+grant execute on function public_listing_org(uuid) to anon, authenticated;
+
 -- Explicit columns only: no tenant, contact, lease or internal financial data.
 create or replace view public_listings as
 select
@@ -88,8 +97,11 @@ select
   b.zone,
   b.name as building_name,
   b.latitude,
-  b.longitude
+  b.longitude,
+  coalesce(oi.config ->> 'phone', oi.config ->> 'number') as whatsapp
 from units u
+left join org_integrations oi on oi.org_id = u.org_id and oi.provider = 'whatsapp'
+
 join buildings b on b.id = u.building_id
 where u.is_listed_publicly
   and b.is_listed_publicly
@@ -114,7 +126,7 @@ create policy listing_enquiries_read on listing_enquiries for select
 create policy listing_enquiries_anon_insert on listing_enquiries for insert to anon
   with check (
     is_publicly_listed(unit_id)
-    and org_id = (select u.org_id from units u where u.id = unit_id)
+    and org_id = public_listing_org(unit_id)
   );
 create policy listing_enquiries_org_insert on listing_enquiries for insert to authenticated
   with check (org_id = auth_org());
