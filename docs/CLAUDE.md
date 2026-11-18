@@ -8,7 +8,7 @@ Project: Gulf Property Management Platform, a multi-tenant, white-label SaaS (bu
 
 - Next.js 15 (App Router, TypeScript strict), React 19
 - Supabase: Postgres, Auth, Storage, Edge Functions, pg_cron
-- Tailwind CSS, shadcn/ui, next-intl (en, ar), Zod, react-hook-form, TanStack Query, Recharts, @react-pdf/renderer
+- Tailwind CSS, shadcn/ui, next-intl (en, ar), Zod, react-hook-form, TanStack Query, Recharts, printable HTML (browser print)
 - Tests: Vitest (unit), Playwright (e2e), pgTAP (database and RLS)
 - Package manager: pnpm
 
@@ -60,7 +60,7 @@ Before declaring any task done, run: `pnpm lint && pnpm typecheck && pnpm test &
 
 ## Security rules
 
-- Never log or expose ID numbers, tokens or the service-role key. ID numbers are encrypted at rest (see `src/lib/crypto.ts`).
+- Never log or expose ID numbers, tokens or the service-role key. ID numbers are encrypted at rest via Postgres `encrypt_id`/`decrypt_id` (Vault + pgcrypto); see D-011.
 - Storage paths start with `{org_id}/`; bucket policies check that prefix. Use signed URLs.
 - Add a cross-tenant test (user in org A cannot read or write org B) for every new table.
 - Do not add third-party services or dependencies without noting them in `docs/DECISIONS.md`.

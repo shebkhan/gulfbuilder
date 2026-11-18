@@ -83,7 +83,7 @@ src/
   components/ui/           # shadcn primitives
   components/domain/       # StackingGrid, ChequeBoard, LedgerTable, LeaseForm, StatementView ...
   lib/supabase/(server | client | admin).ts
-  lib/(money | dates | hijri | rbac | crypto | pdf | i18n | kpi).ts
+  lib/(money | dates | hijri | rbac | i18n | kpi).ts
   schemas/*.ts             # Zod schemas shared by client and server
   server/actions/*.ts      # Server Actions per module
   server/queries/*.ts      # read models
