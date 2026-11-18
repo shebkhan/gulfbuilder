@@ -126,3 +126,134 @@ $$;
 
 revoke all on function public.enqueue_notification(uuid, text, text, text, text, jsonb, text) from public;
 revoke all on function public.render_notification(uuid, text, text, text, jsonb) from public;
+
+-- Row-event triggers. Each function only enqueues through the guarded helper above;
+-- money is formatted with format_money, never recomputed here.
+
+create or replace function public.payments_notify_received() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_recipient   text;
+  v_locale      text;
+  v_tenant_name text;
+begin
+  select t.email, coalesce(t.language, 'en'), t.full_name
+    into v_recipient, v_locale, v_tenant_name
+  from public.tenants t
+  where t.id = new.tenant_id;
+
+  perform public.enqueue_notification(
+    new.org_id, 'payment_received', 'email', v_recipient, v_locale,
+    jsonb_build_object(
+      'receipt_no', new.receipt_year::text || '-' || lpad(new.receipt_no::text, 4, '0'),
+      'amount', public.format_money(new.amount_minor, new.currency),
+      'tenant_name', v_tenant_name
+    ),
+    'payment:' || new.id
+  );
+  return new;
+end;
+$$;
+
+create or replace function public.charges_notify_overdue() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_recipient text;
+  v_locale    text;
+  v_lease_no  text;
+begin
+  select t.email, coalesce(t.language, 'en'), l.lease_no
+    into v_recipient, v_locale, v_lease_no
+  from public.leases l
+  join public.tenants t on t.id = l.tenant_id
+  where l.id = new.lease_id;
+
+  perform public.enqueue_notification(
+    new.org_id, 'rent_overdue', 'email', v_recipient, v_locale,
+    jsonb_build_object(
+      'amount', public.format_money(new.amount_minor, new.currency),
+      'due_date', to_char(new.due_date, 'YYYY-MM-DD'),
+      'lease_no', v_lease_no
+    ),
+    'charge-overdue:' || new.id
+  );
+  return new;
+end;
+$$;
+
+create or replace function public.maintenance_notify_created() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_rec     record;
+  v_unit_no text;
+begin
+  v_unit_no := coalesce((select unit_no from public.units where id = new.unit_id), '');
+  for v_rec in
+    select u.email, coalesce(p.locale, 'en') as locale
+    from public.org_members m
+    join auth.users u on u.id = m.user_id
+    left join public.profiles p on p.id = m.user_id
+    where m.org_id = new.org_id
+      and m.role in ('org_admin', 'manager', 'caretaker')
+      and u.email is not null
+  loop
+    perform public.enqueue_notification(
+      new.org_id, 'maintenance_requested', 'email', v_rec.email, v_rec.locale,
+      jsonb_build_object(
+        'title', new.title,
+        'unit_no', v_unit_no,
+        'status', new.status::text
+      ),
+      'maintenance-requested:' || new.id
+    );
+  end loop;
+  return new;
+end;
+$$;
+
+create or replace function public.maintenance_notify_status() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_recipient text;
+  v_locale    text;
+  v_unit_no   text;
+begin
+  if new.tenant_id is not null then
+    select t.email, coalesce(t.language, 'en')
+      into v_recipient, v_locale
+    from public.tenants t
+    where t.id = new.tenant_id;
+
+    v_unit_no := coalesce((select unit_no from public.units where id = new.unit_id), '');
+
+    perform public.enqueue_notification(
+      new.org_id, 'maintenance_status_changed', 'email', v_recipient, v_locale,
+      jsonb_build_object(
+        'title', new.title,
+        'status', new.status::text,
+        'unit_no', v_unit_no
+      ),
+      'maintenance-status:' || new.id || ':' || new.status::text
+    );
+  end if;
+  return new;
+end;
+$$;
+
+create trigger payments_notify_received
+  after insert on public.payments
+  for each row execute function public.payments_notify_received();
+
+create trigger charges_notify_overdue
+  after update of status on public.charges
+  for each row when (new.status = 'overdue' and new.status is distinct from old.status)
+  execute function public.charges_notify_overdue();
+
+create trigger maintenance_notify_created
+  after insert on public.maintenance_requests
+  for each row execute function public.maintenance_notify_created();
+
+create trigger maintenance_notify_status
+  after update of status on public.maintenance_requests
+  for each row when (new.status is distinct from old.status)
+  execute function public.maintenance_notify_status();
