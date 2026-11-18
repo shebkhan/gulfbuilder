@@ -370,50 +370,75 @@
         "inlineKeyboard": {
           "rows": [
             {
-              "row": [
-                {
-                  "text": "Cheques due",
-                  "callback_data": "cheques due this week"
-                },
-                {
-                  "text": "Units summary",
-                  "callback_data": "units summary"
-                }
-              ]
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Cheques due",
+                    "additionalFields": {
+                      "callback_data": "cheques due this week"
+                    }
+                  },
+                  {
+                    "text": "Units summary",
+                    "additionalFields": {
+                      "callback_data": "units summary"
+                    }
+                  }
+                ]
+              }
             },
             {
-              "row": [
-                {
-                  "text": "Digest",
-                  "callback_data": "daily digest"
-                },
-                {
-                  "text": "Maintenance",
-                  "callback_data": "open maintenance"
-                }
-              ]
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Digest",
+                    "additionalFields": {
+                      "callback_data": "daily digest"
+                    }
+                  },
+                  {
+                    "text": "Maintenance",
+                    "additionalFields": {
+                      "callback_data": "open maintenance"
+                    }
+                  }
+                ]
+              }
             },
             {
-              "row": [
-                {
-                  "text": "Receivables",
-                  "callback_data": "receivables"
-                },
-                {
-                  "text": "Leases expiring",
-                  "callback_data": "leases expiring 30 days"
-                }
-              ]
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Receivables",
+                    "additionalFields": {
+                      "callback_data": "receivables"
+                    }
+                  },
+                  {
+                    "text": "Leases expiring",
+                    "additionalFields": {
+                      "callback_data": "leases expiring 30 days"
+                    }
+                  }
+                ]
+              }
             },
             {
-              "row": [
-                {
-                  "text": "Approvals",
-                  "callback_data": "pending approvals"
-                }
-              ]
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Approvals",
+                    "additionalFields": {
+                      "callback_data": "pending approvals"
+                    }
+                  }
+                ]
+              }
             }
           ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
         }
       },
       "id": "reply",
