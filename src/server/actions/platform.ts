@@ -333,7 +333,7 @@ export async function upsertThemePresetAction(
   );
   if (error) return fail("failed");
 
-  await audit(ctx.admin, ctx.userId, "theme_presets", "upsert", null, parsed.data.code, parsed.data);
+  await audit(ctx.admin, ctx.userId, "theme_presets", "upsert", null, null, parsed.data);
   revalidatePath("/platform/themes");
   return { ok: "theme_saved" };
 }
@@ -369,7 +369,7 @@ export async function setDefaultThemePresetAction(
     .eq("code", parsed.data.code);
   if (setError) return fail("failed");
 
-  await audit(ctx.admin, ctx.userId, "theme_presets", "set_default", null, parsed.data.code, {
+  await audit(ctx.admin, ctx.userId, "theme_presets", "set_default", null, null, {
     code: parsed.data.code,
   });
   revalidatePath("/platform/themes");
