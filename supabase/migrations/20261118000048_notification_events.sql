@@ -257,3 +257,76 @@ create trigger maintenance_notify_status
   after update of status on public.maintenance_requests
   for each row when (new.status is distinct from old.status)
   execute function public.maintenance_notify_status();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- sweep_overdue: the body of mark_overdue_and_late_fees without auth_org()/auth_role(),
+-- so the reminder scan (Task 4) can sweep every org. Settings are read per org because
+-- p_org = null spans orgs with different grace periods and fee policies.
+-- ─────────────────────────────────────────────────────────────────────────────
+create or replace function public.sweep_overdue(p_org uuid default null) returns integer
+language plpgsql security definer set search_path = public as $$
+declare
+  v_count int := 0;
+  v_row   record;
+begin
+  -- Mark overdue
+  with marked as (
+    update public.charges c
+    set status = 'overdue'
+    from public.organizations o
+    where o.id = c.org_id
+      and (p_org is null or c.org_id = p_org)
+      and c.status in ('pending', 'partial')
+      and c.due_date + coalesce((o.settings->>'grace_days')::int, 0) < current_date
+    returning c.id
+  )
+  select count(*) into v_count from marked;
+
+  -- Late fee, once per charge (the unique key on charges stops a second run adding it).
+  -- The fee policy is per org, so the guard moves inside the loop.
+  for v_row in
+    select c.id, c.org_id, c.lease_id,
+           c.amount_minor - c.paid_minor as open_minor, c.currency, c.due_date,
+           coalesce((o.settings->>'late_fee_minor')::bigint, 0) as fee_minor,
+           coalesce((o.settings->>'late_fee_percent')::numeric, 0) as fee_pct
+    from public.charges c
+    join public.organizations o on o.id = c.org_id
+    where (p_org is null or c.org_id = p_org)
+      and c.status = 'overdue'
+      and c.due_date + coalesce((o.settings->>'grace_days')::int, 0) < current_date
+      and not exists (
+        select 1 from public.charges f
+        where f.lease_id = c.lease_id and f.type = 'late_fee' and f.period_start = c.due_date
+      )
+  loop
+    if v_row.fee_minor > 0 or v_row.fee_pct > 0 then
+      insert into public.charges (org_id, lease_id, type, description, period_start, due_date, amount_minor, currency, status)
+      values (
+        v_row.org_id, v_row.lease_id, 'late_fee', 'Late fee', v_row.due_date, current_date,
+        case
+          when v_row.fee_pct > 0 then round(v_row.open_minor * v_row.fee_pct / 100)::bigint
+          else v_row.fee_minor
+        end,
+        v_row.currency, 'pending'
+      );
+    end if;
+  end loop;
+
+  return v_count;
+end;
+$$;
+
+-- Keep the manual RPC's exact signature, role guard and grant: only the body changes.
+create or replace function public.mark_overdue_and_late_fees() returns integer
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth_role() not in ('org_admin', 'accountant') then
+    raise exception 'Insufficient role to run the overdue sweep.' using errcode = '42501';
+  end if;
+  return public.sweep_overdue(auth_org());
+end;
+$$;
+
+revoke all on function public.mark_overdue_and_late_fees() from public;
+grant execute on function public.mark_overdue_and_late_fees() to authenticated;
+revoke all on function public.sweep_overdue(uuid) from public;

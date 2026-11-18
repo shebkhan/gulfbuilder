@@ -250,5 +250,31 @@ select is(
   1::bigint, 'null-email staff adds no maintenance_requested row'
 );
 
+-- a future-due charge is untouched, and a fresh past-due charge is what the sweep marks
+insert into public.charges (id, org_id, lease_id, type, description, period_start, due_date, amount_minor, currency, status)
+values
+  ('99999999-9999-4999-8999-999999999999', '33333333-3333-3333-3333-333333333333',
+   '55555555-5555-5555-5555-555555555555', 'rent', 'Future rent', current_date, current_date + 10, 90000, 'QAR', 'pending'),
+  ('aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1', '33333333-3333-3333-3333-333333333333',
+   '55555555-5555-5555-5555-555555555555', 'rent', 'Late rent', current_date - 5, current_date - 5, 90000, 'QAR', 'pending');
+select is(public.sweep_overdue('33333333-3333-3333-3333-333333333333'), 1,
+  'the sweep marks only past-due charges');
+select is(
+  (select status from public.charges where id = 'aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1'),
+  'overdue'::public.charge_status, 'past-due charge is overdue after the sweep'
+);
+select is(
+  (select status from public.charges where id = '99999999-9999-4999-8999-999999999999'),
+  'pending'::public.charge_status, 'future-due charge is untouched'
+);
+
+-- all-orgs form marks nothing new and adds no duplicate late fees
+select is(public.sweep_overdue(null), 0, 're-running the sweep marks nothing new');
+select is(
+  (select count(*) from public.charges
+    where lease_id = '55555555-5555-5555-5555-555555555555' and type = 'late_fee'),
+  2::bigint, 'one late fee per overdue charge after two sweeps'
+);
+
 select * from finish();
 rollback;
