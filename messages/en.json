@@ -1618,7 +1618,51 @@
       "slug_taken": "That slug is already taken.",
       "failed": "Could not save. Try again.",
       "plan_not_found": "Unknown plan.",
-      "invalid_rules": "Rules must be valid JSON."
+      "invalid_rules": "Rules must be valid JSON.",
+      "org_not_found": "Organization not found.",
+      "invalid_amount": "Check the amount and try again.",
+      "lookup_exists": "That code already exists for this category."
+    },
+    "settings": {
+      "title": "Organization settings",
+      "hint": "Edit the organization's details and policies from the platform console.",
+      "saved": "Settings saved."
+    },
+    "lookups": {
+      "title": "Lookups",
+      "hint": "Reference values for this organization. Enum labels rename existing values; they do not add new ones.",
+      "category": "Category",
+      "code": "Code",
+      "label": "Label",
+      "sortOrder": "Order",
+      "active": "Active",
+      "actions": "Actions",
+      "add": "Add lookup",
+      "save": "Save",
+      "delete": "Delete",
+      "saved": "Lookup saved.",
+      "deleted": "Lookup deleted.",
+      "errors": {
+        "invalid_input": "Check the details and try again.",
+        "lookup_exists": "That code already exists.",
+        "failed": "Could not save. Try again.",
+        "not_authorised": "You are not allowed to use the platform console."
+      }
+    },
+    "telegram": {
+      "title": "Telegram integration",
+      "hint": "Bot credentials for this organization. Leave the token blank to keep the stored one.",
+      "botToken": "Bot API token",
+      "botName": "Chatbot name",
+      "chatId": "Chat ID",
+      "enabled": "Enabled",
+      "save": "Save",
+      "saved": "Integration saved.",
+      "errors": {
+        "invalid_input": "Check the details and try again.",
+        "failed": "Could not save. Try again.",
+        "not_authorised": "You are not allowed to use the platform console."
+      }
     }
   },
   "print": {
