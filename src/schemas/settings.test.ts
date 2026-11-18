@@ -59,6 +59,12 @@ describe("brandingSchema", () => {
   it("accepts valid branding", () => {
     expect(brandingSchema.safeParse(validBranding).success).toBe(true);
   });
+
+  it("rejects a non-http logo URL", () => {
+    expect(
+      messages(brandingSchema, { ...validBranding, logoUrl: "javascript:alert(1)" }),
+    ).toContain("invalid_url");
+  });
 });
 
 describe("templateSchema", () => {

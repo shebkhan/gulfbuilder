@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-slot",
       "@radix-ui/react-tabs",
     ],
+    serverActions: { bodySizeLimit: "3mb" },
   },
 };
 

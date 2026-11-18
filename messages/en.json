@@ -270,6 +270,15 @@
       "primaryColor": "Primary colour",
       "secondaryColor": "Secondary colour",
       "fontFamily": "Font family",
+      "preset": "Start from a preset",
+      "choosePreset": "Choose a preset",
+      "presetHint": "Copies the preset colours and font into the fields below; you can still edit them.",
+      "logoUpload": "Logo image",
+      "faviconUpload": "Favicon image",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "uploaded": "Uploaded.",
+      "uploadHint": "PNG, JPEG or WebP, up to 2 MB.",
       "terminology": "Terminology overrides (JSON)",
       "customDomain": "Custom domain",
       "customDomainHint": "Point a CNAME at the platform, then the domain is verified and the app is served from it.",
@@ -287,6 +296,10 @@
         "invalid_input": "Check the colours and fields.",
         "invalid_terminology": "Terminology must be a JSON object of key/value pairs.",
         "domain_taken": "That domain is already used by another organization.",
+        "file_required": "Choose a file to upload.",
+        "file_too_large": "The file must be 2 MB or smaller.",
+        "unsupported_file_type": "Use a PNG, JPEG or WebP image.",
+        "upload_failed": "The upload failed. Try again.",
         "failed": "Could not save. Try again."
       },
       "terminologyPlaceholder": "{\"leases\": \"Tenancy contracts\"}",
@@ -1663,5 +1676,6 @@
     "page": "Page {page} of {pages}"
   },
   "invalid_slug": "Use 3–40 lowercase letters, numbers or dashes.",
-  "invalid_color": "Enter a 6-digit hex colour, e.g. #795919."
+  "invalid_color": "Enter a 6-digit hex colour, e.g. #795919.",
+  "invalid_url": "Leave empty or enter an http(s) URL."
 }
