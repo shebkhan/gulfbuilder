@@ -273,7 +273,7 @@ select is(public.sweep_overdue(null), 0, 're-running the sweep marks nothing new
 select is(
   (select count(*) from public.charges
     where lease_id = '55555555-5555-5555-5555-555555555555' and type = 'late_fee'),
-  2::bigint, 'one late fee per overdue charge after two sweeps'
+  3::bigint, 'one late fee per overdue charge (three fixtures) after two sweeps'
 );
 
 select * from finish();
