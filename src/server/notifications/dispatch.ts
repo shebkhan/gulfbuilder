@@ -13,6 +13,8 @@ const BATCH_LIMIT = 50;
 export async function dispatchPending(): Promise<DispatchCounts> {
   const admin = createSupabaseAdminClient();
   await linkTelegramCodes(admin);
+  const { error: scanError } = await admin.rpc("enqueue_notification_reminders");
+  if (scanError) throw scanError;
   const { data: rows, error } = await admin.rpc("claim_notification_batch", { p_limit: BATCH_LIMIT });
   if (error) throw error;
   const counts: DispatchCounts = { claimed: rows.length, sent: 0, failed: 0, skipped: 0 };
