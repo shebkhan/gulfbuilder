@@ -336,5 +336,94 @@ select is(public.mark_overdue_and_late_fees(), 0,
 reset role;
 reset request.jwt.claims;
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Task 4: reminder scan (lease + document expiry). The dispatch tick (Task 5)
+-- calls this RPC over PostgREST; here it is exercised directly.
+-- ─────────────────────────────────────────────────────────────────────────────
+-- lease ending inside the org reminder window notifies each staff member once
+update public.organizations
+   set settings = settings || '{"reminder_days": 30}'::jsonb
+ where id = '33333333-3333-3333-3333-333333333333';
+update public.leases set end_date = current_date + 10
+ where id = '55555555-5555-5555-5555-555555555555';
+
+select public.enqueue_notification_reminders();
+select public.enqueue_notification_reminders();
+
+select is(
+  (select count(*) from public.notification_outbox
+    where org_id = '33333333-3333-3333-3333-333333333333' and event = 'lease_expiring'),
+  (select count(*) from public.org_members
+    where org_id = '33333333-3333-3333-3333-333333333333' and role in ('org_admin','manager')),
+  'lease reminder: one row per staff recipient after two scans'
+);
+
+-- document expiring inside 30 days, scanned twice -> one row per staff recipient.
+-- The count subquery joins auth.users and applies the scan's `email is not null`
+-- filter plus the enqueue helper's blank-recipient guard: the caretaker fixture
+-- above has no email and is skipped.
+insert into public.documents (id, org_id, entity_type, entity_id, kind, path, expires_on) values
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '33333333-3333-3333-3333-333333333333',
+   'lease', '55555555-5555-5555-5555-555555555555', 'contract',
+   '33333333-3333-3333-3333-333333333333/contracts/t.pdf', current_date + 5);
+select public.enqueue_notification_reminders();
+select public.enqueue_notification_reminders();
+
+select is(
+  (select count(*) from public.notification_outbox
+    where org_id = '33333333-3333-3333-3333-333333333333' and event = 'document_expiring'),
+  (select count(*) from public.org_members m
+     join auth.users u on u.id = m.user_id
+    where m.org_id = '33333333-3333-3333-3333-333333333333'
+      and m.role in ('org_admin','manager','caretaker')
+      and u.email is not null and btrim(u.email) <> ''),
+  'document reminder is idempotent and fans out per recipient'
+);
+
+-- Every scan starts with sweep_overdue(null); late fees must stay at three.
+select is(
+  (select count(*) from public.charges
+    where lease_id = '55555555-5555-5555-5555-555555555555' and type = 'late_fee'),
+  3::bigint, 'reminder scans add no duplicate late fees'
+);
+
+-- Both events are email-only and carry their token set (Task 2 fix pattern).
+select ok(
+  (select coalesce(bool_and(channel = 'email'), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event in ('lease_expiring','document_expiring')),
+  'reminder events use channel email'
+);
+select ok(
+     (select coalesce(bool_and(payload ?& array['lease_no','end_date']), false)
+      from public.notification_outbox
+      where org_id = '33333333-3333-3333-3333-333333333333' and event = 'lease_expiring')
+ AND (select coalesce(bool_and(payload ?& array['kind','expires_on']), false)
+      from public.notification_outbox
+      where org_id = '33333333-3333-3333-3333-333333333333' and event = 'document_expiring'),
+  'reminder payloads have lease_no/end_date and kind/expires_on'
+);
+
+-- No repo pattern exists for function ACL tests, so read pg_proc.proacl directly.
+select ok(
+     exists (
+       select 1 from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+       cross join lateral aclexplode(p.proacl) a
+       where n.nspname = 'public' and p.proname = 'enqueue_notification_reminders'
+         and a.privilege_type = 'EXECUTE'
+         and a.grantee = (select oid from pg_roles where rolname = 'service_role')
+     )
+     and not exists (
+       select 1 from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+       cross join lateral aclexplode(p.proacl) a
+       where n.nspname = 'public' and p.proname = 'enqueue_notification_reminders'
+         and a.grantee = 0
+     ),
+  'enqueue_notification_reminders: EXECUTE to service_role, revoked from PUBLIC'
+);
+
 select * from finish();
 rollback;

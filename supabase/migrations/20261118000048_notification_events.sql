@@ -336,3 +336,75 @@ $$;
 revoke all on function public.mark_overdue_and_late_fees() from public;
 grant execute on function public.mark_overdue_and_late_fees() to authenticated;
 revoke all on function public.sweep_overdue(uuid) from public;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- enqueue_notification_reminders: the dispatch tick (Task 5) calls this over
+-- PostgREST. security definer + explicit search_path lets it sweep every org;
+-- email is the only channel and dedupe stays owned by enqueue_notification.
+-- ─────────────────────────────────────────────────────────────────────────────
+create or replace function public.enqueue_notification_reminders() returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_lease record;
+  v_doc   record;
+  v_staff record;
+begin
+  perform public.sweep_overdue(null);
+
+  for v_lease in
+    select l.id, l.org_id, l.lease_no, l.end_date
+    from public.leases l
+    join public.organizations o on o.id = l.org_id
+    where l.status = 'active'
+      and l.end_date between current_date
+        and current_date + coalesce((o.settings->>'reminder_days')::int, 30)
+  loop
+    for v_staff in
+      select u.email, coalesce(p.locale, 'en') as locale
+      from public.org_members m
+      join auth.users u on u.id = m.user_id
+      left join public.profiles p on p.id = m.user_id
+      where m.org_id = v_lease.org_id
+        and m.role in ('org_admin', 'manager')
+        and u.email is not null
+    loop
+      perform public.enqueue_notification(
+        v_lease.org_id, 'lease_expiring', 'email', v_staff.email, v_staff.locale,
+        jsonb_build_object(
+          'lease_no', v_lease.lease_no,
+          'end_date', to_char(v_lease.end_date, 'YYYY-MM-DD')
+        ),
+        'lease-expiring:' || v_lease.id || ':' || v_lease.end_date
+      );
+    end loop;
+  end loop;
+
+  for v_doc in
+    select d.id, d.org_id, d.kind, d.expires_on
+    from public.documents d
+    where d.expires_on between current_date and current_date + 30
+  loop
+    for v_staff in
+      select u.email, coalesce(p.locale, 'en') as locale
+      from public.org_members m
+      join auth.users u on u.id = m.user_id
+      left join public.profiles p on p.id = m.user_id
+      where m.org_id = v_doc.org_id
+        and m.role in ('org_admin', 'manager', 'caretaker')
+        and u.email is not null
+    loop
+      perform public.enqueue_notification(
+        v_doc.org_id, 'document_expiring', 'email', v_staff.email, v_staff.locale,
+        jsonb_build_object(
+          'kind', v_doc.kind,
+          'expires_on', to_char(v_doc.expires_on, 'YYYY-MM-DD')
+        ),
+        'document-expiring:' || v_doc.id || ':' || v_doc.expires_on
+      );
+    end loop;
+  end loop;
+end;
+$$;
+
+grant execute on function public.enqueue_notification_reminders() to service_role;
+revoke all on function public.enqueue_notification_reminders() from public;
