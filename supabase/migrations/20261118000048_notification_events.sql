@@ -129,6 +129,8 @@ revoke all on function public.render_notification(uuid, text, text, text, jsonb)
 
 -- Row-event triggers. Each function only enqueues through the guarded helper above;
 -- money is formatted with format_money, never recomputed here.
+-- Tenant/lease lookups also match the row's org_id as a defense-in-depth guard: a row
+-- whose tenant/lease belongs to another org must not copy that org's email into ours.
 
 create or replace function public.payments_notify_received() returns trigger
 language plpgsql security definer set search_path = public as $$
@@ -140,7 +142,7 @@ begin
   select t.email, coalesce(t.language, 'en'), t.full_name
     into v_recipient, v_locale, v_tenant_name
   from public.tenants t
-  where t.id = new.tenant_id;
+  where t.id = new.tenant_id and t.org_id = new.org_id;
 
   perform public.enqueue_notification(
     new.org_id, 'payment_received', 'email', v_recipient, v_locale,
@@ -166,7 +168,7 @@ begin
     into v_recipient, v_locale, v_lease_no
   from public.leases l
   join public.tenants t on t.id = l.tenant_id
-  where l.id = new.lease_id;
+  where l.id = new.lease_id and l.org_id = new.org_id;
 
   perform public.enqueue_notification(
     new.org_id, 'rent_overdue', 'email', v_recipient, v_locale,
@@ -222,7 +224,7 @@ begin
     select t.email, coalesce(t.language, 'en')
       into v_recipient, v_locale
     from public.tenants t
-    where t.id = new.tenant_id;
+    where t.id = new.tenant_id and t.org_id = new.org_id;
 
     v_unit_no := coalesce((select unit_no from public.units where id = new.unit_id), '');
 

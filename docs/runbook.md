@@ -74,6 +74,9 @@ types before any remote push.
 **Before deploying `20261118000048_notification_events.sql` (1B):** run the pgTAP
 suite — `supabase test db` on a local stack, or `pnpm db:test --linked` against a
 staging branch — and confirm `supabase/tests/notification_events_test.sql` passes.
+`pnpm db:test --linked` must be run by the owner/superuser, because the pgTAP suite
+directly calls `render_notification` and `enqueue_notification`, which are revoked from
+`public` with no grants; a non-owner harness cannot execute those assertions.
 Then, in staging, run `select public.enqueue_notification_reminders();` twice and
 confirm the `lease_expiring` and `document_expiring` row counts are unchanged
 after the second call (the scan is idempotent and does not re-enqueue duplicates).

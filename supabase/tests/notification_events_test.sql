@@ -425,5 +425,57 @@ select ok(
   'enqueue_notification_reminders: EXECUTE to service_role, revoked from PUBLIC'
 );
 
+-- FIX-FINAL-1: defense-in-depth org guards on trigger lookups. An org-A row that
+-- references an org-B tenant/lease must not copy B's email into A's outbox. The foreign
+-- tenant has an email, so without the guards a row WOULD be enqueued and these fail.
+-- Fixtures are additive and last so every count above is unaffected.
+insert into public.organizations (id, name, slug, settings) values
+  ('aaaa0000-0000-0000-0000-000000000002', 'Foreign Org', 'foreign-org', '{}'::jsonb);
+insert into public.tenants (id, org_id, full_name, email, language) values
+  ('aaaa0000-0000-0000-0000-000000000003', 'aaaa0000-0000-0000-0000-000000000002',
+   'Foreign Tenant', 'foreign@test.dev', 'en');
+insert into public.leases (id, org_id, lease_no, tenant_id, start_date, end_date, rent_minor, currency, payment_frequency, status)
+values ('aaaa0000-0000-0000-0000-000000000004', 'aaaa0000-0000-0000-0000-000000000002',
+        'FOREIGN-1', 'aaaa0000-0000-0000-0000-000000000003',
+        current_date - 1, current_date + 30, 100000, 'QAR', 'monthly', 'draft');
+
+-- payment: foreign tenant id on an org-A payment enqueues no payment_received row
+insert into public.payments (id, org_id, tenant_id, receipt_no, receipt_year, amount_minor, currency, method, received_at)
+values ('aaaa0000-0000-0000-0000-000000000005', '33333333-3333-3333-3333-333333333333',
+        'aaaa0000-0000-0000-0000-000000000003', 999, 2026, 100000, 'QAR', 'cash', now());
+select is(
+  (select count(*) from public.notification_outbox
+    where org_id = '33333333-3333-3333-3333-333333333333'
+      and event = 'payment_received' and dedupe_key = 'payment:aaaa0000-0000-0000-0000-000000000005'),
+  0::bigint, 'foreign tenant id: payment trigger enqueues nothing for the referencing org'
+);
+
+-- charge: org-A charge on a foreign org's lease enqueues no rent_overdue row
+insert into public.charges (id, org_id, lease_id, type, description, period_start, due_date, amount_minor, currency, status)
+values ('aaaa0000-0000-0000-0000-000000000006', '33333333-3333-3333-3333-333333333333',
+        'aaaa0000-0000-0000-0000-000000000004', 'rent', 'Foreign lease rent',
+        current_date - 10, current_date - 1, 100000, 'QAR', 'pending');
+update public.charges set status = 'overdue' where id = 'aaaa0000-0000-0000-0000-000000000006';
+select is(
+  (select count(*) from public.notification_outbox
+    where org_id = '33333333-3333-3333-3333-333333333333'
+      and event = 'rent_overdue' and dedupe_key = 'charge-overdue:aaaa0000-0000-0000-0000-000000000006'),
+  0::bigint, 'foreign lease id: overdue trigger enqueues nothing for the referencing org'
+);
+
+-- maintenance status: foreign tenant id on an org-A request enqueues no status row
+insert into public.maintenance_requests (id, org_id, building_id, tenant_id, title, status)
+values ('aaaa0000-0000-0000-0000-000000000007', '33333333-3333-3333-3333-333333333333',
+        'cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaa0000-0000-0000-0000-000000000003',
+        'Foreign tenant request', 'open');
+update public.maintenance_requests set status = 'in_progress' where id = 'aaaa0000-0000-0000-0000-000000000007';
+select is(
+  (select count(*) from public.notification_outbox
+    where org_id = '33333333-3333-3333-3333-333333333333'
+      and event = 'maintenance_status_changed'
+      and dedupe_key like 'maintenance-status:aaaa0000-0000-0000-0000-000000000007:%'),
+  0::bigint, 'foreign tenant id: status trigger enqueues nothing for the referencing org'
+);
+
 select * from finish();
 rollback;

@@ -184,8 +184,11 @@ Owner excluded automated suites from release gates.
 - Seeding demo data writes real outbox rows to the seeded staff/tenant emails, because the triggers
   fire on seed inserts too. Acceptable in dev; truncate `notification_outbox` after a seed if the
   noise matters.
-- A maintenance request that returns to a status it already notified (open → in_progress → open)
-  is deduped and sends no second email.
+- Maintenance status-change dedupe is per status: the key is
+  `maintenance-status:<id>:<status>`, so each distinct status sends its own email. A
+  sequence like open → in_progress → open therefore sends two emails (open and in_progress
+  are different keys); only re-entry into a status already notified (e.g. open → in_progress
+  → open → in_progress) is deduped.
 
 ## Out of scope
 
