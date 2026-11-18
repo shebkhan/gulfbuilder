@@ -7,10 +7,12 @@ section it departs from and why.
 
 **D-024 · `src/app/manifest.ts` is dynamic so the installed PWA reads branding.**
 SPEC §10 lists an installable, white-labeled PWA, and the manifest was a static metadata object. It
-now resolves the request host through `getBrand()` at request time so `name`, `short_name`,
-`theme_color`, `background_color` and the logo icon reflect the organization's `org_branding`
-instead of one hard-coded identity. Caveat: browsers expect fixed pixel sizes for raster manifest
-icons, so the bundled SVG may remain the installed icon. Reason: an installed PWA must carry the
+now reads the request host from the `x-forwarded-host`/`host` headers and passes it directly to
+`resolveBrand()` at request time — the middleware matcher excludes dotted paths, so `x-brand` is
+never set on `/manifest.webmanifest` and `getBrand()` would always return null there — so `name`,
+`short_name`, `theme_color`, `background_color` and the logo icon reflect the organization's
+`org_branding` instead of one hard-coded identity. Caveat: browsers expect fixed pixel sizes for
+raster manifest icons, so the bundled SVG may remain the installed icon. Reason: an installed PWA must carry the
 tenant's name, colors and logo, not a single global brand.
 
 **D-023 · Branded print documents keep the HTML `window.print()` sheet instead of `@react-pdf/renderer`.**
