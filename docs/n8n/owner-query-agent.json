@@ -895,7 +895,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "const msg = ($json.callback_query?.data || $json.message?.text || '').toLowerCase();\nconst blocked = ['write code','write a program','ignore previous','ignore all','system prompt','reveal your','act as','pretend you','dan mode','jailbreak','bypass','override instructions','write a script','write javascript','write python','generate code'];\nconst isBlocked = blocked.some(b => msg.includes(b));\nreturn [{json:{...$json, blocked: isBlocked}}];"
+        "jsCode": "const msg = ($json.callback_query?.data || $json.message?.text || '').toLowerCase();\nconst blocked = ['write code','write a program','write a script','write javascript','write python','write js','ignore previous','ignore all','system prompt','reveal your','act as','pretend you','dan mode','jailbreak','bypass','override instructions','generate code','create a program','create a script','js program','python program'];\nconst isBlocked = blocked.some(b => msg.includes(b)) || /write.*(js|javascript|python|code|program|script)/.test(msg) || /create.*(js|javascript|python|code|program|script)/.test(msg);\nreturn [{json:{...$json, blocked: isBlocked}}];"
       }
     },
     {
@@ -933,6 +933,7 @@
     {
       "id": "blockedreply",
       "name": "Blocked Reply",
+      "webhookId": "d741c820-6e42-4cdf-9d76-589159badb23",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "retryOnFail": true,
@@ -955,8 +956,7 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      },
-      "webhookId": "d741c820-6e42-4cdf-9d76-589159badb23"
+      }
     }
   ],
   "connections": {
