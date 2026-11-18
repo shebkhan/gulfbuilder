@@ -9,6 +9,7 @@ import {
   FileText,
   Gauge,
   LayoutDashboard,
+  Palette,
   PiggyBank,
   Receipt,
   Settings,
@@ -89,6 +90,7 @@ export const PLATFORM_NAV: NavItem[] = [
     icon: FileText,
     capability: "platform.admin",
   },
+  { href: "/platform/themes", labelKey: "themes", icon: Palette, capability: "platform.admin" },
 ];
 
 export function visibleNav(role: Role | null, items: NavItem[] = NAV_ITEMS): NavItem[] {

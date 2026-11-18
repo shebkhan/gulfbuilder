@@ -28,7 +28,8 @@
     "agedReceivables": "Aged Receivables",
     "cashFlowForecast": "Cash Flow Forecast",
     "platform": "Platform",
-    "marketPacks": "Market packs"
+    "marketPacks": "Market packs",
+    "themes": "Themes"
   },
   "errors": {
     "title": "Something went wrong",
@@ -1575,6 +1576,27 @@
       "version": "Version",
       "rules": "Rules (JSON)",
       "saved": "Market pack saved."
+    },
+    "themes": {
+      "title": "Theme presets",
+      "subtitle": "Colour and font presets offered to organizations; the default seeds new ones.",
+      "code": "Code",
+      "name": "Name",
+      "primaryColor": "Primary colour",
+      "secondaryColor": "Secondary colour",
+      "fontFamily": "Font family",
+      "isDefault": "Default for new organizations",
+      "setDefault": "Set as default",
+      "saved": "Theme preset saved.",
+      "defaultSaved": "Default preset updated.",
+      "save": "Save",
+      "working": "Working…",
+      "errors": {
+        "not_authorised": "You are not allowed to use the platform console.",
+        "invalid_input": "Check the details and try again.",
+        "failed": "Could not save. Try again.",
+        "preset_not_found": "That preset no longer exists."
+      }
     },
     "errors": {
       "not_authorised": "You are not allowed to use the platform console.",
