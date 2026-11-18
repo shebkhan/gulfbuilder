@@ -23,7 +23,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "ifapproval",
@@ -83,7 +86,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "answercb",
@@ -103,7 +109,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "replyapproval",
@@ -125,7 +134,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "agent",
@@ -188,7 +200,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t2",
@@ -219,7 +234,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t3",
@@ -241,7 +259,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t4",
@@ -272,7 +293,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t5",
@@ -294,7 +318,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t6",
@@ -316,7 +343,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "t7",
@@ -338,7 +368,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "reply",
@@ -458,7 +491,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "answercbq",
@@ -481,7 +517,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "allowlist",
@@ -538,7 +577,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "typing",
@@ -561,7 +603,10 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "chartfetch",
@@ -584,7 +629,10 @@
           "id": "l9ZE1SyEtK8FLTfg",
           "name": "Gulf API Key"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "chartcode",
@@ -622,7 +670,10 @@
           "name": "Gulf Telegram Bot"
         }
       },
-      "webhookId": "6ce9b200-ab62-4412-b825-ffaa458b7dbd"
+      "webhookId": "6ce9b200-ab62-4412-b825-ffaa458b7dbd",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "id": "isch",
