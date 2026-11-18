@@ -1680,6 +1680,7 @@ export type Database = {
           claimed_at: string | null
           channel: string
           created_at: string
+          dedupe_key: string | null
           error: string | null
           event: string
           id: string
@@ -1698,6 +1699,7 @@ export type Database = {
           claimed_at?: string | null
           channel: string
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           event: string
           id?: string
@@ -1716,6 +1718,7 @@ export type Database = {
           claimed_at?: string | null
           channel?: string
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           event?: string
           id?: string

@@ -52,14 +52,31 @@ every minute. The cron caller is supplied by the owner — no Edge Function, pg_
 or scheduler is configured here. For local testing, set `NOTIFICATION_DRY_RUN=1`
 to exercise the dispatch path without delivering messages.
 
-**Before deploying `20261117000046_notification_delivery.sql`:** the migration has
-never been applied to a real database (no local Postgres in the build environment).
-Run `supabase db reset` on a local stack and confirm: (a) the migration applies
-cleanly; (b) `claim_notification_batch` returns a due pending row but **not** one
-whose `scheduled_for` is in the future; (c) a stale claim (>5 min) is reclaimed;
-(d) an authenticated update of an existing `web_push_subscriptions` row passes the
-`update` RLS policy. Then regenerate `src/types/database.ts` from the applied
-migration to confirm the hand-edited types before any remote push.
+The events enqueued are: `cheque_bounced`, `payment_received`, `rent_overdue`,
+`maintenance_requested`, `maintenance_status_changed`, `lease_expiring` and
+`document_expiring`. Each dispatch tick runs `enqueue_notification_reminders`
+first — it sweeps overdue charges and scans for lease/document expiry for every
+org — before calling `claim_notification_batch`. One external cron (the minute
+call above) therefore still covers everything; no second scheduler is needed.
+A scan failure aborts that tick: the RPC error is raised and no rows are claimed
+or delivered until the next tick succeeds.
+
+**Before deploying `20261117000046_notification_delivery.sql` (1A):** the migration
+has never been applied to a real database (no local Postgres in the build
+environment). Run `supabase db reset` on a local stack and confirm: (a) the
+migration applies cleanly; (b) `claim_notification_batch` returns a due pending
+row but **not** one whose `scheduled_for` is in the future; (c) a stale claim
+(>5 min) is reclaimed; (d) an authenticated update of an existing
+`web_push_subscriptions` row passes the `update` RLS policy. Then regenerate
+`src/types/database.ts` from the applied migration to confirm the hand-edited
+types before any remote push.
+
+**Before deploying `20261118000048_notification_events.sql` (1B):** run the pgTAP
+suite — `supabase test db` on a local stack, or `pnpm db:test --linked` against a
+staging branch — and confirm `supabase/tests/notification_events_test.sql` passes.
+Then, in staging, run `select public.enqueue_notification_reminders();` twice and
+confirm the `lease_expiring` and `document_expiring` row counts are unchanged
+after the second call (the scan is idempotent and does not re-enqueue duplicates).
 
 ## Known gaps (v1 scope)
 
