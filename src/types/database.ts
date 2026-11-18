@@ -119,6 +119,69 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          key_hash: string
+          last_used_at: string | null
+          name: string
+          org_id: string
+          owner_id: string | null
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["member_role"]
+          scopes: string[]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          last_used_at?: string | null
+          name: string
+          org_id: string
+          owner_id?: string | null
+          revoked_at?: string | null
+          role: Database["public"]["Enums"]["member_role"]
+          scopes?: string[]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          last_used_at?: string | null
+          name?: string
+          org_id?: string
+          owner_id?: string | null
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["member_role"]
+          scopes?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "api_keys_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -1677,8 +1740,8 @@ export type Database = {
         Row: {
           attempts: number
           body: string
-          claimed_at: string | null
           channel: string
+          claimed_at: string | null
           created_at: string
           error: string | null
           event: string
@@ -1695,8 +1758,8 @@ export type Database = {
         Insert: {
           attempts?: number
           body: string
-          claimed_at?: string | null
           channel: string
+          claimed_at?: string | null
           created_at?: string
           error?: string | null
           event: string
@@ -1713,8 +1776,8 @@ export type Database = {
         Update: {
           attempts?: number
           body?: string
-          claimed_at?: string | null
           channel?: string
+          claimed_at?: string | null
           created_at?: string
           error?: string | null
           event?: string
@@ -2906,6 +2969,42 @@ export type Database = {
           },
         ]
       }
+      theme_presets: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          font_family: string
+          is_default: boolean
+          name: string
+          primary_color: string
+          secondary_color: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          font_family: string
+          is_default?: boolean
+          name: string
+          primary_color: string
+          secondary_color: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          font_family?: string
+          is_default?: boolean
+          name?: string
+          primary_color?: string
+          secondary_color?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       units: {
         Row: {
           area_sqm: number | null
@@ -3295,6 +3394,12 @@ export type Database = {
           status: string
           subject: string | null
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "notification_outbox"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       clear_cheque: { Args: { p_cheque_id: string }; Returns: string }
       close_period: { Args: { p_month: string }; Returns: undefined }
@@ -3402,7 +3507,11 @@ export type Database = {
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
       forecast_cash_flow: {
-        Args: { p_months?: number; p_scenario?: string; p_building_ids?: string[] }
+        Args: {
+          p_building_ids?: string[]
+          p_months?: number
+          p_scenario?: string
+        }
         Returns: Json
       }
       format_type_string: { Args: { "": string }; Returns: string }

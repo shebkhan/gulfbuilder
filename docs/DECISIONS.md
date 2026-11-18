@@ -5,6 +5,15 @@ section it departs from and why.
 
 ## 2026-11-18
 
+**D-021 · n8n integration uses per-owner API keys with service-role scoping.**
+Owners (and staff) get read-only API keys (`gulf_…`, stored hashed) for n8n. `/api/v1/owner/*`
+and `requireApiContext` accept `X-API-Key`, resolve identity via the `api_keys` table, and use
+the service-role client with mandatory application scoping (owner → owned buildings/leases).
+RLS is bypassed on this transport because Supabase cannot issue per-user JWTs for API keys;
+mitigated by key hashing, expiry/revocation, scopes, and cross-tenant tests. n8n-mcp is wired
+into `opencode.json` via `{env:N8N_API_URL}` / `{env:N8N_API_KEY}`. Two workflows (daily digest
+and owner query agent) are shipped as importable JSON and created live in the user's cloud n8n.
+
 **D-020 · An API layer sits in front of Supabase; supersedes D-010.**
 Supabase remains the database, auth provider and object store, and RLS remains the gate on every
 query. The web app calls `src/server/services/*` in-process (no HTTP hop between server components

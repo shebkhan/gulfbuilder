@@ -4,8 +4,10 @@ import type { NextRequest } from "next/server";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
 import { requiresMfa } from "@/lib/mfa";
 import { isRole, type Role } from "@/lib/rbac";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveMembership } from "@/server/org-context";
+import { hashKey } from "@/lib/api-keys";
 import type { Database } from "@/types/database";
 import { ApiError } from "./errors";
 
@@ -14,6 +16,7 @@ export type ApiContext = {
   userId: string;
   orgId: string;
   role: Role;
+  ownerId?: string;
 };
 
 /** Claims set by the access-token hook (D-009) once it is enabled. */
@@ -32,6 +35,9 @@ function bearerToken(request: NextRequest) {
  * so RLS stays the gate on every query.
  */
 export async function requireApiContext(request: NextRequest): Promise<ApiContext> {
+  const apiKey = request.headers.get("x-api-key");
+  if (apiKey) return requireApiKeyContext(apiKey);
+
   const token = bearerToken(request);
 
   if (!token) {
@@ -54,6 +60,35 @@ export async function requireApiContext(request: NextRequest): Promise<ApiContex
   const claims = data.claims as HookClaims;
   if (!claims.sub) throw new ApiError("unauthorized");
   return build(supabase, claims.sub, claims);
+}
+
+export async function requireApiKeyContext(apiKey: string): Promise<ApiContext> {
+  const admin = createSupabaseAdminClient();
+  const hash = hashKey(apiKey);
+  const { data: row, error } = await admin
+    .from("api_keys")
+    .select("id, org_id, user_id, role, owner_id, expires_at, revoked_at, scopes")
+    .eq("key_hash", hash)
+    .maybeSingle();
+  if (error || !row) throw new ApiError("unauthorized");
+  if (row.revoked_at) throw new ApiError("unauthorized");
+  if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) {
+    throw new ApiError("unauthorized");
+  }
+  if (!isRole(row.role)) throw new ApiError("unauthorized");
+
+  await admin
+    .from("api_keys")
+    .update({ last_used_at: new Date().toISOString() })
+    .eq("id", row.id);
+
+  return {
+    supabase: admin as unknown as SupabaseClient<Database>,
+    userId: row.user_id,
+    orgId: row.org_id,
+    role: row.role as Role,
+    ownerId: row.owner_id ?? undefined,
+  };
 }
 
 async function build(

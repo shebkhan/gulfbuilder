@@ -1,0 +1,359 @@
+{
+  "name": "Gulf - Owner Query Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "tgtrigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        250,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Gulf property assistant for an owner. Answer questions about their portfolio using the available tools. Always call a tool to get data; never guess. Summarize results concisely. Amounts are in minor units; convert to major by dividing by 100 (QAR has 2 decimals)."
+        }
+      },
+      "id": "agent",
+      "name": "Owner Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "openai",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        520,
+        500
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CRED",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_dashboard",
+        "description": "Get owner dashboard KPIs: units, occupancy, expected/collected this month, arrears, NOI, upcoming cheques, open maintenance, expiring leases.",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/dashboard",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "tool_dashboard",
+      "name": "Tool Dashboard",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        120
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_cheques_due",
+        "description": "Get cheques due within N days (default 30). Param: days (number).",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/cheques/due",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "days",
+              "value": "={{ $fromAI('days', 'number of days', 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tool_cheques",
+      "name": "Tool Cheques Due",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        260
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_units_summary",
+        "description": "Get units count by status and per building.",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/units/summary",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "tool_units",
+      "name": "Tool Units Summary",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_leases",
+        "description": "Get rent roll and leases expiring within N days. Param: expiring_days (number, optional).",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/leases",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiring_days",
+              "value": "={{ $fromAI('expiring_days', 'days', 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tool_leases",
+      "name": "Tool Leases",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        540
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_receivables",
+        "description": "Get aged receivables (overdue charges).",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/receivables",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "tool_recv",
+      "name": "Tool Receivables",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        680
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "get_digest",
+        "description": "Get full daily digest (cheques due 7d, leases expiring 30d, maintenance, approvals, receivables).",
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "tool_digest",
+      "name": "Tool Digest",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        820
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "tg_send",
+      "name": "Reply Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        760,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Owner Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Dashboard": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Cheques Due": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Units Summary": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Leases": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Receivables": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Digest": {
+      "ai_tool": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

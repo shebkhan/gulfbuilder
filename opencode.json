@@ -17,6 +17,21 @@
       "supabase": {
         "type": "remote",
         "url": "https://mcp.supabase.com/mcp?project_ref=ncytnjrjuuccskhvhmxa&features=database,docs"
+      },
+      "n8n": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "n8n-mcp"
+        ],
+        "environment": {
+          "MCP_MODE": "stdio",
+          "N8N_API_URL": "{env:N8N_API_URL}",
+          "N8N_API_KEY": "{env:N8N_API_KEY}"
+        },
+        "enabled": true,
+        "timeout": 120000
       }
     }
   }
