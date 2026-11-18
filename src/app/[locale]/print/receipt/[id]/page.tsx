@@ -32,7 +32,7 @@ export default async function PrintReceipt({
     .eq("payment_id", id);
   const { data: branding } = await supabase
     .from("org_branding")
-    .select("app_name")
+    .select("app_name, logo_url")
     .eq("org_id", payment.org_id)
     .maybeSingle();
 
@@ -74,6 +74,7 @@ export default async function PrintReceipt({
       <PrintDocument
         title={t("receipt.title")}
         orgName={branding?.app_name ?? t("appName")}
+        logoUrl={branding?.logo_url ?? null}
         lines={lines}
         totals={[{ label: t("amount"), value: money(payment.amount_minor), emphasis: true }]}
         footer={t("footer")}

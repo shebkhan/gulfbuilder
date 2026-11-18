@@ -15,6 +15,7 @@ type AppShellProps = {
   role: Role;
   userName: string;
   locale: string;
+  logoUrl?: string | null;
   /** Overrides the staff navigation (the owner portal passes its own). */
   items?: NavItem[];
   footerItems?: NavItem[];
@@ -27,6 +28,7 @@ export async function AppShell({
   role,
   userName,
   locale,
+  logoUrl,
   items,
   footerItems,
 }: AppShellProps) {
@@ -48,6 +50,7 @@ export async function AppShell({
       <div className="flex min-h-[calc(100vh-2rem)] overflow-hidden rounded-frame bg-gradient-to-br from-surface-container-lowest/95 via-surface-container-lowest/85 to-surface-container/65 shadow-frame lg:min-h-[calc(100vh-4rem)]">
         <CollapsibleSidebar
           orgName={orgName}
+          logoUrl={logoUrl}
           tagline={t("common.appTagline")}
           nav={nav}
           footer={footer}
@@ -58,6 +61,8 @@ export async function AppShell({
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-16 items-center justify-between gap-4 px-6">
             <div className="flex items-center gap-2 rounded-full bg-surface-container-low px-3 py-1.5 font-label-md text-label-md text-on-surface shadow-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl ?? "/icons/icon.svg"} alt="" className="size-5 shrink-0 object-contain" />
               <span className="max-w-[40vw] truncate font-medium">{orgName}</span>
               <span className="text-outline">•</span>
               <span className="font-metric-num-sm text-label-sm tracking-wider text-primary">

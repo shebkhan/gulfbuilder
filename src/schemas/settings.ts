@@ -34,10 +34,25 @@ export const organizationSchema = z.object({
   }),
 });
 
+const brandingUrl = z
+  .string()
+  .trim()
+  .max(300, "validation.tooLong")
+  .refine((value) => {
+    if (value === "") return true;
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }, "invalid_url")
+  .optional();
+
 export const brandingSchema = z.object({
   appName: z.string().trim().max(80, "validation.tooLong").optional().or(z.literal("")),
-  logoUrl: z.string().trim().max(300, "validation.tooLong").optional().or(z.literal("")),
-  faviconUrl: z.string().trim().max(300, "validation.tooLong").optional().or(z.literal("")),
+  logoUrl: brandingUrl,
+  faviconUrl: brandingUrl,
   primaryColor: z
     .string()
     .trim()

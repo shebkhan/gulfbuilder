@@ -31,7 +31,7 @@
 ### Task 1: Migration — api_keys table + RLS
 
 **Files:**
-- Create: `supabase/migrations/20261118000048_api_keys.sql`
+- Create: `supabase/migrations/20261118000049_api_keys.sql`
 - Test: `supabase/tests/api_keys_rls.sql` (pgTAP)
 
 - [ ] **Step 1: Write migration**

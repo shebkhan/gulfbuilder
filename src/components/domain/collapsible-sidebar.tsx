@@ -10,6 +10,7 @@ const STORAGE_KEY = "gulf.sidebar.collapsed";
 
 type Props = {
   orgName: string;
+  logoUrl?: string | null;
   tagline: string;
   nav: SidebarItem[];
   footer: SidebarItem[];
@@ -19,6 +20,7 @@ type Props = {
 
 export function CollapsibleSidebar({
   orgName,
+  logoUrl,
   tagline,
   nav,
   footer,
@@ -51,6 +53,8 @@ export function CollapsibleSidebar({
       <div className="flex flex-col gap-6">
         {collapsed ? null : (
           <div className="flex flex-col px-3 pb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl ?? "/icons/icon.svg"} alt="" className="mb-1 size-8 object-contain" />
             <span className="truncate font-headline-sm text-label-md leading-tight font-semibold tracking-tight text-on-surface">
               {orgName}
             </span>

@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Inter, Manrope, Noto_Sans_Arabic } from "next/font/google";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ServiceWorkerRegistrar } from "@/components/domain/service-worker-registrar";
-import { applyTerminology, decodeBrand } from "@/lib/white-label";
+import { applyTerminology, getBrand } from "@/lib/white-label";
 import "../globals.css";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
@@ -50,14 +49,7 @@ export default async function LocaleLayout({
 
   // White-label branding (SPEC §10): the middleware resolved the organization from the
   // request host and passed its branding along in the `x-brand` header.
-  // Wrapped safely so static prerendering at build time does not fail when headers are unavailable.
-  let brandHeader: string | null = null;
-  try {
-    brandHeader = (await headers()).get("x-brand");
-  } catch {
-    brandHeader = null;
-  }
-  const brand = decodeBrand(brandHeader);
+  const brand = await getBrand();
   const messages = applyTerminology(await getMessages(), brand?.terminology);
 
   const brandStyle = brand

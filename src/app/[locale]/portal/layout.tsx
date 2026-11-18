@@ -5,6 +5,7 @@ import { LocaleSwitcher } from "@/components/domain/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { PortalBottomNav } from "@/components/domain/portal-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getBrand } from "@/lib/white-label";
 import { signOutAction } from "@/server/actions/auth";
 
 /** Tenant portal (SPEC §8 T1). Mobile-first, own data only. */
@@ -48,14 +49,19 @@ export default async function PortalLayout({
     .maybeSingle();
 
   const t = await getTranslations("common");
+  const logoUrl = (await getBrand())?.logoUrl;
 
   return (
     <div className="auth-backdrop min-h-dvh">
       <header className="sticky top-0 z-40 border-b border-hairline bg-surface-container-lowest px-4 py-3">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
-          <span className="truncate font-headline-sm text-headline-sm font-semibold text-on-surface">
-            {org?.name ?? t("appName")}
-          </span>
+          <div className="flex min-w-0 items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl ?? "/icons/icon.svg"} alt="" className="size-7 shrink-0 object-contain" />
+            <span className="truncate font-headline-sm text-headline-sm font-semibold text-on-surface">
+              {org?.name ?? t("appName")}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             <LocaleSwitcher />
             <form action={signOutAction}>

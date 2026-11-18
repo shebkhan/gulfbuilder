@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { headers } from "next/headers";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
 
 /**
@@ -74,6 +75,16 @@ export function decodeBrand(value: string | null | undefined): Brand | null {
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
     return JSON.parse(new TextDecoder().decode(bytes)) as Brand;
   } catch {
+    return null;
+  }
+}
+
+/** Branding for the current request, resolved by middleware from the host. */
+export async function getBrand(): Promise<Brand | null> {
+  try {
+    return decodeBrand((await headers()).get("x-brand"));
+  } catch {
+    // Static prerendering has no request headers.
     return null;
   }
 }

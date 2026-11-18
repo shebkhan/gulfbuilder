@@ -5,6 +5,7 @@ import { z } from "zod";
 import { CURRENCY_EXPONENTS } from "@/lib/money";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { themePresetSchema } from "@/schemas/theme";
 
 export type PlatformState = {
   error?: string;
@@ -125,9 +126,19 @@ export async function createOrganizationAction(
     .single();
   if (error) return fail(error.code === "23505" ? "slug_taken" : "failed");
 
-  await ctx.admin
-    .from("org_branding")
-    .insert({ org_id: org.id, app_name: parsed.data.name, created_by: ctx.userId });
+  const { data: defaultPreset } = await ctx.admin
+    .from("theme_presets")
+    .select("primary_color, secondary_color, font_family")
+    .eq("is_default", true)
+    .maybeSingle();
+  await ctx.admin.from("org_branding").insert({
+    org_id: org.id,
+    app_name: parsed.data.name,
+    primary_color: defaultPreset?.primary_color ?? null,
+    secondary_color: defaultPreset?.secondary_color ?? null,
+    font_family: defaultPreset?.font_family ?? null,
+    created_by: ctx.userId,
+  });
   await ctx.admin.rpc("seed_chart_of_accounts", { p_org: org.id });
   await audit(ctx.admin, ctx.userId, "organizations", "create", org.id, org.id, parsed.data);
 
@@ -289,4 +300,78 @@ export async function impersonateAction(
 
   revalidatePath(`/platform/organizations/${parsed.data.orgId}`);
   return { ok: "impersonated" };
+}
+
+export async function upsertThemePresetAction(
+  _prev: PlatformState,
+  formData: FormData,
+): Promise<PlatformState> {
+  const ctx = await platformAdmin();
+  if (!ctx) return fail("not_authorised");
+
+  const parsed = themePresetSchema.safeParse({
+    code: formData.get("code"),
+    name: formData.get("name"),
+    primaryColor: formData.get("primaryColor"),
+    secondaryColor: formData.get("secondaryColor"),
+    fontFamily: formData.get("fontFamily"),
+    isDefault: formData.get("isDefault"),
+  });
+  if (!parsed.success) return fail("invalid_input");
+
+  const { error } = await ctx.admin.from("theme_presets").upsert(
+    {
+      code: parsed.data.code,
+      name: parsed.data.name,
+      primary_color: parsed.data.primaryColor,
+      secondary_color: parsed.data.secondaryColor,
+      font_family: parsed.data.fontFamily,
+      is_default: parsed.data.isDefault,
+      created_by: ctx.userId,
+    },
+    { onConflict: "code" },
+  );
+  if (error) return fail("failed");
+
+  await audit(ctx.admin, ctx.userId, "theme_presets", "upsert", null, null, parsed.data);
+  revalidatePath("/platform/themes");
+  return { ok: "theme_saved" };
+}
+
+export async function setDefaultThemePresetAction(
+  _prev: PlatformState,
+  formData: FormData,
+): Promise<PlatformState> {
+  const ctx = await platformAdmin();
+  if (!ctx) return fail("not_authorised");
+
+  const parsed = z.object({ code: themePresetSchema.shape.code }).safeParse({
+    code: formData.get("code"),
+  });
+  if (!parsed.success) return fail("invalid_input");
+
+  const { data: preset } = await ctx.admin
+    .from("theme_presets")
+    .select("code")
+    .eq("code", parsed.data.code)
+    .maybeSingle();
+  if (!preset) return fail("preset_not_found");
+
+  const { error: clearError } = await ctx.admin
+    .from("theme_presets")
+    .update({ is_default: false })
+    .eq("is_default", true);
+  if (clearError) return fail("failed");
+
+  const { error: setError } = await ctx.admin
+    .from("theme_presets")
+    .update({ is_default: true })
+    .eq("code", parsed.data.code);
+  if (setError) return fail("failed");
+
+  await audit(ctx.admin, ctx.userId, "theme_presets", "set_default", null, null, {
+    code: parsed.data.code,
+  });
+  revalidatePath("/platform/themes");
+  return { ok: "default_saved" };
 }

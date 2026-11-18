@@ -28,7 +28,7 @@ export default async function PrintOwnerStatement({
 
   const [{ data: owner }, { data: branding }] = await Promise.all([
     supabase.from("owners").select("name").eq("id", statement.owner_id).maybeSingle(),
-    supabase.from("org_branding").select("app_name").eq("org_id", statement.org_id).maybeSingle(),
+    supabase.from("org_branding").select("app_name, logo_url").eq("org_id", statement.org_id).maybeSingle(),
   ]);
 
   const money = (amount: number) => formatMoney(BigInt(amount), statement.currency, locale);
@@ -63,6 +63,7 @@ export default async function PrintOwnerStatement({
       <PrintDocument
         title={t("ownerStatement.title")}
         orgName={branding?.app_name ?? t("appName")}
+        logoUrl={branding?.logo_url ?? null}
         lines={printLines}
         totals={[
           { label: ownerT("opening"), value: money(statement.opening_minor) },

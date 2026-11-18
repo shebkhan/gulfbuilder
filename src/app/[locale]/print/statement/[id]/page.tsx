@@ -34,7 +34,7 @@ export default async function PrintStatement({
         .from("tenant_credits")
         .select("remaining_minor")
         .eq("tenant_id", lease.tenant_id),
-      supabase.from("org_branding").select("app_name").eq("org_id", lease.org_id).maybeSingle(),
+      supabase.from("org_branding").select("app_name, logo_url").eq("org_id", lease.org_id).maybeSingle(),
     ]);
 
   const tenant = lease.tenants as unknown as { full_name: string } | null;
@@ -79,6 +79,7 @@ export default async function PrintStatement({
       <PrintDocument
         title={t("statement.title")}
         orgName={branding?.app_name ?? t("appName")}
+        logoUrl={branding?.logo_url ?? null}
         lines={lines}
         totals={[
           { label: t("billed"), value: money(billed) },

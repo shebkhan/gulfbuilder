@@ -27,7 +27,7 @@ export default async function PrintContract({
 
   const { data: branding } = await supabase
     .from("org_branding")
-    .select("app_name")
+    .select("app_name, logo_url")
     .eq("org_id", lease.org_id)
     .maybeSingle();
 
@@ -79,6 +79,7 @@ export default async function PrintContract({
       <PrintDocument
         title={t("contract.title")}
         orgName={branding?.app_name ?? t("appName")}
+        logoUrl={branding?.logo_url ?? null}
         lines={lines}
         totals={[
           { label: t("rent"), value: money(lease.rent_minor) },

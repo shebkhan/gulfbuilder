@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AppShell } from "@/components/domain/app-shell";
 import { requiresMfa } from "@/lib/mfa";
+import { getBrand } from "@/lib/white-label";
 import { isRole } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -62,6 +63,7 @@ export default async function AppLayout({
       role={role}
       userName={profile?.full_name ?? user.email?.split("@")[0] ?? ""}
       locale={locale}
+      logoUrl={(await getBrand())?.logoUrl}
     >
       {children}
     </AppShell>

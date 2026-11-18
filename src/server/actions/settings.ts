@@ -15,6 +15,16 @@ export type SettingsState = {
   ok?: string;
 };
 
+export type UploadBrandAssetState = {
+  error?: string;
+  ok?: string;
+  url?: string;
+};
+
+const BRANDING_MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+const BRANDING_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const brandAssetKindSchema = z.enum(["logo", "favicon"]);
+
 const pushSubscriptionSchema = z.object({
   endpoint: z.string(),
   keys: z.object({ p256dh: z.string(), auth: z.string() }),
@@ -169,6 +179,50 @@ export async function updateBrandingAction(
 
   revalidatePath("/settings/branding");
   return { ok: "saved" };
+}
+
+export async function uploadBrandAssetAction(
+  _prev: UploadBrandAssetState,
+  formData: FormData,
+): Promise<UploadBrandAssetState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "settings.write")) return { error: "not_authorised" };
+
+  const parsedKind = brandAssetKindSchema.safeParse(formData.get("kind"));
+  if (!parsedKind.success) return { error: "invalid_input" };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { error: "file_required" };
+  if (file.size > BRANDING_MAX_UPLOAD_BYTES) return { error: "file_too_large" };
+  if (!BRANDING_ALLOWED_TYPES.includes(file.type)) return { error: "unsupported_file_type" };
+
+  const kind = parsedKind.data;
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = `${ctx.orgId}/${kind}/${crypto.randomUUID()}-${safeName}`;
+
+  const { error: uploadError } = await ctx.supabase.storage
+    .from("branding")
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (uploadError) return { error: "upload_failed" };
+
+  const url = ctx.supabase.storage.from("branding").getPublicUrl(path).data.publicUrl;
+  const update: Database["public"]["Tables"]["org_branding"]["Update"] = {
+    updated_at: new Date().toISOString(),
+  };
+  if (kind === "logo") update.logo_url = url;
+  else update.favicon_url = url;
+
+  const { error } = await ctx.supabase
+    .from("org_branding")
+    .update(update)
+    .eq("org_id", ctx.orgId);
+  if (error) {
+    await ctx.supabase.storage.from("branding").remove([path]);
+    return { error: "failed" };
+  }
+
+  revalidatePath("/settings/branding");
+  return { ok: "uploaded", url };
 }
 
 export async function updateNotificationTemplateAction(

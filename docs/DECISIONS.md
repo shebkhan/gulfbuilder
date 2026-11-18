@@ -5,6 +5,39 @@ section it departs from and why.
 
 ## 2026-11-18
 
+**D-025 · `src/app/manifest.ts` is dynamic so the installed PWA reads branding.**
+SPEC §10 lists an installable, white-labeled PWA, and the manifest was a static metadata object. It
+now reads the request host from the `x-forwarded-host`/`host` headers and passes it directly to
+`resolveBrand()` at request time — the middleware matcher excludes dotted paths, so `x-brand` is
+never set on `/manifest.webmanifest` and `getBrand()` would always return null there — so `name`,
+`short_name`, `theme_color`, `background_color` and the logo icon reflect the organization's
+`org_branding` instead of one hard-coded identity. Caveat: browsers expect fixed pixel sizes for
+raster manifest icons, so the bundled SVG may remain the installed icon. Reason: an installed PWA must carry the
+tenant's name, colors and logo, not a single global brand.
+
+**D-024 · Branded print documents keep the HTML `window.print()` sheet instead of `@react-pdf/renderer`.**
+SPEC §3 names `@react-pdf/renderer` as the PDF stack and §8 A2/M5 call for bilingual PDFs, but D-014
+already established printable HTML for the four print routes. The new `logoUrl` on `PrintDocument`
+and the four print pages reuse that A4 sheet rather than introducing a renderer dependency, so the
+logo appears through the same browser print path. Reason: follow the existing code and keep Arabic
+layout in the app's RTL stack; cost is still no server-side PDF file.
+
+**D-023 · The new `branding` Storage bucket is public instead of private with signed URLs.**
+SPEC §3, §6 and §11 (and `docs/CLAUDE.md`) call for private buckets with `{org_id}/` prefixes and
+signed URLs. The `branding` bucket is marked public with public `select`; paths are
+`{org_id}/logo/...` and `{org_id}/favicon/...`, and `insert`/`update`/`delete` still require
+`authenticated`, the prefix matching `auth_org()` and `auth_role() = 'org_admin'`. Reason: login,
+notification email, the PWA manifest and print documents render the logo outside a signed-in,
+RLS-scoped session, so they need a stable public URL; the tenant boundary is enforced on writes.
+
+**D-022 · Global `theme_presets` has no `org_id`, matching the `market_packs` exception.**
+SPEC §5/§6 and `docs/CLAUDE.md` require `org_id`, RLS and org-scoped indexes on every business table.
+`theme_presets` is a super-admin catalog of colors and font, like `market_packs`: RLS allows
+`authenticated` select, and all writes go through the service-role client in the `(platform)` route
+group with no client write policies. Organizations snapshot the selected values into `org_branding`
+rather than referencing a shared row. Reason: presets are platform-wide baselines, not tenant data;
+this follows the existing `market_packs` precedent.
+
 **D-021 · n8n integration uses per-owner API keys with service-role scoping.**
 Owners (and staff) get read-only API keys (`gulf_…`, stored hashed) for n8n. `/api/v1/owner/*`
 and `requireApiContext` accept `X-API-Key`, resolve identity via the `api_keys` table, and use

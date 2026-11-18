@@ -39,6 +39,11 @@ export default async function BrandingSettingsPage({
     .eq("org_id", membership!.org_id)
     .maybeSingle();
 
+  const { data: presets } = await supabase
+    .from("theme_presets")
+    .select("code, name, primary_color, secondary_color, font_family")
+    .order("name");
+
   const terminology = branding?.terminology ?? {};
   const t = await getTranslations("settings.branding");
 
@@ -63,6 +68,13 @@ export default async function BrandingSettingsPage({
           customDomain: branding?.custom_domain ?? "",
           customDomainStatus: branding?.custom_domain_status ?? "none",
         }}
+        presets={(presets ?? []).map((preset) => ({
+          code: preset.code,
+          name: preset.name,
+          primaryColor: preset.primary_color,
+          secondaryColor: preset.secondary_color,
+          fontFamily: preset.font_family,
+        }))}
       />
     </div>
   );

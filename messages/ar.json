@@ -28,7 +28,8 @@
     "agedReceivables": "أعمار الديون",
     "cashFlowForecast": "توقعات التدفق النقدي",
     "platform": "المنصة",
-    "marketPacks": "حزم الأسواق"
+    "marketPacks": "حزم الأسواق",
+    "themes": "السمات"
   },
   "errors": {
     "title": "حدث خطأ ما",
@@ -269,6 +270,15 @@
       "primaryColor": "اللون الأساسي",
       "secondaryColor": "اللون الثانوي",
       "fontFamily": "الخط",
+      "preset": "ابدأ من قالب",
+      "choosePreset": "اختر قالبًا",
+      "presetHint": "ينسخ ألوان القالب وخطه إلى الحقول أدناه، ويمكنك تعديلها.",
+      "logoUpload": "صورة الشعار",
+      "faviconUpload": "صورة الأيقونة",
+      "upload": "رفع",
+      "uploading": "جارٍ الرفع…",
+      "uploaded": "تم الرفع.",
+      "uploadHint": "PNG أو JPEG أو WebP، بحد أقصى ٢ ميجابايت.",
       "terminology": "تعاريف بديلة (JSON)",
       "customDomain": "نطاق مخصص",
       "customDomainHint": "أضف سجل CNAME يشير إلى المنصة، ثم يتم التحقق من النطاق ويُقدَّم التطبيق منه.",
@@ -286,6 +296,10 @@
         "invalid_input": "راجع الألوان والحقول.",
         "invalid_terminology": "التعاريف يجب أن تكون كائن JSON من مفاتيح وقيم.",
         "domain_taken": "النطاق مستخدم بالفعل من منشأة أخرى.",
+        "file_required": "اختر ملفًا للرفع.",
+        "file_too_large": "يجب ألا يتجاوز الملف ٢ ميجابايت.",
+        "unsupported_file_type": "استخدم صورة PNG أو JPEG أو WebP.",
+        "upload_failed": "فشل الرفع. حاول مرة أخرى.",
         "failed": "تعذر الحفظ. حاول مرة أخرى."
       },
       "terminologyPlaceholder": "{\"leases\": \"عقود الإيجار\"}",
@@ -1576,6 +1590,27 @@
       "rules": "القواعد (JSON)",
       "saved": "تم حفظ حزمة السوق."
     },
+    "themes": {
+      "title": "سمات الثيم",
+      "subtitle": "سمات الألوان والخطوط المتاحة للمؤسسات، والسمة الافتراضية تُستخدم للمؤسسات الجديدة.",
+      "code": "المعرف",
+      "name": "الاسم",
+      "primaryColor": "اللون الأساسي",
+      "secondaryColor": "اللون الثانوي",
+      "fontFamily": "عائلة الخط",
+      "isDefault": "الافتراضية للمؤسسات الجديدة",
+      "setDefault": "تعيين كافتراضية",
+      "saved": "تم حفظ سمة الثيم.",
+      "defaultSaved": "تم تحديث السمة الافتراضية.",
+      "save": "حفظ",
+      "working": "جارٍ العمل…",
+      "errors": {
+        "not_authorised": "غير مسموح لك باستخدام لوحة المنصة.",
+        "invalid_input": "راجع البيانات وحاول مرة أخرى.",
+        "failed": "تعذر الحفظ. حاول مرة أخرى.",
+        "preset_not_found": "هذه السمة لم تعد موجودة."
+      }
+    },
     "errors": {
       "not_authorised": "غير مسموح لك باستخدام لوحة المنصة.",
       "invalid_input": "راجع البيانات وحاول مرة أخرى.",
@@ -1641,5 +1676,6 @@
     "page": "صفحة {page} من {pages}"
   },
   "invalid_slug": "استخدم ٣–٤٠ حرفًا صغيرًا أو رقمًا أو شرطة.",
-  "invalid_color": "أدخل لونًا سداسيًا من ٦ خانات، مثل #795919."
+  "invalid_color": "أدخل لونًا سداسيًا من ٦ خانات، مثل #795919.",
+  "invalid_url": "اتركه فارغًا أو أدخل رابطًا يبدأ بـ http أو https."
 }

@@ -1,15 +1,19 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthForm } from "@/components/domain/auth-form";
 import { Link } from "@/i18n/navigation";
+import { getBrand } from "@/lib/white-label";
 import { signInAction } from "@/server/actions/auth";
 
 export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("auth");
+  const brand = await getBrand();
 
   return (
     <div className="flex flex-col gap-space-lg">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={brand?.logoUrl ?? "/icons/icon.svg"} alt="" className="size-10 object-contain" />
       <div className="flex flex-col gap-1">
         <h1 className="font-headline-md text-headline-md text-on-surface">{t("signIn")}</h1>
         <p className="font-body-md text-body-md text-on-surface-variant">{t("signInSubtitle")}</p>

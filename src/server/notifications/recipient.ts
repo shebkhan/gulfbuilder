@@ -15,11 +15,13 @@ export async function resolveOutbound(
     if (channel === "email") {
       const branding = await admin
         .from("org_branding")
-        .select("email_from")
+        .select("email_from,app_name,logo_url")
         .eq("org_id", row.org_id)
         .maybeSingle();
       if (branding.error) throw new Error("recipient_lookup_failed");
       if (branding.data?.email_from) outbound.from = branding.data.email_from;
+      outbound.appName = branding.data?.app_name;
+      outbound.logoUrl = branding.data?.logo_url;
     }
     return [outbound];
   }

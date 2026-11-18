@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/domain/app-shell";
 import { OWNER_NAV } from "@/components/domain/nav-items";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getBrand } from "@/lib/white-label";
 
 /** Owner portal (SPEC §8 O1): read-only, the owner's own buildings only. */
 export default async function OwnerLayout({
@@ -65,6 +66,7 @@ export default async function OwnerLayout({
       role="owner"
       userName={profile?.full_name ?? owner?.name ?? user.email?.split("@")[0] ?? ""}
       locale={locale}
+      logoUrl={(await getBrand())?.logoUrl}
       items={OWNER_NAV}
       footerItems={[]}
     >
