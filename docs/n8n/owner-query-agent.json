@@ -455,6 +455,28 @@
           "name": "Gulf Telegram Bot"
         }
       }
+    },
+    {
+      "parameters": {
+        "operation": "answerCallbackQuery",
+        "callbackQueryId": "={{ $json.callback_query?.id }}",
+        "additionalFields": {}
+      },
+      "id": "answercbq",
+      "name": "Answer Callback Query",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Gulf Telegram Bot"
+        }
+      },
+      "continueOnFail": true
     }
   ],
   "connections": {
@@ -480,7 +502,7 @@
         ],
         [
           {
-            "node": "Owner Agent",
+            "node": "Answer Callback Query",
             "type": "main",
             "index": 0
           }
@@ -603,6 +625,17 @@
           {
             "node": "Owner Agent",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Callback Query": {
+      "main": [
+        [
+          {
+            "node": "Owner Agent",
+            "type": "main",
             "index": 0
           }
         ]
