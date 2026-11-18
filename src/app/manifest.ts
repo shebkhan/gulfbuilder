@@ -1,9 +1,12 @@
 import type { MetadataRoute } from "next";
-import { getBrand } from "@/lib/white-label";
+import { headers } from "next/headers";
+import { resolveBrand } from "@/lib/white-label";
 
 /** PWA manifest (SPEC §10, v1 surfaces). The name and colours follow the branding. */
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  const brand = await getBrand();
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "";
+  const brand = await resolveBrand(host);
 
   return {
     name: brand?.appName ?? "Gulf Property",
