@@ -707,21 +707,6 @@
       }
     },
     {
-      "id": "simplemem",
-      "name": "Simple Memory",
-      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "typeVersion": 1.3,
-      "position": [
-        2616,
-        600
-      ],
-      "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Telegram Trigger').first().json.callback_query?.message?.chat?.id || $('Telegram Trigger').first().json.message?.chat?.id }}",
-        "contextWindowLength": 10
-      }
-    },
-    {
       "id": "escif",
       "name": "Needs Escalation?",
       "type": "n8n-nodes-base.if",
@@ -1199,17 +1184,6 @@
           {
             "node": "Send Chart",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Simple Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "Owner Agent",
-            "type": "ai_memory",
             "index": 0
           }
         ]
