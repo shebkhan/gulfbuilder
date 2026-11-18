@@ -40,7 +40,7 @@ existing dispatch tick. No new scheduler, no new dependency, no new channel.
 
 ## Design
 
-### 1. Migration `20261118000047_notification_events.sql`
+### 1. Migration `20261118000048_notification_events.sql`
 
 Schema:
 

@@ -14,7 +14,7 @@
 
 - Money: integer minor units + currency code. Only `QAR AED SAR KWD BHD OMR` are supported; KWD/BHD/OMR have **3** decimals, the rest 2. Never use floats for money and never show minor units to a user.
 - All new SQL functions are `security definer set search_path = public`. `enqueue_notification` and `sweep_overdue` are revoked from `public` and granted to nobody; `enqueue_notification_reminders` is granted to `service_role` only.
-- Never edit an applied migration. All work in this plan goes into the single new file `supabase/migrations/20261118000047_notification_events.sql`.
+- Never edit an applied migration. All work in this plan goes into the single new file `supabase/migrations/20261118000048_notification_events.sql`.
 - Email is the only channel enqueued in this plan.
 - No new dependency, no scheduler, no pg_cron, no Edge Function, no remote DB command.
 - Do not touch `package.json`, `pnpm-lock.yaml`, `src/server/actions/forecast.ts`, `src/app/[locale]/(app)/reports/cash-flow-forecast/`, `supabase/functions/`, `src/components/ui/date-picker.tsx` or `src/lib/i18n-keys.test.ts`.
@@ -36,7 +36,7 @@ These are the failure modes the spec implies but no task's happy path exercises.
 ### Task 1: Dedupe key, renderer and enqueue helper
 
 **Files:**
-- Create: `supabase/migrations/20261118000047_notification_events.sql`
+- Create: `supabase/migrations/20261118000048_notification_events.sql`
 - Create: `supabase/tests/notification_events_test.sql`
 
 **Interfaces:**
@@ -49,7 +49,7 @@ Create `supabase/tests/notification_events_test.sql`. Start with no fixed plan c
 
 ```sql
 -- pgTAP: notification event coverage (payment, overdue, maintenance, reminders).
--- Run with `pnpm db:test`. Requires migrations 0001..20261118000047 applied.
+-- Run with `pnpm db:test`. Requires migrations 0001..20261118000048 applied.
 begin;
 create extension if not exists pgtap;
 select no_plan();
@@ -146,10 +146,10 @@ Run: `supabase test db` is owner-gated and unavailable here, so inspect instead:
 
 - [ ] **Step 3: Write the migration**
 
-Create `supabase/migrations/20261118000047_notification_events.sql`:
+Create `supabase/migrations/20261118000048_notification_events.sql`:
 
 ```sql
--- 0047: notification event coverage. Enqueue helpers + row-event triggers + reminder scan.
+-- 0048: notification event coverage. Enqueue helpers + row-event triggers + reminder scan.
 
 alter table public.notification_outbox add column dedupe_key text;
 create unique index notification_outbox_dedupe_idx
@@ -226,7 +226,7 @@ select is(public.format_money(1500, 'KWD'), '1.500 KWD', 'KWD uses 3 decimals');
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/20261118000047_notification_events.sql supabase/tests/notification_events_test.sql
+git add supabase/migrations/20261118000048_notification_events.sql supabase/tests/notification_events_test.sql
 git commit -m "feat(notifications): enqueue helpers with template fallback and dedupe"
 ```
 
@@ -235,7 +235,7 @@ git commit -m "feat(notifications): enqueue helpers with template fallback and d
 ### Task 2: Row-event triggers
 
 **Files:**
-- Modify: `supabase/migrations/20261118000047_notification_events.sql`
+- Modify: `supabase/migrations/20261118000048_notification_events.sql`
 - Modify: `supabase/tests/notification_events_test.sql`
 
 **Interfaces:**
@@ -322,7 +322,7 @@ select is(
 
 - [ ] **Step 2: Confirm the assertions fail**
 
-Run: `grep -c "payments_notify_received" supabase/migrations/20261118000047_notification_events.sql`. Expected: `0` (no triggers yet), so the new assertions have nothing to observe.
+Run: `grep -c "payments_notify_received" supabase/migrations/20261118000048_notification_events.sql`. Expected: `0` (no triggers yet), so the new assertions have nothing to observe.
 
 - [ ] **Step 3: Add the trigger functions and triggers**
 
@@ -346,7 +346,7 @@ Re-read the appended test block against the trigger definitions: event names, ke
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/20261118000047_notification_events.sql supabase/tests/notification_events_test.sql
+git add supabase/migrations/20261118000048_notification_events.sql supabase/tests/notification_events_test.sql
 git commit -m "feat(notifications): enqueue payment, overdue and maintenance events"
 ```
 
@@ -355,7 +355,7 @@ git commit -m "feat(notifications): enqueue payment, overdue and maintenance eve
 ### Task 3: Extract the overdue sweep so it can run without a user
 
 **Files:**
-- Modify: `supabase/migrations/20261118000047_notification_events.sql`
+- Modify: `supabase/migrations/20261118000048_notification_events.sql`
 - Modify: `supabase/tests/notification_events_test.sql`
 
 **Interfaces:**
@@ -396,7 +396,7 @@ select is(
 
 - [ ] **Step 2: Confirm the assertions fail**
 
-Run: `grep -n "sweep_overdue" supabase/migrations/20261118000047_notification_events.sql`. Expected: no match.
+Run: `grep -n "sweep_overdue" supabase/migrations/20261118000048_notification_events.sql`. Expected: no match.
 
 - [ ] **Step 3: Add `sweep_overdue`**
 
@@ -433,7 +433,7 @@ Run: `grep -rn "mark_overdue_and_late_fees" src/ | head`. Expected: only `src/se
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/20261118000047_notification_events.sql supabase/tests/notification_events_test.sql
+git add supabase/migrations/20261118000048_notification_events.sql supabase/tests/notification_events_test.sql
 git commit -m "refactor(notifications): extract all-org overdue sweep"
 ```
 
@@ -442,7 +442,7 @@ git commit -m "refactor(notifications): extract all-org overdue sweep"
 ### Task 4: Reminder scan (lease and document expiry)
 
 **Files:**
-- Modify: `supabase/migrations/20261118000047_notification_events.sql`
+- Modify: `supabase/migrations/20261118000048_notification_events.sql`
 - Modify: `supabase/tests/notification_events_test.sql`
 
 **Interfaces:**
@@ -489,7 +489,7 @@ select is(
 
 - [ ] **Step 2: Confirm the assertions fail**
 
-Run: `grep -n "enqueue_notification_reminders" supabase/migrations/20261118000047_notification_events.sql`. Expected: no match.
+Run: `grep -n "enqueue_notification_reminders" supabase/migrations/20261118000048_notification_events.sql`. Expected: no match.
 
 - [ ] **Step 3: Add the scan**
 
@@ -509,7 +509,7 @@ Append `public.enqueue_notification_reminders() returns void`, `language plpgsql
 - [ ] **Step 4: Commit**
 
 ```bash
-git add supabase/migrations/20261118000047_notification_events.sql supabase/tests/notification_events_test.sql
+git add supabase/migrations/20261118000048_notification_events.sql supabase/tests/notification_events_test.sql
 git commit -m "feat(notifications): lease and document expiry reminder scan"
 ```
 
