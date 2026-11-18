@@ -161,5 +161,94 @@ select is(
   1::bigint, 'status change enqueues one tenant row'
 );
 
+-- FIX-ROUND-1: pin the payload token names for all four events. `?&` fails if any
+-- token is misspelled; bool_and keeps the subquery scalar for fan-out events and
+-- coalesce makes a missing row a failure.
+select ok(
+  (select coalesce(bool_and(payload ?& array['receipt_no', 'amount', 'tenant_name']), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'payment_received' and dedupe_key like 'payment:%'),
+  'payment_received payload has receipt_no, amount, tenant_name'
+);
+select ok(
+  (select coalesce(bool_and(payload ?& array['amount', 'due_date', 'lease_no']), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'rent_overdue' and dedupe_key like 'charge-overdue:%'),
+  'rent_overdue payload has amount, due_date, lease_no'
+);
+select ok(
+  (select coalesce(bool_and(payload ?& array['title', 'unit_no', 'status']), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'maintenance_requested' and dedupe_key like 'maintenance-requested:%'),
+  'maintenance_requested payload has title, unit_no, status'
+);
+select ok(
+  (select coalesce(bool_and(payload ?& array['title', 'unit_no', 'status']), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'maintenance_status_changed' and dedupe_key like 'maintenance-status:%'),
+  'maintenance_status_changed payload has title, unit_no, status'
+);
+
+-- FIX-ROUND-1: real interpolation of a three-token event. Org 'en' template is reached
+-- via the renderer's locale fallback (tenant language is 'ar'); a fresh charge id gives
+-- a fresh dedupe key, and the existing lease keeps the fixture isolated from Task 3.
+insert into public.notification_templates (org_id, event, channel, locale, subject, body) values
+  ('33333333-3333-3333-3333-333333333333', 'rent_overdue', 'email', 'en',
+   'Overdue notice', 'OVERDUE|{{amount}}|{{due_date}}|{{lease_no}}');
+insert into public.charges (id, org_id, lease_id, type, description, period_start, due_date, amount_minor, currency, status)
+values ('99999999-9999-9999-9999-999999999999', '33333333-3333-3333-3333-333333333333',
+        '55555555-5555-5555-5555-555555555555', 'rent', 'Interpolation fixture',
+        current_date - 70, current_date - 20, 275000, 'QAR', 'pending');
+update public.charges set status = 'overdue' where id = '99999999-9999-9999-9999-999999999999';
+select is(
+  (select body from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'rent_overdue'
+     and dedupe_key = 'charge-overdue:99999999-9999-9999-9999-999999999999'),
+  'OVERDUE|2,750.00 QAR|' || to_char(current_date - 20, 'YYYY-MM-DD') || '|L-1',
+  'rent_overdue template interpolates amount, due_date and lease_no'
+);
+
+-- FIX-ROUND-1: every trigger-enqueued row (all four prefixes, k2 rows excluded) is email.
+select ok(
+  (select coalesce(bool_and(channel = 'email'), false)
+   from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and (dedupe_key like 'payment:%' or dedupe_key like 'charge-overdue:%'
+       or dedupe_key like 'maintenance-requested:%' or dedupe_key like 'maintenance-status:%')),
+  'all trigger-enqueued rows use channel email'
+);
+
+-- FIX-ROUND-1: null tenant / null-email staff add no notification rows.
+insert into public.maintenance_requests (id, org_id, building_id, title, status)
+values ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '33333333-3333-3333-3333-333333333333',
+        'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Null tenant', 'open');
+update public.maintenance_requests set status = 'in_progress' where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+select is(
+  (select count(*) from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'maintenance_status_changed'
+     and dedupe_key like 'maintenance-status:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:%'),
+  0::bigint, 'status change on a null-tenant request enqueues nothing'
+);
+
+insert into auth.users (id) values ('11111111-1111-1111-1111-111111111111');
+insert into public.org_members (org_id, user_id, role) values
+  ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', 'caretaker');
+insert into public.maintenance_requests (id, org_id, building_id, title, status)
+values ('22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333',
+        'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Null email staff', 'open');
+select is(
+  (select count(*) from public.notification_outbox
+   where org_id = '33333333-3333-3333-3333-333333333333'
+     and event = 'maintenance_requested'
+     and dedupe_key = 'maintenance-requested:22222222-2222-2222-2222-222222222222'),
+  1::bigint, 'null-email staff adds no maintenance_requested row'
+);
+
 select * from finish();
 rollback;
