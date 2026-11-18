@@ -12,7 +12,7 @@
       "waitBetweenTries": 1000,
       "position": [
         16,
-        576
+        480
       ],
       "parameters": {
         "updates": [
@@ -34,7 +34,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        1360,
+        1808,
         480
       ],
       "parameters": {
@@ -71,7 +71,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        1584,
+        2032,
         176
       ],
       "parameters": {
@@ -101,7 +101,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        1808,
+        2256,
         176
       ],
       "parameters": {
@@ -124,7 +124,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2544,
+        2992,
         176
       ],
       "parameters": {
@@ -145,7 +145,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        2480,
+        2928,
         368
       ],
       "parameters": {
@@ -163,7 +163,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2040,
+        2488,
         600
       ],
       "parameters": {
@@ -193,7 +193,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2296,
+        2744,
         600
       ],
       "parameters": {
@@ -218,7 +218,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2424,
+        2872,
         600
       ],
       "parameters": {
@@ -252,7 +252,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2552,
+        3000,
         600
       ],
       "parameters": {
@@ -277,7 +277,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2680,
+        3128,
         600
       ],
       "parameters": {
@@ -311,7 +311,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2808,
+        3256,
         600
       ],
       "parameters": {
@@ -336,7 +336,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2936,
+        3384,
         600
       ],
       "parameters": {
@@ -361,7 +361,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        3064,
+        3512,
         600
       ],
       "parameters": {
@@ -387,7 +387,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        3712,
+        4160,
         480
       ],
       "parameters": {
@@ -510,7 +510,7 @@
       "waitBetweenTries": 1000,
       "continueOnFail": true,
       "position": [
-        1584,
+        2032,
         624
       ],
       "parameters": {
@@ -530,7 +530,7 @@
       "typeVersion": 2,
       "position": [
         240,
-        576
+        480
       ],
       "parameters": {
         "conditions": {
@@ -568,7 +568,7 @@
       "waitBetweenTries": 1000,
       "position": [
         464,
-        672
+        576
       ],
       "parameters": {
         "chatId": "={{ $json.message?.chat?.id || $json.callback_query?.message?.chat?.id }}",
@@ -595,7 +595,7 @@
       "waitBetweenTries": 1000,
       "position": [
         464,
-        480
+        384
       ],
       "parameters": {
         "operation": "sendChatAction",
@@ -617,7 +617,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        2544,
+        2992,
         768
       ],
       "parameters": {
@@ -639,7 +639,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3264,
+        3712,
         768
       ],
       "parameters": {
@@ -656,7 +656,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        3488,
+        3936,
         768
       ],
       "parameters": {
@@ -678,7 +678,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        1808,
+        2256,
         624
       ],
       "parameters": {
@@ -712,7 +712,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        2168,
+        2616,
         600
       ],
       "parameters": {
@@ -727,7 +727,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        3264,
+        3712,
         480
       ],
       "parameters": {
@@ -765,7 +765,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        3488,
+        3936,
         400
       ],
       "parameters": {
@@ -788,7 +788,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        688,
+        1136,
         480
       ],
       "parameters": {
@@ -826,7 +826,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        912,
+        1360,
         400
       ],
       "parameters": {
@@ -850,7 +850,7 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        1136,
+        1584,
         400
       ],
       "parameters": {
@@ -891,11 +891,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        300,
-        300
+        688,
+        384
       ],
       "parameters": {
-        "jsCode": "const msg = ($json.callback_query?.data || $json.message?.text || '').toLowerCase();\nconst blocked = ['write code','write a program','write a script','write javascript','write python','write js','ignore previous','ignore all','system prompt','reveal your','act as','pretend you','dan mode','jailbreak','bypass','override instructions','generate code','create a program','create a script','js program','python program'];\nconst isBlocked = blocked.some(b => msg.includes(b)) || /write.*(js|javascript|python|code|program|script)/.test(msg) || /create.*(js|javascript|python|code|program|script)/.test(msg);\nreturn [{json:{...$json, blocked: isBlocked}}];"
+        "jsCode": "const msg = ($json.callback_query?.data || $json.message?.text || '').toLowerCase();\nconst blocked = [\n  'write code','write a program','write a script','write javascript','write python','write js',\n  'ignore previous','ignore all','ignore above','ignore your','disregard','forget your instructions','forget everything',\n  'system prompt','reveal your','show your instructions','what are your rules','print your prompt',\n  'act as','pretend you','pretend to be','you are now','you are a','roleplay','role play',\n  'dan mode','jailbreak','bypass','override instructions','override your','developer mode',\n  'generate code','create a program','create a script','js program','python program',\n  'base64','decode this','encode this','rot13','hex decode',\n  'sudo','admin mode','god mode','unrestricted mode','no restrictions',\n  'hypothetically','in a fictional world','for educational purposes only',\n  'repeat after me','say exactly','output only',\n  'what is your','who created you','who made you','are you chatgpt','are you gpt'\n];\nconst isBlocked = blocked.some(b => msg.includes(b))\n  || /write.*(js|javascript|python|code|program|script|html|css)/.test(msg)\n  || /create.*(js|javascript|python|code|program|script|html|css)/.test(msg)\n  || /generate.*(js|javascript|python|code|program|script|html|css)/.test(msg)\n  || /solve.*(math|equation|problem)/.test(msg)\n  || /what is \\d/.test(msg);\nreturn [{json:{...$json, blocked: isBlocked}}];"
       }
     },
     {
@@ -904,15 +904,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        420,
-        300
+        912,
+        384
       ],
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -927,7 +928,8 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       }
     },
     {
@@ -940,11 +942,10 @@
       "maxTries": 3,
       "waitBetweenTries": 1000,
       "position": [
-        640,
-        520
+        1136,
+        288
       ],
       "parameters": {
-        "operation": "sendMessage",
         "chatId": "={{ $json.message?.chat?.id || $json.callback_query?.message?.chat?.id }}",
         "text": "I can only help with your property portfolio. I can't write code or answer unrelated questions.",
         "additionalFields": {
@@ -956,6 +957,19 @@
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
+      }
+    },
+    {
+      "id": "outputguard",
+      "name": "Output Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        420
+      ],
+      "parameters": {
+        "jsCode": "const out = $json.output || '';\nconst hasCode = /```/.test(out) || /function\\s*\\(/.test(out) || /const\\s+\\w+\\s*=/.test(out) || /<script/.test(out);\nconst offTopic = /I can help you with|Here is the code|Here's a program/i.test(out);\nif (hasCode || offTopic) return [{json:{...$json, output: 'I can only help with your property portfolio. I can\\'t write code or answer unrelated questions.'}}];\nreturn [{json:$json}];"
       }
     }
   ],
@@ -1015,7 +1029,7 @@
       "main": [
         [
           {
-            "node": "Needs Escalation?",
+            "node": "Output Guard",
             "type": "main",
             "index": 0
           }
@@ -1293,6 +1307,17 @@
         [
           {
             "node": "Has Voice?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Guard": {
+      "main": [
+        [
+          {
+            "node": "Needs Escalation?",
             "type": "main",
             "index": 0
           }
