@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { randomInt } from "node:crypto";
-import { toMinor } from "@/lib/money";
+import { organizationUpdate } from "@/lib/org-settings";
 import { can } from "@/lib/rbac";
 import { brandingSchema, organizationSchema, templateSchema } from "@/schemas/settings";
 import { dispatchPending } from "@/server/notifications/dispatch";
@@ -58,41 +58,21 @@ export async function updateOrganizationSettingsAction(
   });
   if (!parsed.success) return fail("invalid_input");
 
-  const data = parsed.data;
-  let lateFeeMinor: bigint;
-  try {
-    lateFeeMinor = toMinor(data.lateFee, data.baseCurrency);
-  } catch {
-    return fail("invalid_amount");
-  }
-
   const { data: org } = await ctx.supabase
     .from("organizations")
     .select("settings")
     .eq("id", ctx.orgId)
     .maybeSingle();
-  const settings = {
-    ...((org?.settings ?? {}) as Record<string, unknown>),
-    grace_days: data.graceDays,
-    late_fee_minor: Number(lateFeeMinor),
-    late_fee_type: data.lateFeeType,
-    late_fee_percent: data.lateFeePercent,
-    tax_rate: data.taxRate,
-    reminder_days: data.reminderDays,
-    revenue_recognition: data.revenueRecognition,
-  };
+  let update: ReturnType<typeof organizationUpdate>;
+  try {
+    update = organizationUpdate(parsed.data, org?.settings ?? {});
+  } catch {
+    return fail("invalid_amount");
+  }
 
   const { error } = await ctx.supabase
     .from("organizations")
-    .update({
-      name: data.name,
-      legal_name: data.legalName || null,
-      tax_id: data.taxId || null,
-      base_currency: data.baseCurrency,
-      default_locale: data.defaultLocale,
-      timezone: data.timezone,
-      settings,
-    })
+    .update(update)
     .eq("id", ctx.orgId);
   if (error) return fail("failed");
 
