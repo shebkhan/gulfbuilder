@@ -159,7 +159,7 @@ create unique index notification_outbox_dedupe_idx
 -- Display formatting only; the ledger value is never converted. The exponent is the one
 -- the currencies table (and `src/lib/money.ts`) already uses, so KWD/BHD/OMR stay 3-digit.
 create or replace function public.format_money(p_minor bigint, p_currency text) returns text
-language sql stable set search_path = public as $$
+language sql stable security definer set search_path = public as $$
   select to_char(
     p_minor / power(10, coalesce((select exponent from public.currencies where code = p_currency), 2)),
     case when coalesce((select exponent from public.currencies where code = p_currency), 2) = 3
