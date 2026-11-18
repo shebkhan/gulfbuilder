@@ -65,7 +65,7 @@ function fail(error: string): PlatformState {
 }
 
 /** Authorisation uses the caller's session; only the work below uses the service role. */
-async function platformAdmin() {
+export async function platformAdmin() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -76,7 +76,7 @@ async function platformAdmin() {
   return { admin: createSupabaseAdminClient(), userId: user.id };
 }
 
-async function audit(
+export async function audit(
   admin: ReturnType<typeof createSupabaseAdminClient>,
   actorId: string,
   tableName: string,
