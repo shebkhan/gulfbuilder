@@ -3,7 +3,7 @@ begin;
 
 create extension if not exists pgtap;
 
-select plan(14);
+select plan(16);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000f2', 'platform-org-a@test.dev'),
@@ -24,8 +24,10 @@ select ok((select relrowsecurity from pg_class where oid = to_regclass('public.o
 select ok((select relrowsecurity from pg_class where oid = to_regclass('public.org_integrations')),
   'org_integrations has RLS enabled');
 
+-- Seeded by postgres (RLS bypassed).
 insert into org_lookups (org_id, category, code, label)
-values ('44444444-4444-4444-4444-444444444444', 'unit_type', 'studio', 'Studio');
+values ('44444444-4444-4444-4444-444444444444', 'unit_type', 'studio', 'Studio'),
+       ('55555555-5555-5555-5555-555555555555', 'unit_type', 'villa', 'Villa');
 insert into org_integrations (org_id, provider, config)
 values ('44444444-4444-4444-4444-444444444444', 'telegram', '{"bot_name":"Demo","chat_id":"1"}');
 
@@ -36,31 +38,40 @@ select throws_ok($$ insert into org_integrations (org_id, provider, config)
   values ('44444444-4444-4444-4444-444444444444', 'telegram', '{}') $$,
   '23505', null, 'duplicate integration provider is rejected');
 
+-- Signed in as org A admin.
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-0000-0000-0000000000f2","org_id":"44444444-4444-4444-4444-444444444444","org_role":"org_admin"}', true);
 
 select is((select count(*) from org_lookups), 1::bigint, 'org admin reads own lookups');
 select is((select count(*) from org_integrations), 1::bigint, 'org admin reads own integrations');
-select is_empty($$ insert into org_lookups (org_id, category, code, label)
-  values ('55555555-5555-5555-5555-555555555555', 'unit_type', 'villa', 'Villa') returning id $$,
-  'org admin cannot write another org lookups');
-select is_empty($$ insert into org_integrations (org_id, provider, config)
-  values ('55555555-5555-5555-5555-555555555555', 'telegram', '{}') returning id $$,
-  'org admin cannot write another org integrations');
 select is((select count(*) from org_lookups
   where org_id = '55555555-5555-5555-5555-555555555555'), 0::bigint,
   'org admin cannot see another org lookups');
+select lives_ok($$ insert into org_lookups (org_id, category, code, label)
+  values ('44444444-4444-4444-4444-444444444444', 'unit_type', '1br', 'One bedroom') $$,
+  'org admin can write own lookups');
+select lives_ok($$ insert into org_integrations (org_id, provider, config)
+  values ('44444444-4444-4444-4444-444444444444', 'whatsapp', '{}') $$,
+  'org admin can write own integrations');
+select throws_ok($$ insert into org_lookups (org_id, category, code, label)
+  values ('55555555-5555-5555-5555-555555555555', 'unit_type', 'villa-x', 'Villa X') $$,
+  '42501', null, 'org admin cannot write another org lookups');
+select throws_ok($$ insert into org_integrations (org_id, provider, config)
+  values ('55555555-5555-5555-5555-555555555555', 'telegram', '{}') $$,
+  '42501', null, 'org admin cannot write another org integrations');
 
+-- Signed in as org B tenant.
 select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-0000-0000-0000000000f3","org_id":"55555555-5555-5555-5555-555555555555","org_role":"tenant"}', true);
 
-select is((select count(*) from org_lookups), 0::bigint, 'tenant sees no lookups in own org');
-select is_empty($$ insert into org_lookups (org_id, category, code, label)
-  values ('55555555-5555-5555-5555-555555555555', 'unit_type', 'villa', 'Villa') returning id $$,
-  'tenant cannot write lookups');
-select is_empty($$ insert into org_integrations (org_id, provider, config)
-  values ('55555555-5555-5555-5555-555555555555', 'telegram', '{}') returning id $$,
-  'tenant cannot write integrations');
+select is((select count(*) from org_lookups), 1::bigint, 'tenant reads own org lookups');
+select throws_ok($$ insert into org_lookups (org_id, category, code, label)
+  values ('55555555-5555-5555-5555-555555555555', 'unit_type', 'villa-2', 'Villa 2') $$,
+  '42501', null, 'tenant cannot write lookups');
+select throws_ok($$ insert into org_integrations (org_id, provider, config)
+  values ('55555555-5555-5555-5555-555555555555', 'telegram', '{}') $$,
+  '42501', null, 'tenant cannot write integrations');
 
+select * from finish();
 rollback;

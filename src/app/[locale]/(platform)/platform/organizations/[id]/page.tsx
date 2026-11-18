@@ -10,6 +10,7 @@ import { PlatformLookupsManager, type LookupRow } from "@/components/domain/plat
 import { PlatformOrgSettingsForm } from "@/components/domain/platform-org-settings-form";
 import { PlatformTelegramForm } from "@/components/domain/platform-telegram-form";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { hasStoredToken } from "@/lib/telegram-config";
 import { LOOKUP_CATEGORIES } from "@/schemas/platform-admin";
 
 export default async function PlatformOrganization({
@@ -198,7 +199,7 @@ export default async function PlatformOrganization({
         <PlatformTelegramForm
           orgId={id}
           config={{
-            botToken: typeof telegramConfig.bot_token === "string" ? telegramConfig.bot_token : "",
+            hasToken: hasStoredToken(telegramConfig),
             botName: typeof telegramConfig.bot_name === "string" ? telegramConfig.bot_name : "",
             chatId: typeof telegramConfig.chat_id === "string" ? telegramConfig.chat_id : "",
             enabled: telegramConfig.enabled === true,

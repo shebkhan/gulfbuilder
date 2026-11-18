@@ -88,6 +88,7 @@ export function PlatformLookupsManager({ orgId, rows }: { orgId: string; rows: L
                       <form id={formId} action={upsertAction}>
                         <input type="hidden" name="orgId" value={orgId} />
                         <input type="hidden" name="id" value={row.id} />
+                        <input type="hidden" name="isActive" value="off" />
                         <Button type="submit" size="sm" disabled={upsertPending}>
                           {t("save")}
                         </Button>
@@ -108,8 +109,9 @@ export function PlatformLookupsManager({ orgId, rows }: { orgId: string; rows: L
         </table>
       </div>
 
-      <form action={upsertAction} className="grid gap-3 sm:grid-cols-5">
+      <form action={upsertAction} className="grid gap-3 sm:grid-cols-6">
         <input type="hidden" name="orgId" value={orgId} />
+        <input type="hidden" name="isActive" value="off" />
         <Select name="category" defaultValue={LOOKUP_CATEGORIES[0]}>
           <SelectTrigger>
             <SelectValue />
@@ -125,6 +127,7 @@ export function PlatformLookupsManager({ orgId, rows }: { orgId: string; rows: L
         <Input name="code" placeholder={t("code")} dir="ltr" required />
         <Input name="label" placeholder={t("label")} required />
         <Input name="sortOrder" type="number" min={0} defaultValue={0} placeholder={t("sortOrder")} />
+        <Checkbox name="isActive" defaultChecked aria-label={t("active")} />
         <Button type="submit" disabled={upsertPending}>
           {t("add")}
         </Button>

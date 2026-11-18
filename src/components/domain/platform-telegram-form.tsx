@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { saveOrgIntegrationAction } from "@/server/actions/platform-org";
 
 export type TelegramConfig = {
-  botToken: string;
+  hasToken: boolean;
   botName: string;
   chatId: string;
   enabled: boolean;
@@ -31,7 +31,7 @@ export function PlatformTelegramForm({ orgId, config }: { orgId: string; config:
           name="botToken"
           type="password"
           autoComplete="new-password"
-          placeholder={config.botToken ? "••••••" : undefined}
+          placeholder={config.hasToken ? "••••••" : undefined}
           dir="ltr"
         />
       </div>

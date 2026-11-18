@@ -7,3 +7,7 @@ export function toFormData(values: Record<string, unknown>): FormData {
   }
   return fd;
 }
+
+export function hasFormFlag(fd: FormData, key: string): boolean {
+  return fd.getAll(key).includes("on");
+}

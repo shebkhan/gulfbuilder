@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { hasFormFlag } from "@/lib/form-data";
 import { organizationUpdate } from "@/lib/org-settings";
 import { integrationSchema, lookupSchema } from "@/schemas/platform-admin";
 import { organizationSchema } from "@/schemas/settings";
@@ -89,7 +90,7 @@ export async function upsertLookupAction(
     code: formData.get("code"),
     label: formData.get("label"),
     sortOrder: formData.get("sortOrder") ?? 0,
-    isActive: formData.get("isActive") === "on",
+    isActive: hasFormFlag(formData, "isActive"),
   });
   if (!parsed.success) return fail("invalid_input");
 
