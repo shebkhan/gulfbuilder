@@ -47,11 +47,21 @@ Schema:
 ```sql
 alter table public.notification_outbox add column dedupe_key text;
 create unique index notification_outbox_dedupe_idx
-  on public.notification_outbox (org_id, event, dedupe_key)
+  on public.notification_outbox (org_id, event, dedupe_key, recipient)
   where dedupe_key is not null;
 ```
 
+`recipient` is part of the key because most events fan out to several staff members; without it the
+first staff email would suppress the rest of the fan-out.
+
 ### 2. Rendering and enqueue helpers
+
+```sql
+-- Display-only money formatting; the ledger value is never converted. Reads the same
+-- currencies.exponent the app uses, so KWD/BHD/OMR keep 3 decimals.
+create function public.format_money(p_minor bigint, p_currency text) returns text
+  language sql stable security definer set search_path = public;
+```
 
 ```sql
 -- Exact locale template, then 'en' template, then a built-in default for (event, locale).
@@ -77,9 +87,9 @@ create function public.enqueue_notification(
 
 `enqueue_notification` returns early when `p_recipient` is null/blank, renders via
 `render_notification`, and inserts into `notification_outbox` with `status='pending'`,
-`scheduled_for=now()` and `on conflict (org_id, event, dedupe_key) where dedupe_key is not null
-do nothing`. Execute is revoked from `public` and granted to nothing: only the security-definer
-triggers and scan call it as the owner.
+`scheduled_for=now()` and `on conflict (org_id, event, dedupe_key, recipient)
+where dedupe_key is not null do nothing`. Execute is revoked from `public` and granted to nothing:
+only the security-definer triggers and scan call it as the owner.
 
 ### 3. Row-event triggers
 
@@ -92,8 +102,8 @@ All trigger functions are `security definer set search_path = public`; they writ
 | `after insert on maintenance_requests` | `maintenance_requested` | each staff email for `org_admin`, `manager`, `caretaker` | `maintenance-requested:<request id>` | `title`, `unit_no`, `status` |
 | `after update of status on maintenance_requests` when status changed | `maintenance_status_changed` | `tenants.email` via `tenant_id` (skip if null) | `maintenance-status:<request id>:<new status>` | `title`, `status`, `unit_no` |
 
-Money is formatted for display in the trigger as
-`to_char(amount_minor / 100, 'FM999,999,990.00') || ' ' || currency`; the ledger value is untouched.
+Money is formatted for display with `public.format_money(amount_minor, currency)` in the trigger; the
+ledger value is untouched.
 
 Staff recipient helper: inline `select u.email from org_members m join auth.users u on u.id=m.user_id
 where m.org_id=... and m.role in (...)`, skipping null emails. Tenant emails come from `tenants.email`
