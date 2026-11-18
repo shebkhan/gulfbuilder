@@ -1,4 +1,4 @@
--- 0047: notification event coverage. Enqueue helpers + row-event triggers + reminder scan.
+-- 0048: notification event coverage. Enqueue helpers + row-event triggers + reminder scan.
 
 alter table public.notification_outbox add column dedupe_key text;
 create unique index notification_outbox_dedupe_idx

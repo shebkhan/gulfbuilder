@@ -1,5 +1,5 @@
 -- pgTAP: notification event coverage (payment, overdue, maintenance, reminders).
--- Run with `pnpm db:test`. Requires migrations 0001..20261118000047 applied.
+-- Run with `pnpm db:test`. Requires migrations 0001..20261118000048 applied.
 begin;
 create extension if not exists pgtap;
 select no_plan();
