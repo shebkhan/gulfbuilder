@@ -2,6 +2,15 @@
   "name": "Gulf - Owner Query Agent",
   "nodes": [
     {
+      "id": "tgtrigger",
+      "name": "Telegram Trigger",
+      "webhookId": "cca7f143-a407-453a-ae1e-85fc1a0ff9fd",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        304
+      ],
       "parameters": {
         "updates": [
           "message",
@@ -9,14 +18,6 @@
         ],
         "additionalFields": {}
       },
-      "id": "tgtrigger",
-      "name": "Telegram Trigger",
-      "type": "n8n-nodes-base.telegramTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        200,
-        300
-      ],
       "credentials": {
         "telegramApi": {
           "id": "m0TcrFMdHYuAkrSa",
@@ -25,12 +26,21 @@
       }
     },
     {
+      "id": "ifapproval",
+      "name": "Is Approval Callback?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        224,
+        320
+      ],
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -45,18 +55,19 @@
             }
           ],
           "combinator": "or"
-        }
-      },
-      "id": "ifapproval",
-      "name": "Is Approval Callback?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        420,
-        300
-      ]
+        },
+        "options": {}
+      }
     },
     {
+      "id": "decide",
+      "name": "Decide Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        176
+      ],
       "parameters": {
         "method": "POST",
         "url": "={{ 'https://gulfbuilder.vercel.app/api/v1/owner/approvals/' + ($json.callback_query.data.split(':')[1]) + '/decide' }}",
@@ -67,14 +78,6 @@
         "jsonBody": "={{ JSON.stringify({ decision: $json.callback_query.data.split(':')[0] === 'approve' ? 'approved' : 'rejected' }) }}",
         "options": {}
       },
-      "id": "decide",
-      "name": "Decide Approval",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        640,
-        180
-      ],
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -83,19 +86,18 @@
       }
     },
     {
-      "parameters": {
-        "operation": "answerCallbackQuery",
-        "callbackQueryId": "={{ $('Telegram Trigger').first().json.callback_query.id }}",
-        "additionalFields": {}
-      },
       "id": "answercb",
       "name": "Answer Callback",
+      "webhookId": "c5df0854-dcc3-43da-b40d-ba2a6238b626",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        860,
-        180
+        864,
+        176
       ],
+      "parameters": {
+        "operation": "answerCallbackQuery"
+      },
       "credentials": {
         "telegramApi": {
           "id": "m0TcrFMdHYuAkrSa",
@@ -104,22 +106,20 @@
       }
     },
     {
-      "parameters": {
-        "operation": "sendMessage",
-        "chatId": "={{ $('Telegram Trigger').first().json.callback_query.message.chat.id }}",
-        "text": "={{ 'Approval ' + ($('Decide Approval').first().json.data.decision) + '.' }}",
-        "additionalFields": {
-          "replyMarkup": "inlineKeyboard"
-        }
-      },
       "id": "replyapproval",
       "name": "Reply Approval Done",
+      "webhookId": "1e87eb2d-891c-41d8-824e-f66034c7ebe0",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1080,
-        180
+        1088,
+        176
       ],
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query.message.chat.id }}",
+        "text": "={{ 'Approval ' + ($('Decide Approval').first().json.data.decision) + '.' }}",
+        "additionalFields": {}
+      },
       "credentials": {
         "telegramApi": {
           "id": "m0TcrFMdHYuAkrSa",
@@ -128,39 +128,39 @@
       }
     },
     {
-      "parameters": {
-        "agent": "toolsAgent",
-        "promptType": "define",
-        "text": "={{ $json.callback_query?.data || $json.message?.text }}",
-        "hasOutputParser": false,
-        "options": {
-          "systemMessage": "You are the Gulf property assistant for an owner. Answer questions about their portfolio using the available tools. Always call a tool to get data; never guess. Summarize concisely. Amounts are in minor units; divide by 100 for QAR. When listing pending approvals, mention the approval id so the owner can approve via buttons."
-        }
-      },
       "id": "agent",
       "name": "Owner Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        640,
-        420
-      ]
+        416,
+        384
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').first().json.callback_query?.data || $('Telegram Trigger').first().json.message?.text }}",
+        "options": {
+          "systemMessage": "You are the Gulf property assistant for an owner. Answer questions about their portfolio using the available tools. Always call a tool to get data; never guess. Summarize concisely. Amounts are in minor units; divide by 100 for QAR (2 decimals). When listing pending approvals, mention the approval id so the owner can approve via buttons. Reply in the same language the user writes in (Arabic if Arabic, otherwise English)."
+        }
+      }
     },
     {
-      "parameters": {
-        "model": {
-          "mode": "id",
-          "value": "gpt-4o-mini"
-        }
-      },
       "id": "openai",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
         640,
-        620
+        624
       ],
+      "parameters": {
+        "model": {
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
       "credentials": {
         "openAiApi": {
           "id": "V2LhZWF2IiVXfskY",
@@ -169,23 +169,20 @@
       }
     },
     {
-      "parameters": {
-        "name": "get_dashboard",
-        "description": "Get owner dashboard KPIs.",
-        "method": "GET",
-        "url": "https://gulfbuilder.vercel.app/api/v1/owner/dashboard",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
       "id": "t1",
       "name": "Tool Dashboard",
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
         880,
-        260
+        256
       ],
+      "parameters": {
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/dashboard",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -194,10 +191,15 @@
       }
     },
     {
+      "id": "t2",
+      "name": "Tool Cheques Due",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        384
+      ],
       "parameters": {
-        "name": "get_cheques_due",
-        "description": "Get cheques due within N days.",
-        "method": "GET",
         "url": "https://gulfbuilder.vercel.app/api/v1/owner/cheques/due",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
@@ -212,14 +214,6 @@
         },
         "options": {}
       },
-      "id": "t2",
-      "name": "Tool Cheques Due",
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 4.2,
-      "position": [
-        880,
-        380
-      ],
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -228,23 +222,20 @@
       }
     },
     {
-      "parameters": {
-        "name": "get_units_summary",
-        "description": "Get units count by status.",
-        "method": "GET",
-        "url": "https://gulfbuilder.vercel.app/api/v1/owner/units/summary",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
       "id": "t3",
       "name": "Tool Units Summary",
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
         880,
-        500
+        496
       ],
+      "parameters": {
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/units/summary",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -253,10 +244,15 @@
       }
     },
     {
+      "id": "t4",
+      "name": "Tool Leases",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        624
+      ],
       "parameters": {
-        "name": "get_leases",
-        "description": "Get rent roll and leases expiring within N days.",
-        "method": "GET",
         "url": "https://gulfbuilder.vercel.app/api/v1/owner/leases",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
@@ -271,14 +267,6 @@
         },
         "options": {}
       },
-      "id": "t4",
-      "name": "Tool Leases",
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 4.2,
-      "position": [
-        880,
-        620
-      ],
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -287,23 +275,20 @@
       }
     },
     {
-      "parameters": {
-        "name": "get_receivables",
-        "description": "Get aged receivables.",
-        "method": "GET",
-        "url": "https://gulfbuilder.vercel.app/api/v1/owner/receivables",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
       "id": "t5",
       "name": "Tool Receivables",
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
         880,
-        740
+        736
       ],
+      "parameters": {
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/receivables",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -312,23 +297,20 @@
       }
     },
     {
-      "parameters": {
-        "name": "get_digest",
-        "description": "Get full daily digest.",
-        "method": "GET",
-        "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
       "id": "t6",
       "name": "Tool Digest",
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
         880,
-        860
+        864
       ],
+      "parameters": {
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -337,23 +319,20 @@
       }
     },
     {
-      "parameters": {
-        "name": "get_approvals",
-        "description": "Get pending expense approvals with ids.",
-        "method": "GET",
-        "url": "https://gulfbuilder.vercel.app/api/v1/owner/approvals",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
       "id": "t7",
       "name": "Tool Approvals",
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
         880,
-        980
+        976
       ],
+      "parameters": {
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/approvals",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
       "credentials": {
         "httpHeaderAuth": {
           "id": "l9ZE1SyEtK8FLTfg",
@@ -362,10 +341,19 @@
       }
     },
     {
+      "id": "reply",
+      "name": "Reply Telegram",
+      "webhookId": "6bc8c1ef-0fdb-4150-817d-bec56f57a749",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        416
+      ],
       "parameters": {
         "operation": "sendMessage",
-        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
-        "text": "={{ $json.output }}",
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query?.message?.chat?.id || $('Telegram Trigger').first().json.message?.chat?.id }}",
+        "text": "={{ $('Owner Agent').first().json.output }}",
         "replyMarkup": "inlineKeyboard",
         "inlineKeyboard": {
           "rows": [
@@ -434,6 +422,30 @@
                   }
                 ]
               }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Open portal",
+                    "additionalFields": {
+                      "url": "https://gulfbuilder.vercel.app"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Chart",
+                    "additionalFields": {
+                      "callback_data": "chart"
+                    }
+                  }
+                ]
+              }
             }
           ]
         },
@@ -441,14 +453,6 @@
           "appendAttribution": false
         }
       },
-      "id": "reply",
-      "name": "Reply Telegram",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        1100,
-        420
-      ],
       "credentials": {
         "telegramApi": {
           "id": "m0TcrFMdHYuAkrSa",
@@ -457,26 +461,200 @@
       }
     },
     {
+      "id": "answercbq",
+      "name": "Answer Callback Query",
+      "webhookId": "5b6a5fc4-8a85-4343-833b-98ec89e8f94a",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "continueOnFail": true,
+      "position": [
+        640,
+        300
+      ],
       "parameters": {
         "operation": "answerCallbackQuery",
         "callbackQueryId": "={{ $json.callback_query?.id }}",
         "additionalFields": {}
       },
-      "id": "answercbq",
-      "name": "Answer Callback Query",
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Gulf Telegram Bot"
+        }
+      }
+    },
+    {
+      "id": "allowlist",
+      "name": "Allow-list Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "allow1",
+              "leftValue": "={{ ($json.message?.chat?.id || $json.callback_query?.message?.chat?.id || '').toString() }}",
+              "rightValue": "6986993618",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "rightValue": "6986993618"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "unauth",
+      "name": "Unauthorized Reply",
+      "webhookId": "d9a893d4-0868-4d90-81b2-2c53db7dff33",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        640,
-        300
+        420,
+        520
       ],
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $json.message?.chat?.id || $json.callback_query?.message?.chat?.id }}",
+        "text": "Sorry, you are not authorized to use this bot.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Gulf Telegram Bot"
+        }
+      }
+    },
+    {
+      "id": "typing",
+      "name": "Typing Indicator",
+      "webhookId": "5ac239f1-7b4c-48ed-aaad-df8bce49c311",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        180
+      ],
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.message?.chat?.id || $json.callback_query?.message?.chat?.id }}",
+        "action": "typing",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "m0TcrFMdHYuAkrSa",
+          "name": "Gulf Telegram Bot"
+        }
+      }
+    },
+    {
+      "id": "chartfetch",
+      "name": "Fetch Units (chart)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        600
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://gulfbuilder.vercel.app/api/v1/owner/units/summary",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l9ZE1SyEtK8FLTfg",
+          "name": "Gulf API Key"
+        }
+      }
+    },
+    {
+      "id": "chartcode",
+      "name": "Build Chart URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        600
+      ],
+      "parameters": {
+        "jsCode": "const d=$input.first().json; const data=d.data||d; const by=data.byStatus||{}; const labels=Object.keys(by); const values=Object.values(by); const url='https://quickchart.io/chart?c='+encodeURIComponent(JSON.stringify({type:'pie',data:{labels,datasets:[{data:values}]}})); return [{json:{url}}];"
+      }
+    },
+    {
+      "id": "chartphoto",
+      "name": "Send Chart",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        600
+      ],
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query?.message?.chat?.id || $('Telegram Trigger').first().json.message?.chat?.id }}",
+        "file": "={{ $json.url }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
       "credentials": {
         "telegramApi": {
           "id": "m0TcrFMdHYuAkrSa",
           "name": "Gulf Telegram Bot"
         }
       },
-      "continueOnFail": true
+      "webhookId": "6ce9b200-ab62-4412-b825-ffaa458b7dbd"
+    },
+    {
+      "id": "isch",
+      "name": "Is Chart Callback?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        420,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "chart1",
+              "leftValue": "={{ $json.callback_query?.data || '' }}",
+              "rightValue": "chart",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "rightValue": "chart"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
     }
   ],
   "connections": {
@@ -484,7 +662,7 @@
       "main": [
         [
           {
-            "node": "Is Approval Callback?",
+            "node": "Allow-list Check",
             "type": "main",
             "index": 0
           }
@@ -634,7 +812,76 @@
       "main": [
         [
           {
+            "node": "Is Chart Callback?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allow-list Check": {
+      "main": [
+        [
+          {
+            "node": "Typing Indicator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unauthorized Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Typing Indicator": {
+      "main": [
+        [
+          {
+            "node": "Is Approval Callback?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Chart Callback?": {
+      "main": [
+        [
+          {
+            "node": "Fetch Units (chart)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Owner Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Units (chart)": {
+      "main": [
+        [
+          {
+            "node": "Build Chart URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Chart URL": {
+      "main": [
+        [
+          {
+            "node": "Send Chart",
             "type": "main",
             "index": 0
           }
@@ -643,6 +890,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
-  }
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null
 }
