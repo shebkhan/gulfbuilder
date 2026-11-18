@@ -390,9 +390,12 @@ select is(public.sweep_overdue(null), 0, 're-running the sweep marks nothing new
 select is(
   (select count(*) from public.charges
     where lease_id = '55555555-5555-5555-5555-555555555555' and type = 'late_fee'),
-  2::bigint, 'one late fee per overdue charge after two sweeps'
+  3::bigint, 'one late fee per overdue charge after two sweeps'
 );
 ```
+
+The count is 3, not 2: Task 2's interpolation fixture adds a third past-due charge (due
+`current_date - 20`) alongside `current_date - 10` and Task 3's fresh `current_date - 5`.
 
 - [ ] **Step 2: Confirm the assertions fail**
 
