@@ -1092,6 +1092,52 @@
       "collectionsLessExpenses": "Collections less expenses",
       "agedOutstanding": "Aged outstanding"
     },
+    "cashFlowForecastPage": {
+      "title": "Cash Flow Forecast",
+      "description": "Projected net cash flows by scenario, with renewal and cheque-clearance assumptions.",
+      "loading": "Loading forecast…",
+      "error": "Could not load the forecast",
+      "months": "months",
+      "controls": {
+        "title": "Forecast controls",
+        "description": "Adjust the horizon and scenario to model projected net cash flow.",
+        "months": "Forecast period",
+        "scenario": "Scenario",
+        "whatIf": "What-if assumptions",
+        "applyWhatIf": "Apply what-if"
+      },
+      "scenarios": {
+        "base": "Base",
+        "conservative": "Conservative",
+        "optimistic": "Optimistic"
+      },
+      "whatIf": {
+        "title": "What-if assumptions",
+        "renewalRate": "Renewal rate",
+        "chequeClearance": "Cheque clearance rate"
+      },
+      "warnings": {
+        "title": "Forecast warnings"
+      },
+      "chart": {
+        "title": "Projected net cash flow",
+        "description": "Net position for each forecast month.",
+        "net": "Net",
+        "month": "Month"
+      },
+      "currency": {
+        "QAR": "QAR"
+      },
+      "summary": {
+        "title": "Monthly summary",
+        "description": "Inflows, outflows and net cash by month.",
+        "month": "Month",
+        "inflow": "Inflow",
+        "outflow": "Outflow",
+        "net": "Net",
+        "monthLabel": "Month {month}"
+      }
+    },
     "cashFlowForecast": "Cash Flow Forecast",
     "cashFlowForecastDesc": "Projected net cash flows, scenario modeling, renewal rate, and PDC clearance assumptions."
   },

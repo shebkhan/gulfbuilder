@@ -30,7 +30,7 @@ const CashFlowChart = dynamic(
 );
 
 export default function CashFlowForecastPage() {
-  const t = useTranslations("Reports.CashFlowForecast");
+  const t = useTranslations("reports.cashFlowForecastPage");
   const [forecast, setForecast] = useState<ForecastResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
