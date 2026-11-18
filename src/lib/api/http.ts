@@ -16,7 +16,9 @@ export function jsonResponse(
   data: unknown,
   cache: CacheMode = "private",
 ): Response {
-  const body = JSON.stringify({ data });
+  const body = JSON.stringify({ data }, (_, value) =>
+    typeof value === "bigint" ? Number(value) : value,
+  );
 
   if (cache === "no-store") {
     return new Response(body, {
