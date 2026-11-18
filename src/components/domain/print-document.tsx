@@ -21,12 +21,14 @@ export function PrintLocaleLink({ href, locale }: { href: string; locale: string
 export function PrintDocument({
   title,
   orgName,
+  logoUrl,
   lines,
   totals,
   footer,
 }: {
   title: string;
   orgName: string;
+  logoUrl?: string | null;
   lines: PrintLine[];
   totals: PrintTotal[];
   footer: string;
@@ -45,7 +47,10 @@ export function PrintDocument({
       <article className="print-sheet w-full max-w-[210mm] border border-black/20 bg-white p-10 text-black shadow-sm">
         <header className="flex flex-col gap-1 border-b border-black/25 pb-4">
           <h1 className="text-2xl font-semibold">{title}</h1>
-          <p className="text-sm">{orgName}</p>
+          <div className="flex items-center gap-2">
+            {logoUrl ? <img src={logoUrl} alt="" className="h-8 w-auto object-contain" /> : null}
+            <p className="text-sm">{orgName}</p>
+          </div>
         </header>
 
         <dl className="mt-6 flex flex-col gap-2 text-sm">
