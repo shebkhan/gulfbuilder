@@ -11,6 +11,8 @@ export type Outbound = {
   subject?: string | null;
   body: string;
   from?: string;
+  appName?: string | null;
+  logoUrl?: string | null;
   subscription?: { endpoint: string; p256dh: string; auth: string };
 };
 export type SendResult = { ok: true } | { ok: false; error: string };

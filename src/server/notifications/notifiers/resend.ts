@@ -1,3 +1,4 @@
+import { renderBrandedEmail } from "@/lib/html";
 import type { Notifier, Outbound, SendResult } from "../notifier";
 import { dryRunSend, isDryRun, outboundTitle } from "../notifier";
 
@@ -19,6 +20,7 @@ export const resendNotifier: Notifier = {
           to: message.recipient,
           subject: outboundTitle(message),
           text: message.body,
+          html: renderBrandedEmail(message),
         }),
       });
       if (!response.ok) return { ok: false, error: `resend_http_${response.status}` };
