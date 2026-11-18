@@ -1,11 +1,28 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/domain/marketplace/listing-card";
 import { ListingSearch } from "@/components/domain/marketplace/listing-search";
 import { Link } from "@/i18n/navigation";
-import { getCities, getListingImages, getPublicListings } from "@/lib/marketplace-data";
+import { getCities, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "marketplace" });
+  return {
+    metadataBase: new URL(await siteUrl()),
+    title: `${t("brand")} — ${t("hero")}`,
+    description: t("subtitle"),
+    alternates: { canonical: `/${locale}` },
+    openGraph: { type: "website", title: t("hero"), description: t("subtitle"), locale },
+  };
+}
 
 export default async function MarketplaceLanding({
   params,

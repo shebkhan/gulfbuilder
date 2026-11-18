@@ -1,11 +1,27 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/domain/marketplace/listing-card";
 import { ListingSearch } from "@/components/domain/marketplace/listing-search";
 import { Link } from "@/i18n/navigation";
 import { filterListings, parseListingFilters } from "@/lib/marketplace";
-import { getCities, getListingImages, getPublicListings } from "@/lib/marketplace-data";
+import { getCities, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "marketplace" });
+  return {
+    metadataBase: new URL(await siteUrl()),
+    title: t("resultsTitle"),
+    description: t("subtitle"),
+    alternates: { canonical: `/${locale}/properties` },
+  };
+}
 
 type QueryValue = string | string[] | undefined;
 type SearchParams = Promise<Record<string, QueryValue>>;

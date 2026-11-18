@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { MapPin } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -12,10 +13,31 @@ import {
   getPublicListings,
   siteUrl,
 } from "@/lib/marketplace-data";
+import { listingJsonLd, listingOg } from "@/lib/marketplace-seo";
 
 export const revalidate = 60;
 
 type Spec = { label: string; value: string };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const [listing, origin] = await Promise.all([getPublicListing(slug), siteUrl()]);
+  if (!listing) return {};
+  const images = await getListingImages(listing.unit_id);
+  const seo = listingOg(listing, `${origin}/${locale}/properties/${slug}`, images[0], locale);
+  return {
+    metadataBase: new URL(origin),
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: `/${locale}/properties/${slug}` },
+    openGraph: seo.openGraph,
+    twitter: seo.twitter,
+  };
+}
 
 export default async function ListingDetailPage({
   params,
@@ -59,6 +81,12 @@ export default async function ListingDetailPage({
     specs.push({ label: t("detail.occupancy"), value: listing.occupancy_type });
   }
 
+  const jsonLd = listingJsonLd(
+    listing,
+    `${origin}/${locale}/properties/${listing.slug}`,
+    hero,
+  );
+
   const mapUrl =
     listing.latitude !== null && listing.longitude !== null
       ? `https://www.google.com/maps/search/?api=1&query=${listing.latitude},${listing.longitude}`
@@ -66,6 +94,10 @@ export default async function ListingDetailPage({
 
   return (
     <main className="min-h-screen bg-surface px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <div className="mx-auto max-w-6xl">
         <Link href="/properties" className="font-label-md text-label-md text-secondary underline">
           {t("backToResults")}
