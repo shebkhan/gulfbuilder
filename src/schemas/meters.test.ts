@@ -4,7 +4,7 @@ import { meterSchema, readingSchema } from "./meters";
 
 const UUID = "11111111-1111-4111-8111-111111111111";
 
-const validMeter = { kind: "electricity", buildingId: UUID };
+const validMeter = { kind: "electricity", buildingId: UUID, meterNo: "M-001" };
 const validReading = { meterId: UUID, readOn: "2026-11-17", value: "123.5" };
 
 function messages(schema: z.ZodTypeAny, data: unknown): string[] {
@@ -24,6 +24,12 @@ describe("meterSchema", () => {
 
   it("requires a building", () => {
     expect(messages(meterSchema, { ...validMeter, buildingId: "" })).toContain(
+      "validation.required",
+    );
+  });
+
+  it("requires a meter number", () => {
+    expect(messages(meterSchema, { ...validMeter, meterNo: "" })).toContain(
       "validation.required",
     );
   });

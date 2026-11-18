@@ -4,7 +4,7 @@ export const meterSchema = z.object({
   kind: z.enum(["electricity", "water", "gas"], { message: "validation.required" }),
   buildingId: z.string().min(1, "validation.required").uuid("validation.invalidUuid"),
   unitId: z.string().uuid("validation.invalidUuid").optional().or(z.literal("")),
-  meterNo: z.string().trim().max(60, "validation.tooLong").optional().or(z.literal("")),
+  meterNo: z.string().trim().min(1, "validation.required").max(60, "validation.tooLong"),
 });
 
 export const readingSchema = z.object({

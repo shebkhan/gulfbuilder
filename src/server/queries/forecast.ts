@@ -18,7 +18,7 @@ export async function getForecast(input: unknown): Promise<ForecastResponse> {
   const { data, error } = await ctx.supabase.rpc("forecast_cash_flow", {
     p_months: parsed.months,
     p_scenario: parsed.scenario,
-    p_building_ids: null,
+    p_building_ids: undefined,
   });
   if (error) {
     console.error("Forecast RPC failed", error);

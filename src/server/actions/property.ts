@@ -121,7 +121,7 @@ export async function generateUnitsAction(
     p_count: parsed.data.count,
     p_pad: parsed.data.pad,
     p_unit_type: parsed.data.unitType || undefined,
-    p_area_sqm: parsed.data.areaSqm ?? undefined,
+    p_area_sqm: parsed.data.areaSqm === "" ? undefined : parsed.data.areaSqm,
     p_rent_minor: rentMinor ?? undefined,
   });
   if (error) return fail("failed");

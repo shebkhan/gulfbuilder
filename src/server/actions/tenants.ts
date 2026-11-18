@@ -6,6 +6,7 @@ import { tenantSchema } from "@/schemas/tenants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getOrgContext } from "@/server/org-context";
 import { mergeTenantGroups, type PickerTenant } from "@/lib/tenant-picker";
+import type { Database } from "@/types/database";
 
 export type TenantState = {
   error?: string;
@@ -145,7 +146,7 @@ export async function updateTenantAction(
 
   if (!parsed.success) return fail("invalid_input");
 
-  const updateData: Record<string, unknown> = {
+  const updateData: Database["public"]["Tables"]["tenants"]["Update"] = {
     full_name: parsed.data.fullName,
     kind: parsed.data.kind,
     language: parsed.data.language,

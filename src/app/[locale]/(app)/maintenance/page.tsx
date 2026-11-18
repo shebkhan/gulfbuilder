@@ -81,7 +81,9 @@ export default async function MaintenancePage({
   const openCount = aggregateRows.filter((r) => r.status === "open").length;
   const inProgressCount = aggregateRows.filter((r) => r.status === "in_progress").length;
   const urgentCount = aggregateRows.filter(
-    (r) => (r.priority === "urgent" || r.priority === "high") && r.status !== "completed",
+    (r) =>
+      (r.priority === "urgent" || r.priority === "high") &&
+      !["resolved", "closed", "cancelled"].includes(r.status),
   ).length;
 
   const transformedRequests: MaintenanceItem[] = (requests ?? []).map((r) => ({

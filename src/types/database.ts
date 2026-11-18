@@ -3401,6 +3401,10 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      forecast_cash_flow: {
+        Args: { p_months?: number; p_scenario?: string; p_building_ids?: string[] }
+        Returns: Json
+      }
       format_type_string: { Args: { "": string }; Returns: string }
       generate_floors: {
         Args: { p_building: string; p_from: number; p_to: number }

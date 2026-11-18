@@ -8,6 +8,7 @@ import { can } from "@/lib/rbac";
 import { brandingSchema, organizationSchema, templateSchema } from "@/schemas/settings";
 import { dispatchPending } from "@/server/notifications/dispatch";
 import { getOrgContext } from "@/server/org-context";
+import type { Database } from "@/types/database";
 
 export type SettingsState = {
   error?: string;
@@ -140,7 +141,7 @@ export async function updateBrandingAction(
   const domainChanged =
     data.customDomain !== undefined && data.customDomain !== (current?.custom_domain ?? "");
 
-  const update: Record<string, unknown> = {
+  const update: Database["public"]["Tables"]["org_branding"]["Update"] = {
     app_name: data.appName || null,
     logo_url: data.logoUrl || null,
     favicon_url: data.faviconUrl || null,

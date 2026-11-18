@@ -56,7 +56,7 @@ export default async function NewLeasePage({
     .from("rooms")
     .select(`
       id,
-      room_number,
+      room_no,
       status,
       units!inner (
         id,
@@ -65,7 +65,7 @@ export default async function NewLeasePage({
       )
     `)
     .in("status", ["vacant", "reserved"])
-    .order("room_number");
+    .order("room_no");
 
   const rooms = (rawRooms ?? []).map((r) => {
     const u = r.units as unknown as {
@@ -74,7 +74,7 @@ export default async function NewLeasePage({
     };
     return {
       id: r.id,
-      room_number: r.room_number,
+      room_number: r.room_no,
       unit_no: u?.unit_no || "",
       building_name: u?.buildings?.name || "",
     };
@@ -132,11 +132,11 @@ export default async function NewLeasePage({
 
     if (unit?.building_id) {
       const { data: plainId } = await ctx.supabase.rpc("tenant_id_number", {
-        p_tenant: linkedTenant.id,
+        p_tenant: tenantId,
       });
       initialTenant = {
-        id: linkedTenant.id,
-        full_name: linkedTenant.full_name,
+        id: tenantId,
+        full_name: linkedTenant.full_name ?? "",
         id_number: plainId ?? null,
         nationality: linkedTenant.nationality,
         buildingId: unit.building_id,

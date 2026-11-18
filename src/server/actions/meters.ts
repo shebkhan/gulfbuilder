@@ -34,7 +34,7 @@ export async function createMeterAction(
     building_id: parsed.data.buildingId,
     unit_id: parsed.data.unitId || null,
     kind: parsed.data.kind,
-    meter_no: parsed.data.meterNo || null,
+    meter_no: parsed.data.meterNo,
   });
   if (error) return fail("failed");
 

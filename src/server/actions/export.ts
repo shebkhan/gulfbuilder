@@ -63,7 +63,7 @@ export async function exportDatasetAction(dataset: string): Promise<ExportState>
     case "journal_lines": {
       const { data } = await supabase
         .from("journal_lines")
-        .select("id, journal_id, account_id, debit_minor, credit_minor, currency, tenant_id, lease_id, building_id, unit_id, description")
+        .select("id, journal_id, account_id, debit_minor, credit_minor, tenant_id, lease_id, building_id, unit_id, description")
         .order("id");
       return {
         csv: toCsv((data ?? []) as Record<string, unknown>[]),

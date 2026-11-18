@@ -150,13 +150,12 @@ export async function createTenantRequestAction(
   const { data: requestId, error } = await ctx.supabase.rpc("create_maintenance_request", {
     p_building_id: buildingId,
     p_title: parsed.data.title,
-    p_description: parsed.data.description ?? null,
-    p_unit_id: lease.unit_id ?? null,
-    p_room_id: lease.room_id ?? null,
+    p_description: parsed.data.description ?? undefined,
+    p_unit_id: lease.unit_id ?? undefined,
+    p_room_id: lease.room_id ?? undefined,
     p_tenant_id: tenant.id,
     p_category: parsed.data.category,
     p_priority: parsed.data.priority,
-    p_assigned_vendor_id: null,
   });
   if (error || !requestId) return fail(error?.message || "request_failed");
 

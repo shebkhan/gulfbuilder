@@ -112,7 +112,7 @@ export default async function TenantDetailPage({
           <CardBody className="flex flex-col divide-y divide-hairline">
             {canSeeId && maskedId ? (
               <TenantIdReveal
-                tenantId={tenant.id}
+                tenantId={id}
                 initialMasked={maskedId}
                 labels={{
                   idNumber: t("idNumber"),
@@ -250,7 +250,7 @@ export default async function TenantDetailPage({
                             <DaysLeft date={lease.end_date} />
                           </td>
                           <td className="py-2.5 text-end font-medium text-on-surface">
-                            {formatMoney(lease.rent_minor, lease.currency)}
+                            {formatMoney(BigInt(lease.rent_minor), lease.currency)}
                           </td>
                           <td className="py-2.5 text-center">
                             <span className="flex items-center justify-center gap-1.5">

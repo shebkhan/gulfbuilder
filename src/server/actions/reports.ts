@@ -476,7 +476,7 @@ export async function fetchCollectionReport(
 export type ChequeRow = {
   id: string;
   cheque_no: string;
-  bank_name: string;
+  bank_name: string | null;
   amount_minor: number;
   currency: string;
   cheque_date: string;
