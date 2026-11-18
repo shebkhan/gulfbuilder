@@ -86,9 +86,10 @@ export function ThemePresetForm({ initial }: { initial?: ThemePresetInput }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <input type="hidden" name="isDefault" value={initial?.isDefault ? "on" : ""} />
           <Checkbox
             id={`default-${key}`}
-            name="isDefault"
+            disabled
             defaultChecked={initial?.isDefault ?? false}
           />
           <Label
