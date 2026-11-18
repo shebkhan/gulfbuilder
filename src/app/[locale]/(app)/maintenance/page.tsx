@@ -4,7 +4,7 @@ import { ListPagination } from "@/components/domain/list-pagination";
 import { MaintenanceList, type MaintenanceItem } from "@/components/domain/maintenance-form";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -33,10 +33,16 @@ export default async function MaintenancePage({
   const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
-  // Fetch requests
-  let query = ctx.supabase
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  let aggregateQuery = ctx.supabase
     .from("maintenance_requests")
-    .select(`
+    .select("status, priority");
+  let pageQuery = ctx.supabase
+    .from("maintenance_requests")
+    .select(
+      `
       id,
       title,
       description,
@@ -51,28 +57,34 @@ export default async function MaintenancePage({
       units ( id, unit_no ),
       tenants ( id, full_name ),
       vendors ( id, name )
-    `)
+    `,
+      { count: "exact" },
+    )
     .order("opened_at", { ascending: false });
 
   if (status && status !== "all") {
-    query = query.eq("status", status as never);
+    aggregateQuery = aggregateQuery.eq("status", status as never);
+    pageQuery = pageQuery.eq("status", status as never);
   }
 
   if (priority && priority !== "all") {
-    query = query.eq("priority", priority as never);
+    aggregateQuery = aggregateQuery.eq("priority", priority as never);
+    pageQuery = pageQuery.eq("priority", priority as never);
   }
 
-  const { data: requests } = await query;
+  const [{ data: allRequests }, { data: requests, count }] = await Promise.all([
+    aggregateQuery,
+    pageQuery.range(from, to),
+  ]);
 
-  const allRequests = requests || [];
-
-  const openCount = allRequests.filter((r) => r.status === "open").length;
-  const inProgressCount = allRequests.filter((r) => r.status === "in_progress").length;
-  const urgentCount = allRequests.filter(
+  const aggregateRows = allRequests ?? [];
+  const openCount = aggregateRows.filter((r) => r.status === "open").length;
+  const inProgressCount = aggregateRows.filter((r) => r.status === "in_progress").length;
+  const urgentCount = aggregateRows.filter(
     (r) => (r.priority === "urgent" || r.priority === "high") && r.status !== "completed",
   ).length;
 
-  const transformedRequests: MaintenanceItem[] = allRequests.map((r) => ({
+  const transformedRequests: MaintenanceItem[] = (requests ?? []).map((r) => ({
     id: r.id,
     title: r.title,
     description: r.description,
@@ -89,7 +101,7 @@ export default async function MaintenancePage({
     vendor: r.vendors as unknown as { id: string; name: string } | null,
   }));
 
-  const paged = paginate(transformedRequests, Number(page ?? 1));
+  const paged = toPaginated(transformedRequests, count, currentPage);
 
   const filterTabs = [
     { key: "all", label: tCommon("all") },

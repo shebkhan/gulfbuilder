@@ -33,6 +33,9 @@ export default async function DashboardPage({
   if (!ctx) return null;
 
   const t = await getTranslations("dashboard");
+  const tCheques = await getTranslations("cheques");
+  const tPayments = await getTranslations("payments");
+  const tMaintenance = await getTranslations("maintenance");
 
   const next30Days = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
 
@@ -178,9 +181,9 @@ export default async function DashboardPage({
             <div className="flex flex-col">
               <KpiLabel>{t("monthlyRentRoll")}</KpiLabel>
               <CountUp
-                to={Number(toDecimal(BigInt(kpis?.monthly_rent_roll ?? 0), "QAR"))}
-                decimals={exponentOf("QAR")}
-                prefix="QAR "
+                to={Number(toDecimal(BigInt(kpis?.monthly_rent_roll ?? 0), ctx.currency))}
+                decimals={exponentOf(ctx.currency)}
+                prefix={`${ctx.currency} `}
                 separator=","
                 replayOnHover
                 className="font-headline-md text-headline-md font-bold text-on-surface"
@@ -198,9 +201,9 @@ export default async function DashboardPage({
             <div className="flex flex-col">
               <KpiLabel>{t("netOperatingIncome")}</KpiLabel>
               <CountUp
-                to={Number(toDecimal(BigInt(kpis?.net_operating_income ?? 0), "QAR"))}
-                decimals={exponentOf("QAR")}
-                prefix="QAR "
+                to={Number(toDecimal(BigInt(kpis?.net_operating_income ?? 0), ctx.currency))}
+                decimals={exponentOf(ctx.currency)}
+                prefix={`${ctx.currency} `}
                 separator=","
                 replayOnHover
                 className="font-headline-md text-headline-md font-bold text-on-surface"
@@ -323,7 +326,7 @@ export default async function DashboardPage({
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={c.status === "deposited" ? "warning" : "info"}>
-                            {c.status}
+                            {tCheques(`statuses.${c.status}`)}
                           </Badge>
                           <span className="font-semibold text-on-surface">
                             {formatMoney(BigInt(c.amount_minor), c.currency, locale)}
@@ -372,7 +375,7 @@ export default async function DashboardPage({
                             {receiptFormatted}
                           </span>
                           <span className="text-xs text-on-surface-variant">
-                            {tenant?.full_name} · {p.method}
+                            {tenant?.full_name} · {tPayments(`methods.${p.method}`)}
                           </span>
                         </div>
                         <span className="font-semibold text-on-surface">
@@ -484,10 +487,10 @@ export default async function DashboardPage({
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={getPriorityVariant(req.priority)}>
-                            {req.priority}
+                            {tMaintenance(`priorities.${req.priority}`)}
                           </Badge>
                           <Badge variant={req.status === "in_progress" ? "info" : "neutral"}>
-                            {req.status.replace("_", " ")}
+                            {tMaintenance(`statuses.${req.status}`)}
                           </Badge>
                         </div>
                       </div>

@@ -53,7 +53,7 @@ export default async function NewExpensePage({
           <CardTitle>{t("createExpense")}</CardTitle>
         </CardHeader>
         <CardBody>
-          <ExpenseForm vendors={vendors} buildings={buildings} />
+          <ExpenseForm vendors={vendors} buildings={buildings} currency={ctx.currency} />
         </CardBody>
       </Card>
     </div>

@@ -3,8 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -78,31 +87,33 @@ export function BuildingTenantPicker({ buildings, value, initialTenant, onChange
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <div className="relative">
-        <Input
-          readOnly
-          value={selected?.full_name ?? ""}
-          placeholder={t("selectTenant")}
-          aria-label={t("tenant")}
-          className="cursor-pointer pe-9"
-          onClick={() => setOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setOpen(true);
-            }
-          }}
-        />
-        <ChevronDown className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
+        <DialogTrigger asChild>
+          <Input
+            readOnly
+            value={selected?.full_name ?? ""}
+            placeholder={t("selectTenant")}
+            aria-label={t("tenant")}
+            className="cursor-pointer pe-9"
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setOpen(true);
+              }
+            }}
+          />
+        </DialogTrigger>
+        <ChevronDown className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" />
       </div>
 
-      <DialogContent className="max-w-[36rem]" aria-describedby={undefined}>
+      <DialogContent className="sm:max-w-[36rem]">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-zinc-500">{t("building")}</Label>
+        <div className="grid gap-4">
+          <div className="grid gap-1.5">
+            <Label>{t("building")}</Label>
             <Select value={buildingId} onValueChange={handleBuildingChange}>
               <SelectTrigger>
                 <SelectValue placeholder={t("selectBuilding")} />
@@ -118,21 +129,23 @@ export function BuildingTenantPicker({ buildings, value, initialTenant, onChange
           </div>
 
           {!buildingId ? (
-            <p className="py-6 text-center font-body-sm text-body-sm text-zinc-500">
+            <p className="py-6 text-center font-body-sm text-body-sm text-on-surface-variant">
               {t("chooseBuilding")}
             </p>
           ) : loading ? (
-            <p className="py-6 text-center font-body-sm text-body-sm text-zinc-500">
+            <p className="py-6 text-center font-body-sm text-body-sm text-on-surface-variant">
               {tCommon("loading")}
             </p>
           ) : error ? (
-            <p role="alert" className="py-6 text-center font-body-sm text-body-sm text-red-600">
+            <p role="alert" className="py-6 text-center font-body-sm text-body-sm text-error">
               {t("error")}
             </p>
           ) : tenants.length === 0 ? (
-            <p className="py-6 text-center font-body-sm text-body-sm text-zinc-500">{t("empty")}</p>
+            <p className="py-6 text-center font-body-sm text-body-sm text-on-surface-variant">
+              {t("empty")}
+            </p>
           ) : (
-            <div className="flex max-h-72 flex-col gap-1 overflow-y-auto rounded-md border border-zinc-200 p-1">
+            <Card className="grid max-h-72 gap-1 overflow-y-auto p-1">
               {tenants.map((tenant) => (
                 <Button
                   type="button"
@@ -142,16 +155,18 @@ export function BuildingTenantPicker({ buildings, value, initialTenant, onChange
                     onChange(tenant.id, tenant);
                     setOpen(false);
                   }}
-                  className="flex h-auto items-center justify-between gap-3 rounded-md px-3 py-2 text-start hover:bg-zinc-100"
+                  className="h-auto justify-between gap-3 rounded-lg px-3 py-2 text-start"
                 >
-                  <span className="font-medium text-zinc-900">{tenant.full_name}</span>
-                  <span className="flex items-center gap-2 text-sm text-zinc-500">
+                  <span className="font-medium text-on-surface">{tenant.full_name}</span>
+                  <span className="flex items-center gap-2 text-label-sm text-on-surface-variant">
                     {tenant.id_number ? <span dir="ltr">{tenant.id_number}</span> : null}
-                    {tenant.nationality ? <span>{tenant.nationality}</span> : null}
+                    {tenant.nationality ? (
+                      <Badge variant="neutral">{tenant.nationality}</Badge>
+                    ) : null}
                   </span>
                 </Button>
               ))}
-            </div>
+            </Card>
           )}
         </div>
       </DialogContent>

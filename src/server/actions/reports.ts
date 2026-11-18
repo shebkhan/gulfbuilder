@@ -231,28 +231,19 @@ export async function fetchOccupancyReport(
   }
 
   const buildingIds = buildings.map((b) => b.id);
-  const [{ data: units }, { data: leases }] = await Promise.all([
-    ctx.supabase
-      .from("units")
-      .select("id, building_id, status, default_rent_minor")
-      .in("building_id", buildingIds)
-      .is("deleted_at", null),
-    ctx.supabase
-      .from("leases")
-      .select("id, unit_id, status, start_date, end_date, rent_minor")
-      .in(
-        "unit_id",
-        (
-          await ctx.supabase
-            .from("units")
-            .select("id")
-            .in("building_id", buildingIds)
-            .is("deleted_at", null)
-        ).data?.map((u) => u.id) ?? [],
-      ),
-  ]);
+  const { data: units } = await ctx.supabase
+    .from("units")
+    .select("id, building_id, status, default_rent_minor")
+    .in("building_id", buildingIds)
+    .is("deleted_at", null);
 
   const unitRows = (units ?? []) as UnitForKpi[];
+  const { data: leases } = unitRows.length
+    ? await ctx.supabase
+        .from("leases")
+        .select("id, unit_id, status, start_date, end_date, rent_minor")
+        .in("unit_id", unitRows.map((u) => u.id))
+    : { data: [] };
   const leaseRows = (leases ?? []) as LeaseForKpi[];
 
   const perBuilding = buildings.map((building) => {

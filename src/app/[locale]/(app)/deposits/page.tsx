@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DepositCard, type DepositItem } from "@/components/domain/deposit-card";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -27,10 +27,16 @@ export default async function DepositsPage({
   const t = await getTranslations("deposits");
   const writable = ["org_admin", "manager"].includes(ctx.role);
 
-  // Fetch deposits
-  const { data: deposits } = await ctx.supabase
-    .from("deposits")
-    .select(`
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  // KPI totals scan scalar-only rows; the page query fetches joined rows for the visible slice.
+  const [{ data: allDeposits }, { data: deposits, count }] = await Promise.all([
+    ctx.supabase.from("deposits").select("held_minor, deducted_minor, refunded_minor"),
+    ctx.supabase
+      .from("deposits")
+      .select(
+        `
       id,
       amount_minor,
       held_minor,
@@ -40,16 +46,25 @@ export default async function DepositsPage({
       notes,
       tenants ( id, full_name ),
       leases ( id, lease_no )
-    `)
-    .order("created_at", { ascending: false });
+    `,
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: false })
+      .range(from, to),
+  ]);
 
-  const allDeposits = deposits || [];
+  const aggregateRows = allDeposits ?? [];
+  const totalHeldMinor = aggregateRows.reduce((acc, d) => acc + BigInt(d.held_minor), 0n);
+  const totalDeductedMinor = aggregateRows.reduce(
+    (acc, d) => acc + BigInt(d.deducted_minor),
+    0n,
+  );
+  const totalRefundedMinor = aggregateRows.reduce(
+    (acc, d) => acc + BigInt(d.refunded_minor),
+    0n,
+  );
 
-  const totalHeldMinor = allDeposits.reduce((acc, d) => acc + BigInt(d.held_minor), 0n);
-  const totalDeductedMinor = allDeposits.reduce((acc, d) => acc + BigInt(d.deducted_minor), 0n);
-  const totalRefundedMinor = allDeposits.reduce((acc, d) => acc + BigInt(d.refunded_minor), 0n);
-
-  const transformedDeposits: DepositItem[] = allDeposits.map((d) => ({
+  const transformedDeposits: DepositItem[] = (deposits ?? []).map((d) => ({
     id: d.id,
     amount_minor: d.amount_minor,
     held_minor: d.held_minor,
@@ -61,7 +76,7 @@ export default async function DepositsPage({
     lease: d.leases as unknown as { id: string; lease_no: string } | null,
   }));
 
-  const paged = paginate(transformedDeposits, Number(page ?? 1));
+  const paged = toPaginated(transformedDeposits, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -82,7 +97,7 @@ export default async function DepositsPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.totalHeldInEscrow")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(totalHeldMinor, "QAR", locale)}
+                {formatMoney(totalHeldMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>
@@ -96,7 +111,7 @@ export default async function DepositsPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.deductionsApplied")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(totalDeductedMinor, "QAR", locale)}
+                {formatMoney(totalDeductedMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>
@@ -110,7 +125,7 @@ export default async function DepositsPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.refundsDisbursed")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(totalRefundedMinor, "QAR", locale)}
+                {formatMoney(totalRefundedMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>

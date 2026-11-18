@@ -30,6 +30,14 @@
     "platform": "Platform",
     "marketPacks": "Market packs"
   },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "This page could not be loaded. Please try again.",
+    "retry": "Try again",
+    "dashboard": "Go to dashboard",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or you do not have access to it."
+  },
   "common": {
     "appName": "Gulf Property",
     "appTagline": "Property management",
@@ -72,6 +80,7 @@
   },
   "tenantPicker": {
     "title": "Select a tenant",
+    "description": "Choose a building, then select one of its tenants.",
     "building": "Building",
     "selectBuilding": "Select building",
     "tenant": "Tenant",

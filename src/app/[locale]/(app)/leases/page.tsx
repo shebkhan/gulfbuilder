@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { PAGE_SIZE, getPaginationRange, type Paginated } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -88,16 +88,8 @@ export default async function LeasesPage({
     query = query.eq("status", "active").gte("end_date", today).lte("end_date", in30Days);
   }
 
-  const { data: leases, count: totalCount } = await query.range(from, to);
-
-  const total = totalCount ?? (leases?.length ?? 0);
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const paged: Paginated<NonNullable<typeof leases>[number]> = {
-    rows: leases ?? [],
-    page: currentPage,
-    pages,
-    total,
-  };
+  const { data: leases, count } = await query.range(from, to);
+  const paged = toPaginated(leases, count, currentPage);
 
   const getStatusVariant = (s: string) => {
     switch (s) {

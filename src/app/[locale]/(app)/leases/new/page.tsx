@@ -192,6 +192,7 @@ export default async function NewLeasePage({
             activeParentLeases={activeParentLeases}
             initialTenant={initialTenant}
             defaultUnitId={unitId}
+            currency={ctx.currency}
             labels={{
               leaseNo: t("leaseNo"),
               autoLeaseNo: t("autoLeaseNo"),

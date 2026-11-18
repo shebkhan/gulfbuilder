@@ -159,7 +159,13 @@ export function DepositCard({
   );
 }
 
-export function DepositDeductForm({ deposit }: { deposit: DepositItem }) {
+export function DepositDeductForm({
+  deposit,
+  currency = "QAR",
+}: {
+  deposit: DepositItem;
+  currency?: string;
+}) {
   const t = useTranslations("deposits");
   const tCommon = useTranslations("common");
   const errors = t.raw("errors") as Record<string, string>;
@@ -170,7 +176,7 @@ export function DepositDeductForm({ deposit }: { deposit: DepositItem }) {
     defaultValues: {
       depositId: deposit.id,
       amount: "",
-      currency: "QAR",
+      currency,
       reason: "",
       chargeId: "",
     },
@@ -246,9 +252,11 @@ export function DepositDeductForm({ deposit }: { deposit: DepositItem }) {
 export function DepositRefundForm({
   deposit,
   balance,
+  currency = "QAR",
 }: {
   deposit: DepositItem;
   balance: number;
+  currency?: string;
 }) {
   const t = useTranslations("deposits");
   const tCommon = useTranslations("common");
@@ -260,7 +268,7 @@ export function DepositRefundForm({
     defaultValues: {
       depositId: deposit.id,
       amount: (balance / 100).toFixed(2),
-      currency: "QAR",
+      currency,
       reason: "",
     },
   });

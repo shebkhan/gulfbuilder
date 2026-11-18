@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
 
@@ -27,11 +27,17 @@ export default async function MetersPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const [{ data: meters }, { data: readings }] = await Promise.all([
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  const [{ data: meters, count }, { data: readings }] = await Promise.all([
     ctx.supabase
       .from("meters")
-      .select("id, kind, meter_no, building_id, unit_id, buildings(code, name)")
-      .order("kind"),
+      .select("id, kind, meter_no, building_id, unit_id, buildings(code, name)", {
+        count: "exact",
+      })
+      .order("kind")
+      .range(from, to),
     ctx.supabase
       .from("meter_readings")
       .select("id, meter_id, read_on, value")
@@ -46,7 +52,7 @@ export default async function MetersPage({
     readingsByMeter.set(r.meter_id, list);
   }
 
-  const paged = paginate(meters ?? [], Number(page ?? 1));
+  const paged = toPaginated(meters, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -72,7 +78,7 @@ export default async function MetersPage({
           <CardTitle>{t("list")}</CardTitle>
         </CardHeader>
         <CardBody className="pt-0">
-          {!meters || meters.length === 0 ? (
+          {paged.total === 0 ? (
             <div className="flex flex-col items-center gap-3 py-10 text-center">
               <Gauge className="size-12 text-on-surface-variant/40" />
               <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>

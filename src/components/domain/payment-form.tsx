@@ -50,10 +50,12 @@ export function PaymentForm({
   buildings,
   leases,
   locale = "en",
+  currency = "QAR",
 }: {
   buildings: BuildingOption[];
   leases: LeaseOption[];
   locale?: string;
+  currency?: string;
 }) {
   const t = useTranslations("payments");
   const tCommon = useTranslations("common");
@@ -70,7 +72,7 @@ export function PaymentForm({
       tenantId: "",
       leaseId: "",
       amount: "",
-      currency: "QAR",
+      currency,
       method: "cash",
       receivedAt: new Date().toISOString().slice(0, 10),
       reference: "",

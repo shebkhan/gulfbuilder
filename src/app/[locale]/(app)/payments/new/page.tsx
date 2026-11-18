@@ -57,7 +57,12 @@ export default async function NewPaymentPage({
           <CardTitle>{t("recordPayment")}</CardTitle>
         </CardHeader>
         <CardBody>
-          <PaymentForm buildings={buildingOptions} leases={leaseOptions} locale={locale} />
+          <PaymentForm
+            buildings={buildingOptions}
+            leases={leaseOptions}
+            locale={locale}
+            currency={ctx.currency}
+          />
         </CardBody>
       </Card>
     </div>

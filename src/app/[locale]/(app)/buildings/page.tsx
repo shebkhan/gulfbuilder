@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/domain/page-header";
 import { Button } from "@/components/ui/button";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 
@@ -27,13 +27,17 @@ export default async function BuildingsPage({
   const t = await getTranslations("buildings");
   const writable = can(ctx.role, "properties.write");
 
-  const [{ data: buildings }, { data: owners }, { data: floors }, { data: units }] =
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  const [{ data: buildings, count }, { data: owners }, { data: floors }, { data: units }] =
     await Promise.all([
       ctx.supabase
         .from("buildings")
-        .select("id, code, name, city, owner_id")
+        .select("id, code, name, city, owner_id", { count: "exact" })
         .is("deleted_at", null)
-        .order("code"),
+        .order("code")
+        .range(from, to),
       ctx.supabase.from("owners").select("id, name").is("deleted_at", null).order("name"),
       ctx.supabase.from("floors").select("building_id"),
       ctx.supabase.from("units").select("building_id, status"),
@@ -58,7 +62,7 @@ export default async function BuildingsPage({
     {},
   );
 
-  const paged = paginate(buildings ?? [], Number(page ?? 1));
+  const paged = toPaginated(buildings, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -89,7 +93,7 @@ export default async function BuildingsPage({
         }
       />
 
-      {buildings && buildings.length > 0 ? (
+      {paged.total > 0 ? (
         <>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {paged.rows.map((building) => {

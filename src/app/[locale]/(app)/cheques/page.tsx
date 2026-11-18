@@ -4,7 +4,7 @@ import { ChequeTable, type ChequeItem } from "@/components/domain/cheque-table";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { formatMoney } from "@/lib/money";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -32,10 +32,14 @@ export default async function ChequesPage({
   const tCommon = await getTranslations("common");
   const writable = ["org_admin", "manager", "accountant"].includes(ctx.role);
 
-  // Fetch cheques
-  let query = ctx.supabase
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  let aggregateQuery = ctx.supabase.from("cheques").select("amount_minor, status");
+  let pageQuery = ctx.supabase
     .from("cheques")
-    .select(`
+    .select(
+      `
       id,
       cheque_no,
       bank_name,
@@ -46,28 +50,34 @@ export default async function ChequesPage({
       bounce_reason,
       tenants ( id, full_name ),
       leases ( id, lease_no )
-    `)
+    `,
+      { count: "exact" },
+    )
     .order("cheque_date", { ascending: true });
 
   if (status && status !== "all") {
-    query = query.eq("status", status as never);
+    aggregateQuery = aggregateQuery.eq("status", status as never);
+    pageQuery = pageQuery.eq("status", status as never);
   }
 
-  const { data: cheques } = await query;
+  const [{ data: allCheques }, { data: cheques, count }] = await Promise.all([
+    aggregateQuery,
+    pageQuery.range(from, to),
+  ]);
 
   // KPI Calculations
-  const allCheques = cheques || [];
-  const pendingAmountMinor = allCheques
+  const aggregateRows = allCheques ?? [];
+  const pendingAmountMinor = aggregateRows
     .filter((c) => c.status === "received" || c.status === "deposited")
     .reduce((acc, c) => acc + BigInt(c.amount_minor), 0n);
 
-  const clearedAmountMinor = allCheques
+  const clearedAmountMinor = aggregateRows
     .filter((c) => c.status === "cleared")
     .reduce((acc, c) => acc + BigInt(c.amount_minor), 0n);
 
-  const bouncedCount = allCheques.filter((c) => c.status === "bounced").length;
+  const bouncedCount = aggregateRows.filter((c) => c.status === "bounced").length;
 
-  const transformedCheques: ChequeItem[] = allCheques.map((c) => ({
+  const transformedCheques: ChequeItem[] = (cheques ?? []).map((c) => ({
     id: c.id,
     cheque_no: c.cheque_no,
     bank_name: c.bank_name,
@@ -88,7 +98,7 @@ export default async function ChequesPage({
     { key: "bounced", label: t("statuses.bounced") },
   ];
 
-  const paged = paginate(transformedCheques, Number(page ?? 1));
+  const paged = toPaginated(transformedCheques, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -109,7 +119,7 @@ export default async function ChequesPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.pendingClearance")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(pendingAmountMinor, "QAR", locale)}
+                {formatMoney(pendingAmountMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>
@@ -123,7 +133,7 @@ export default async function ChequesPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.clearedTotal")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(clearedAmountMinor, "QAR", locale)}
+                {formatMoney(clearedAmountMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>

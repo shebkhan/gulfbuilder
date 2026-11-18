@@ -14,6 +14,7 @@ import {
 import { ListPagination } from "@/components/domain/list-pagination";
 import { DateCell, DaysLeft } from "@/components/domain/date-cell";
 import { formatMoney } from "@/lib/money";
+import { getOrgContext } from "@/server/org-context";
 import { paginate } from "@/lib/pagination";
 import type {
   ChequeReport,
@@ -116,6 +117,7 @@ export async function OccupancyView({
   locale: string;
 }) {
   const t = await getTranslations("reports");
+  const currency = (await getOrgContext())?.currency ?? "QAR";
   const { occupancy, value, perBuilding } = report;
 
   return (
@@ -129,12 +131,12 @@ export async function OccupancyView({
         <ReportStat label={t("vacantUnits")} value={occupancy.vacant} />
         <ReportStat
           label={t("gpr")}
-          value={formatMoney(BigInt(value.gpr), "QAR", locale)}
+          value={formatMoney(BigInt(value.gpr), currency, locale)}
           hint={t("egiHint")}
         />
         <ReportStat
           label={t("vacancyLoss")}
-          value={formatMoney(BigInt(value.vacancyLoss), "QAR", locale)}
+          value={formatMoney(BigInt(value.vacancyLoss), currency, locale)}
         />
       </div>
 
@@ -176,10 +178,10 @@ export async function OccupancyView({
                     {b.occupied} / {b.total} ({b.vacant} {t("vacantUnits")})
                   </td>
                   <td className={`${cell} text-end text-on-surface`}>
-                    {formatMoney(BigInt(b.gpr), "QAR", locale)}
+                    {formatMoney(BigInt(b.gpr), currency, locale)}
                   </td>
                   <td className={`${cell} text-end text-error`}>
-                    {formatMoney(BigInt(b.vacancyLoss), "QAR", locale)}
+                    {formatMoney(BigInt(b.vacancyLoss), currency, locale)}
                   </td>
                 </tr>
               ))}
@@ -205,6 +207,7 @@ export async function ExpiryView({
   params: Record<string, string | undefined>;
 }) {
   const t = await getTranslations("reports");
+  const currency = (await getOrgContext())?.currency ?? "QAR";
   const tc = await getTranslations("common");
   const paged = paginate(report.rows, page);
 
@@ -223,7 +226,7 @@ export async function ExpiryView({
           label={t("monthlyRentRoll")}
           value={formatMoney(
             BigInt(report.rows.reduce((sum, row) => sum + row.rent_minor, 0)),
-            "QAR",
+            currency,
             locale,
           )}
         />
@@ -286,18 +289,19 @@ export async function CollectionView({
   locale: string;
 }) {
   const t = await getTranslations("reports");
+  const currency = (await getOrgContext())?.currency ?? "QAR";
 
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ReportStat label={t("billed")} value={formatMoney(BigInt(report.billed), "QAR", locale)} />
+        <ReportStat label={t("billed")} value={formatMoney(BigInt(report.billed), currency, locale)} />
         <ReportStat
           label={t("collected")}
-          value={formatMoney(BigInt(report.collected), "QAR", locale)}
+          value={formatMoney(BigInt(report.collected), currency, locale)}
         />
         <ReportStat
           label={t("outstanding")}
-          value={formatMoney(BigInt(report.outstanding), "QAR", locale)}
+          value={formatMoney(BigInt(report.outstanding), currency, locale)}
         />
         <ReportStat
           label={t("averageDaysToPay")}
@@ -327,13 +331,13 @@ export async function CollectionView({
                     {row.building_code} — {row.building_name}
                   </td>
                   <td className={`${cell} text-end text-on-surface`}>
-                    {formatMoney(BigInt(row.billed), "QAR", locale)}
+                    {formatMoney(BigInt(row.billed), currency, locale)}
                   </td>
                   <td className={`${cell} text-end text-on-surface`}>
-                    {formatMoney(BigInt(row.collected), "QAR", locale)}
+                    {formatMoney(BigInt(row.collected), currency, locale)}
                   </td>
                   <td className={`${cell} text-end text-error`}>
-                    {formatMoney(BigInt(row.outstanding), "QAR", locale)}
+                    {formatMoney(BigInt(row.outstanding), currency, locale)}
                   </td>
                   <td className={`${cell} tabular text-end text-on-surface-variant`}>
                     {row.rate}%
@@ -362,6 +366,7 @@ export async function ChequeView({
   params: Record<string, string | undefined>;
 }) {
   const t = await getTranslations("reports");
+  const currency = (await getOrgContext())?.currency ?? "QAR";
   const paged = paginate(report.rows, page);
 
   return (
@@ -369,17 +374,17 @@ export async function ChequeView({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <ReportStat
           label={t("dueThisWeek")}
-          value={formatMoney(BigInt(report.dueThisWeek.amount), "QAR", locale)}
+          value={formatMoney(BigInt(report.dueThisWeek.amount), currency, locale)}
           hint={`${report.dueThisWeek.count} ${t("cheques")}`}
         />
         <ReportStat
           label={t("dueThisMonth")}
-          value={formatMoney(BigInt(report.dueThisMonth.amount), "QAR", locale)}
+          value={formatMoney(BigInt(report.dueThisMonth.amount), currency, locale)}
           hint={`${report.dueThisMonth.count} ${t("cheques")}`}
         />
         <ReportStat
           label={t("atRisk")}
-          value={formatMoney(BigInt(report.atRisk.amount), "QAR", locale)}
+          value={formatMoney(BigInt(report.atRisk.amount), currency, locale)}
           hint={`${report.atRisk.count} ${t("cheques")}`}
         />
       </div>
@@ -388,7 +393,7 @@ export async function ChequeView({
         {report.byStatus.map((entry) => (
           <Badge key={entry.status} variant="neutral">
             {entry.status.replace(/_/g, " ")} · {entry.count} ·{" "}
-            {formatMoney(BigInt(entry.amount), "QAR", locale)}
+            {formatMoney(BigInt(entry.amount), currency, locale)}
           </Badge>
         ))}
       </div>

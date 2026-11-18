@@ -1,266 +1,167 @@
-// src/app/[locale]/(app)/reports/cash-flow-forecast/route.tsx
-"use client";
-
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
+import { AlertTriangle } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
+import CashFlowChart from "@/components/domain/reports/cash-flow-chart";
+import { PageHeader } from "@/components/domain/page-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { useTranslations } from "next-intl";
+import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
+import { can } from "@/lib/rbac";
 import { formatMoney } from "@/lib/money";
-import { getCashFlowForecast, ForecastInput, ForecastResponse } from "@/server/actions/forecast";
+import { getOrgContext } from "@/server/org-context";
+import { getForecast } from "@/server/queries/forecast";
 
-const CashFlowChart = dynamic(
-  () => import("@/components/domain/reports/cash-flow-chart"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-80 w-full animate-pulse rounded-xl bg-surface-container-low" />
-    ),
-  },
-);
+type SearchParams = Promise<{ months?: string; scenario?: string }>;
 
-export default function CashFlowForecastPage() {
-  const t = useTranslations("reports.cashFlowForecastPage");
-  const [forecast, setForecast] = useState<ForecastResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [months, setMonths] = useState<3 | 6 | 12>(3);
-  const [scenario, setScenario] = useState<"base" | "conservative" | "optimistic">("base");
-  const [renewalRate, setRenewalRate] = useState<number>(75);
-  const [chequeClearance, setChequeClearance] = useState<number>(85);
+const HORIZONS = [3, 6, 12] as const;
+const SCENARIOS = ["base", "conservative", "optimistic"] as const;
 
-  // Load initial forecast
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const input: ForecastInput = { months, scenario };
-        const result = await getCashFlowForecast(input);
-        setForecast(result);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load forecast");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [months, scenario]);
+export default async function CashFlowForecastPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: SearchParams;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-  // Mock "what-if" effect (in real app, this would call a separate RPC)
-  const handleWhatIf = () => {
-    alert(
-      `What-if applied:\n- Renewal rate: ${renewalRate}%\n- Cheque clearance: ${chequeClearance}%\n\n(Real implementation would call a refined RPC)`,
-    );
-  };
+  const ctx = await getOrgContext();
+  if (!ctx) notFound();
+  if (!can(ctx.role, "reports.read")) notFound();
 
-  // Format chart data
-  const chartData =
-    forecast?.net.map((item) => ({
-      month: `Month ${item.month}`,
-      net: Number(item.amount_minor),
-    })) || [];
+  const raw = await searchParams;
+  const months = HORIZONS.includes(Number(raw.months) as (typeof HORIZONS)[number])
+    ? Number(raw.months)
+    : 3;
+  const scenario = SCENARIOS.includes(raw.scenario as (typeof SCENARIOS)[number])
+    ? (raw.scenario as (typeof SCENARIOS)[number])
+    : "base";
 
-  if (loading) return <div className="p-6">{t("loading")}</div>;
-  if (error)
-    return (
-      <div className="p-6 text-red-600">
-        {t("error")}: {error}
-      </div>
-    );
+  const t = await getTranslations("reports.cashFlowForecastPage");
+  const forecast = await getForecast({ months, scenario });
+
+  const href = (m: number, s: string) => `?months=${m}&scenario=${s}`;
+  const chartData = forecast.net.map((item) => ({
+    month: t("summary.monthLabel", { month: item.month }),
+    net: item.amount_minor,
+  }));
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted-foreground mt-2">{t("description")}</p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-space-lg pt-2">
+      <PageHeader
+        section="reports"
+        role={ctx.role}
+        title={t("title")}
+        description={t("description")}
+      />
 
-      {/* Controls */}
-      <Card className="mb-8">
+      <Card>
         <CardHeader>
           <CardTitle>{t("controls.title")}</CardTitle>
-          <p className="text-muted-foreground text-sm">{t("controls.description")}</p>
         </CardHeader>
-        <CardBody className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div>
-              <Label htmlFor="months">{t("controls.months")}</Label>
-              <Select
-                value={String(months)}
-                onValueChange={(value) => setMonths(Number(value) as 3 | 6 | 12)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select months" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">3 {t("months")}</SelectItem>
-                  <SelectItem value="6">6 {t("months")}</SelectItem>
-                  <SelectItem value="12">12 {t("months")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>{t("controls.scenario")}</Label>
-              <RadioGroup
-                value={scenario}
-                onValueChange={(value) =>
-                  setScenario(value as "base" | "conservative" | "optimistic")
-                }
-                className="mt-2 flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="base" id="base" />
-                  <Label
-                    htmlFor="base"
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {t("scenarios.base")}
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="conservative" id="conservative" />
-                  <Label
-                    htmlFor="conservative"
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {t("scenarios.conservative")}
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="optimistic" id="optimistic" />
-                  <Label
-                    htmlFor="optimistic"
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {t("scenarios.optimistic")}
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label>{t("controls.whatIf")}</Label>
-              <Button onClick={handleWhatIf} className="mt-2 w-full" variant="secondary">
-                {t("controls.applyWhatIf")}
-              </Button>
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <h3 className="mb-3 font-medium">{t("whatIf.title")}</h3>
-            <div className="space-y-4">
-              <div>
-                <div className="mb-1 flex justify-between">
-                  <span>
-                    {t("whatIf.renewalRate")} ({renewalRate}%)
-                  </span>
-                </div>
-                <Slider
-                  min={0}
-                  max={100}
-                  value={[renewalRate]}
-                  onValueChange={([value = 0]) => setRenewalRate(value)}
-                  aria-label={t("whatIf.renewalRate")}
-                />
-              </div>
-              <div>
-                <div className="mb-1 flex justify-between">
-                  <span>
-                    {t("whatIf.chequeClearance")} ({chequeClearance}%)
-                  </span>
-                </div>
-                <Slider
-                  min={0}
-                  max={100}
-                  value={[chequeClearance]}
-                  onValueChange={([value = 0]) => setChequeClearance(value)}
-                  aria-label={t("whatIf.chequeClearance")}
-                />
-              </div>
-            </div>
-          </div>
+        <CardBody className="flex flex-wrap gap-2">
+          {HORIZONS.map((m) => (
+            <Button
+              key={m}
+              asChild
+              variant={m === months ? "primary" : "secondary"}
+              aria-current={m === months ? "true" : undefined}
+            >
+              <Link href={href(m, scenario)}>
+                {m} {t("months")}
+              </Link>
+            </Button>
+          ))}
+          <span className="w-px bg-hairline" aria-hidden />
+          {SCENARIOS.map((s) => (
+            <Button
+              key={s}
+              asChild
+              variant={s === scenario ? "primary" : "secondary"}
+              aria-current={s === scenario ? "true" : undefined}
+            >
+              <Link href={href(months, s)}>{t(`scenarios.${s}`)}</Link>
+            </Button>
+          ))}
         </CardBody>
       </Card>
 
-      {/* Warnings */}
-      {forecast?.warnings.length ? (
-        <Card className="mb-8 border-yellow-200 bg-yellow-50">
+      {forecast.warnings.length > 0 ? (
+        <Card className="border-primary-container bg-primary-container/20">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-yellow-800">
-              ⚠️ {t("warnings.title")}
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="size-4" aria-hidden />
+              {t("warnings.title")}
             </CardTitle>
           </CardHeader>
           <CardBody>
-            <ul className="list-disc space-y-1 pl-5 text-yellow-700">
-              {forecast.warnings.map((w, i) => (
-                <li key={i}>{w}</li>
+            <ul className="list-disc space-y-1 ps-5">
+              {forecast.warnings.map((warning, i) => (
+                <li key={i}>{warning}</li>
               ))}
             </ul>
           </CardBody>
         </Card>
       ) : null}
 
-      {/* Chart */}
-      <Card className="mb-8">
+      <Card>
         <CardHeader>
           <CardTitle>{t("chart.title")}</CardTitle>
-          <p className="text-muted-foreground text-sm">{t("chart.description")}</p>
         </CardHeader>
         <CardBody>
           <CashFlowChart
             data={chartData}
-            currencyLabel={t("currency.QAR")}
+            currency={ctx.currency}
+            locale={locale}
             netLabel={t("chart.net")}
             monthLabel={t("chart.month")}
           />
         </CardBody>
       </Card>
 
-      {/* Summary Table */}
       <Card>
         <CardHeader>
           <CardTitle>{t("summary.title")}</CardTitle>
-          <p className="text-muted-foreground text-sm">{t("summary.description")}</p>
         </CardHeader>
         <CardBody>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="py-2 ps-2 text-left">{t("summary.month")}</th>
-                  <th className="py-2 pe-2 text-right">{t("summary.inflow")}</th>
-                  <th className="py-2 pe-2 text-right">{t("summary.outflow")}</th>
-                  <th className="py-2 pe-2 text-right">{t("summary.net")}</th>
+                <tr className="border-b border-hairline">
+                  <th scope="col" className="py-2 ps-2 text-start">
+                    {t("summary.month")}
+                  </th>
+                  <th scope="col" className="py-2 pe-2 text-end">
+                    {t("summary.inflow")}
+                  </th>
+                  <th scope="col" className="py-2 pe-2 text-end">
+                    {t("summary.outflow")}
+                  </th>
+                  <th scope="col" className="py-2 pe-2 text-end">
+                    {t("summary.net")}
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {forecast?.net.map((item, i) => (
-                  <tr key={i} className="hover:bg-muted/50 border-b last:border-0">
-                    <td className="py-2 ps-2">{t("summary.monthLabel", { month: item.month })}</td>
-                    <td className="py-2 pe-2 text-right">
+              <tbody className="divide-y divide-hairline">
+                {forecast.net.map((item, i) => (
+                  <tr key={i}>
+                    <td className="py-2 ps-2">
+                      {t("summary.monthLabel", { month: item.month })}
+                    </td>
+                    <td className="py-2 pe-2 text-end">
                       {formatMoney(
                         BigInt(
                           Math.round(
-                            (forecast.inflows[i]?.charges ?? 0) + (forecast.inflows[i]?.cheques ?? 0),
+                            (forecast.inflows[i]?.charges ?? 0) +
+                              (forecast.inflows[i]?.cheques ?? 0),
                           ),
                         ),
-                        "QAR",
+                        ctx.currency,
+                        locale,
                       )}
                     </td>
-                    <td className="py-2 pe-2 text-right">
+                    <td className="py-2 pe-2 text-end">
                       {formatMoney(
                         BigInt(
                           Math.round(
@@ -268,11 +169,12 @@ export default function CashFlowForecastPage() {
                               (forecast.outflows[i]?.payouts ?? 0),
                           ),
                         ),
-                        "QAR",
+                        ctx.currency,
+                        locale,
                       )}
                     </td>
-                    <td className="py-2 pe-2 text-right font-medium">
-                      {formatMoney(BigInt(Math.round(item.amount_minor)), "QAR")}
+                    <td className="py-2 pe-2 text-end font-medium">
+                      {formatMoney(BigInt(Math.round(item.amount_minor)), ctx.currency, locale)}
                     </td>
                   </tr>
                 ))}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -31,10 +31,16 @@ export default async function PaymentsPage({
   const t = await getTranslations("payments");
   const writable = can(ctx.role, "finance.write") || ctx.role === "manager";
 
-  // Fetch payments
-  const { data: payments } = await ctx.supabase
-    .from("payments")
-    .select(`
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  // KPI totals scan scalar-only rows; the page query fetches joined rows for the visible slice.
+  const [{ data: allPayments }, { data: payments, count }] = await Promise.all([
+    ctx.supabase.from("payments").select("amount_minor"),
+    ctx.supabase
+      .from("payments")
+      .select(
+        `
       id,
       receipt_no,
       receipt_year,
@@ -46,18 +52,21 @@ export default async function PaymentsPage({
       notes,
       tenants ( id, full_name ),
       leases ( id, lease_no )
-    `)
-    .order("receipt_year", { ascending: false })
-    .order("receipt_no", { ascending: false });
+    `,
+        { count: "exact" },
+      )
+      .order("receipt_year", { ascending: false })
+      .order("receipt_no", { ascending: false })
+      .range(from, to),
+  ]);
 
-  // KPI aggregates
-  const totalReceivedMinor = (payments || []).reduce(
+  const totalReceivedMinor = (allPayments ?? []).reduce(
     (acc, p) => acc + BigInt(p.amount_minor),
     0n,
   );
-  const paymentCount = payments?.length || 0;
+  const paymentCount = allPayments?.length ?? 0;
 
-  const paged = paginate(payments ?? [], Number(page ?? 1));
+  const paged = toPaginated(payments, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -91,7 +100,7 @@ export default async function PaymentsPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.totalCollections")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(totalReceivedMinor, "QAR", locale)}
+                {formatMoney(totalReceivedMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>

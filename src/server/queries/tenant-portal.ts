@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -103,7 +104,7 @@ const EMPTY: TenantPortalData = {
   documents: [],
 };
 
-export async function getTenantPortalData(): Promise<TenantPortalData | null> {
+export const getTenantPortalData = cache(async (): Promise<TenantPortalData | null> => {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -214,4 +215,4 @@ export async function getTenantPortalData(): Promise<TenantPortalData | null> {
     requests: (requestRows ?? []) as PortalRequest[],
     documents: [...(documentRows ?? []), ...(leaseDocuments ?? [])] as PortalDocument[],
   };
-}
+});

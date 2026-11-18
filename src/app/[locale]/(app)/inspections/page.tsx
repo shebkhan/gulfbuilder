@@ -4,7 +4,7 @@ import { InspectionList, type InspectionItem } from "@/components/domain/inspect
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -32,10 +32,14 @@ export default async function InspectionsPage({
   const tCommon = await getTranslations("common");
   const writable = can(ctx.role, "maintenance.write");
 
-  // Fetch inspections
-  let query = ctx.supabase
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  let aggregateQuery = ctx.supabase.from("inspections").select("kind, completed_at");
+  let pageQuery = ctx.supabase
     .from("inspections")
-    .select(`
+    .select(
+      `
       id,
       kind,
       data,
@@ -48,22 +52,27 @@ export default async function InspectionsPage({
         lease_no,
         tenants ( id, full_name )
       )
-    `)
+    `,
+      { count: "exact" },
+    )
     .order("created_at", { ascending: false });
 
   if (kind && kind !== "all") {
-    query = query.eq("kind", kind);
+    aggregateQuery = aggregateQuery.eq("kind", kind);
+    pageQuery = pageQuery.eq("kind", kind);
   }
 
-  const { data: inspections } = await query;
+  const [{ data: allInspections }, { data: inspections, count }] = await Promise.all([
+    aggregateQuery,
+    pageQuery.range(from, to),
+  ]);
 
-  const allInspections = inspections || [];
+  const aggregateRows = allInspections ?? [];
+  const moveInCount = aggregateRows.filter((i) => i.kind === "move_in").length;
+  const moveOutCount = aggregateRows.filter((i) => i.kind === "move_out").length;
+  const pendingCount = aggregateRows.filter((i) => !i.completed_at).length;
 
-  const moveInCount = allInspections.filter((i) => i.kind === "move_in").length;
-  const moveOutCount = allInspections.filter((i) => i.kind === "move_out").length;
-  const pendingCount = allInspections.filter((i) => !i.completed_at).length;
-
-  const transformedInspections: InspectionItem[] = allInspections.map((i) => {
+  const transformedInspections: InspectionItem[] = (inspections ?? []).map((i) => {
     const leaseData = i.leases as unknown as {
       id: string;
       lease_no: string;
@@ -94,7 +103,7 @@ export default async function InspectionsPage({
     { key: "move_out", label: t("moveOut") },
   ];
 
-  const paged = paginate(transformedInspections, Number(page ?? 1));
+  const paged = toPaginated(transformedInspections, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">

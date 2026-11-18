@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -13,7 +14,7 @@ export type OwnerScope = {
   currency: string;
 };
 
-export async function getOwnerScope(): Promise<OwnerScope | null> {
+export const getOwnerScope = cache(async (): Promise<OwnerScope | null> => {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -84,7 +85,7 @@ export async function getOwnerScope(): Promise<OwnerScope | null> {
     tenantIds,
     currency: org?.base_currency ?? "QAR",
   };
-}
+});
 
 export type OwnerDashboard = {
   totalUnits: number;

@@ -74,6 +74,7 @@ type Props = {
   activeParentLeases: ParentLeaseOption[];
   initialTenant?: (PickerTenant & { buildingId: string }) | null;
   defaultUnitId?: string;
+  currency?: string;
   labels: {
     leaseNo: string;
     tenant: string;
@@ -121,6 +122,7 @@ export function LeaseForm({
   activeParentLeases,
   initialTenant,
   defaultUnitId,
+  currency = "QAR",
   labels,
 }: Props) {
   const router = useRouter();
@@ -139,7 +141,7 @@ export function LeaseForm({
       startDate: today,
       endDate: endDate.toISOString().slice(0, 10),
       rent: "10000",
-      currency: "QAR",
+      currency,
       frequency: "annual",
       installments: 4,
       dueDay: 1,

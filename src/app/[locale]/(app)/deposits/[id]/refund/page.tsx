@@ -67,7 +67,7 @@ export default async function RefundDepositPage({
           <CardTitle>{t("refund")}</CardTitle>
         </CardHeader>
         <CardBody>
-          <DepositRefundForm deposit={deposit} balance={balance} />
+          <DepositRefundForm deposit={deposit} balance={balance} currency={ctx.currency} />
         </CardBody>
       </Card>
     </div>

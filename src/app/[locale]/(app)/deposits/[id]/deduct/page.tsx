@@ -66,7 +66,7 @@ export default async function DeductDepositPage({
           <CardTitle>{t("applyDeduction")}</CardTitle>
         </CardHeader>
         <CardBody>
-          <DepositDeductForm deposit={deposit} />
+          <DepositDeductForm deposit={deposit} currency={ctx.currency} />
         </CardBody>
       </Card>
     </div>

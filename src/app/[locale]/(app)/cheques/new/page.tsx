@@ -52,7 +52,7 @@ export default async function NewChequePage({
           <CardTitle>{t("register")}</CardTitle>
         </CardHeader>
         <CardBody>
-          <ChequeRegisterForm buildings={buildings} leases={leases} />
+          <ChequeRegisterForm buildings={buildings} leases={leases} currency={ctx.currency} />
         </CardBody>
       </Card>
     </div>

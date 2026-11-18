@@ -25,8 +25,6 @@ const lookup = (messages: unknown, path: string): unknown =>
     messages,
   );
 
-type Usage = { file: string; namespace: string; key: string };
-
 const usages = sourceFiles(sourceRoot).flatMap((file) => {
   const source = readFileSync(file, "utf8");
   const namespaces = [
@@ -40,7 +38,7 @@ const usages = sourceFiles(sourceRoot).flatMap((file) => {
   if (!namespaces.length) return [];
 
   const keys = [...source.matchAll(/\bt(?:\.(?:rich|raw|has|markup))?\(\s*"([^"]+)"/g)].map(
-    (m) => m[1],
+    (m) => m[1]!,
   );
   return keys.map((key) => ({
     file: relative(process.cwd(), file),

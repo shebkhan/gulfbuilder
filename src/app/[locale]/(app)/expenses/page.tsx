@@ -5,7 +5,7 @@ import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody, KpiLabel } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -37,10 +37,14 @@ export default async function ExpensesPage({
   const canApprove = can(ctx.role, "expenses.approve");
   const canPay = ["org_admin", "accountant"].includes(ctx.role);
 
-  // Fetch expenses
-  let query = ctx.supabase
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  let aggregateQuery = ctx.supabase.from("expenses").select("amount_minor, status");
+  let pageQuery = ctx.supabase
     .from("expenses")
-    .select(`
+    .select(
+      `
       id,
       category,
       description,
@@ -52,30 +56,36 @@ export default async function ExpensesPage({
       vendors ( id, name ),
       buildings ( id, name, code ),
       units ( id, unit_no )
-    `)
+    `,
+      { count: "exact" },
+    )
     .order("expense_date", { ascending: false });
 
   if (status && status !== "all") {
-    query = query.eq("status", status as never);
+    aggregateQuery = aggregateQuery.eq("status", status as never);
+    pageQuery = pageQuery.eq("status", status as never);
   }
 
   if (category && category !== "all") {
-    query = query.eq("category", category);
+    aggregateQuery = aggregateQuery.eq("category", category);
+    pageQuery = pageQuery.eq("category", category);
   }
 
-  const { data: expenses } = await query;
+  const [{ data: allExpenses }, { data: expenses, count }] = await Promise.all([
+    aggregateQuery,
+    pageQuery.range(from, to),
+  ]);
 
-  const allExpenses = expenses || [];
-
-  const totalExpenseMinor = allExpenses.reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
-  const pendingApprovalMinor = allExpenses
+  const aggregateRows = allExpenses ?? [];
+  const totalExpenseMinor = aggregateRows.reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
+  const pendingApprovalMinor = aggregateRows
     .filter((e) => e.status === "submitted")
     .reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
-  const paidMinor = allExpenses
+  const paidMinor = aggregateRows
     .filter((e) => e.status === "paid")
     .reduce((acc, e) => acc + BigInt(e.amount_minor), 0n);
 
-  const transformedExpenses: ExpenseItem[] = allExpenses.map((e) => ({
+  const transformedExpenses: ExpenseItem[] = (expenses ?? []).map((e) => ({
     id: e.id,
     category: e.category,
     description: e.description,
@@ -89,7 +99,7 @@ export default async function ExpensesPage({
     unit: e.units as unknown as { id: string; unit_no: string } | null,
   }));
 
-  const paged = paginate(transformedExpenses, Number(page ?? 1));
+  const paged = toPaginated(transformedExpenses, count, currentPage);
 
   const filterTabs = [
     { key: "all", label: tCommon("all") },
@@ -117,7 +127,7 @@ export default async function ExpensesPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.totalExpenses")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(totalExpenseMinor, "QAR", locale)}
+                {formatMoney(totalExpenseMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>
@@ -131,7 +141,7 @@ export default async function ExpensesPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.pendingApproval")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(pendingApprovalMinor, "QAR", locale)}
+                {formatMoney(pendingApprovalMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>
@@ -145,7 +155,7 @@ export default async function ExpensesPage({
             <div className="flex flex-col">
               <KpiLabel>{t("kpis.disbursed")}</KpiLabel>
               <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                {formatMoney(paidMinor, "QAR", locale)}
+                {formatMoney(paidMinor, ctx.currency, locale)}
               </span>
             </div>
           </CardBody>

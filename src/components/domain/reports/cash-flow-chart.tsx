@@ -10,35 +10,35 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatMoney } from "@/lib/money";
 
 interface CashFlowChartProps {
   data: Array<{ month: string; net: number }>;
-  currencyLabel: string;
+  currency: string;
+  locale: string;
   netLabel: string;
   monthLabel: string;
 }
 
 export default function CashFlowChart({
   data,
-  currencyLabel,
+  currency,
+  locale,
   netLabel,
   monthLabel,
 }: CashFlowChartProps) {
+  const money = (value: unknown) =>
+    formatMoney(BigInt(Math.round(Number(value))), currency, locale);
+
   return (
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey="month" stroke="#6b7280" />
-          <YAxis
-            stroke="#6b7280"
-            tickFormatter={(value) => `${currencyLabel} ${Number(value) / 100}`}
-          />
+          <YAxis stroke="#6b7280" tickFormatter={money} />
           <Tooltip
-            formatter={(value) => [
-              `${currencyLabel} ${Number(value) / 100}`,
-              netLabel,
-            ]}
+            formatter={(value) => [money(value), netLabel]}
             labelFormatter={(label) => `${monthLabel}: ${label}`}
           />
           <Legend />
@@ -60,4 +60,3 @@ export default function CashFlowChart({
     </div>
   );
 }
-

@@ -17,6 +17,19 @@ export function getPaginationRange(page: number, pageSize = PAGE_SIZE): { from: 
   return { from, to };
 }
 
+/** Builds page metadata from a DB-side `.range()` result that returned an exact count. */
+export function toPaginated<T>(
+  rows: T[] | null,
+  count: number | null,
+  page: number,
+  pageSize = PAGE_SIZE,
+): Paginated<T> {
+  const total = count ?? rows?.length ?? 0;
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const current = Math.min(Math.max(1, Math.trunc(page) || 1), pages);
+  return { rows: rows ?? [], page: current, pages, total };
+}
+
 /** Slices a list for the requested page. Page numbers are clamped to the list. */
 export function paginate<T>(rows: T[], page: number, pageSize = PAGE_SIZE): Paginated<T> {
   const total = rows.length;

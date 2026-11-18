@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { paginate } from "@/lib/pagination";
+import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
@@ -29,15 +29,18 @@ export default async function DocumentsPage({
   const ctx = await getOrgContext();
   if (!ctx) return null;
 
-  const { data: documents } = await ctx.supabase
+  const currentPage = Math.max(1, Number(page ?? 1));
+  const { from, to } = getPaginationRange(currentPage, PAGE_SIZE);
+
+  const { data: documents, count } = await ctx.supabase
     .from("documents")
-    .select("id, entity_type, entity_id, kind, path, expires_on, created_at")
+    .select("id, entity_type, entity_id, kind, path, expires_on, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
-    .limit(200);
+    .range(from, to);
 
   const writable = can(ctx.role, "maintenance.write") || can(ctx.role, "finance.write");
 
-  const paged = paginate(documents ?? [], Number(page ?? 1));
+  const paged = toPaginated(documents, count, currentPage);
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
@@ -65,7 +68,7 @@ export default async function DocumentsPage({
           <CardTitle>{t("list")}</CardTitle>
         </CardHeader>
         <CardBody className="pt-0">
-          {!documents || documents.length === 0 ? (
+          {paged.total === 0 ? (
             <div className="flex flex-col items-center gap-3 py-10 text-center">
               <FileText className="size-12 text-on-surface-variant/40" />
               <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>

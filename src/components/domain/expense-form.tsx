@@ -71,9 +71,11 @@ const CATEGORY_KEYS: Record<string, string> = {
 export function ExpenseForm({
   vendors,
   buildings,
+  currency = "QAR",
 }: {
   vendors: VendorOption[];
   buildings: BuildingOption[];
+  currency?: string;
 }) {
   const t = useTranslations("expenses");
   const tCommon = useTranslations("common");
@@ -86,7 +88,7 @@ export function ExpenseForm({
       category: "maintenance",
       description: "",
       amount: "",
-      currency: "QAR",
+      currency,
       expenseDate: new Date().toISOString().slice(0, 10),
       vendorId: "",
       buildingId: "",

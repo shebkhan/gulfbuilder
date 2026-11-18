@@ -68,7 +68,7 @@ export default async function ReplaceChequePage({
           <CardTitle>{t("replaceTitle", { no: cheque.cheque_no })}</CardTitle>
         </CardHeader>
         <CardBody>
-          <ChequeReplaceForm cheque={cheque} />
+          <ChequeReplaceForm cheque={cheque} currency={ctx.currency} />
         </CardBody>
       </Card>
     </div>

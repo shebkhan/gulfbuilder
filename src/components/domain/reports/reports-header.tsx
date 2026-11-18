@@ -5,6 +5,7 @@ import { StatementGenerator } from "@/components/domain/statement-generator";
 import { formatMoney } from "@/lib/money";
 import { can, type Role } from "@/lib/rbac";
 import type { PortfolioKpis } from "@/server/actions/reports";
+import { getOrgContext } from "@/server/org-context";
 
 type ReportsHeaderProps = {
   locale: string;
@@ -24,6 +25,8 @@ export async function ReportsHeader({
   showStatementGenerator = false,
 }: ReportsHeaderProps) {
   const t = await getTranslations("reports");
+  const ctx = await getOrgContext();
+  const currency = ctx?.currency ?? "QAR";
   const writable = can(role, "statements.write");
 
   return (
@@ -64,7 +67,7 @@ export async function ReportsHeader({
               <div className="flex flex-col">
                 <KpiLabel>{t("monthlyRentRoll")}</KpiLabel>
                 <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                  {formatMoney(BigInt(kpis.monthly_rent_roll ?? 0), "QAR", locale)}
+                  {formatMoney(BigInt(kpis.monthly_rent_roll ?? 0), currency, locale)}
                 </span>
                 <span className="text-xs text-on-surface-variant">Active annualized pipeline</span>
               </div>
@@ -79,7 +82,7 @@ export async function ReportsHeader({
               <div className="flex flex-col">
                 <KpiLabel>{t("netOperatingIncome")}</KpiLabel>
                 <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                  {formatMoney(BigInt(kpis.net_operating_income ?? 0), "QAR", locale)}
+                  {formatMoney(BigInt(kpis.net_operating_income ?? 0), currency, locale)}
                 </span>
                 <span className="text-xs text-on-surface-variant">Collections less expenses</span>
               </div>
@@ -94,7 +97,7 @@ export async function ReportsHeader({
               <div className="flex flex-col">
                 <KpiLabel>{t("overdueReceivables")}</KpiLabel>
                 <span className="font-headline-md text-headline-md font-bold text-on-surface">
-                  {formatMoney(BigInt(kpis.overdue_receivables ?? 0), "QAR", locale)}
+                  {formatMoney(BigInt(kpis.overdue_receivables ?? 0), currency, locale)}
                 </span>
                 <span className="text-xs text-on-surface-variant">Aged outstanding</span>
               </div>

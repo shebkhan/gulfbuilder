@@ -40,7 +40,7 @@ export default async function UnitPage({
       .order("room_no"),
   ]);
 
-  const currency = unit.currency ?? "QAR";
+  const currency = unit.currency ?? ctx.currency;
   const facts: [string, string][] = [
     [t("type"), unit.unit_type ?? "—"],
     [t("area"), unit.area_sqm ? String(unit.area_sqm) : "—"],

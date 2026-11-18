@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { paginate, pageHref } from "@/lib/pagination";
+import { paginate, pageHref, toPaginated } from "@/lib/pagination";
 
 describe("pagination", () => {
   it("slices the requested page", () => {
@@ -27,5 +27,16 @@ describe("pagination", () => {
     expect(pageHref("/tenants", { q: "ali" }, 3)).toBe("/tenants?q=ali&page=3");
     expect(pageHref("/tenants", {}, 1)).toBe("/tenants");
     expect(pageHref("/tenants", { q: undefined }, 2)).toBe("/tenants?page=2");
+  });
+
+  it("builds page metadata from a DB count", () => {
+    expect(toPaginated([1, 2], 25, 2, 10)).toEqual({
+      rows: [1, 2],
+      page: 2,
+      pages: 3,
+      total: 25,
+    });
+    expect(toPaginated(null, 0, 9)).toEqual({ rows: [], page: 1, pages: 1, total: 0 });
+    expect(toPaginated([1], null, 1)).toEqual({ rows: [1], page: 1, pages: 1, total: 1 });
   });
 });

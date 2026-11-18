@@ -256,9 +256,11 @@ export function ChequeTable({
 export function ChequeRegisterForm({
   buildings,
   leases,
+  currency = "QAR",
 }: {
   buildings: BuildingOption[];
   leases: LeaseOption[];
+  currency?: string;
 }) {
   const t = useTranslations("cheques");
   const tCommon = useTranslations("common");
@@ -273,7 +275,7 @@ export function ChequeRegisterForm({
       chequeNo: "",
       bankName: "",
       amount: "",
-      currency: "QAR",
+      currency,
       chequeDate: new Date().toISOString().slice(0, 10),
       notes: "",
     },
@@ -475,7 +477,13 @@ export function ChequeBounceForm({ chequeId }: { chequeId: string }) {
   );
 }
 
-export function ChequeReplaceForm({ cheque }: { cheque: ChequeItem }) {
+export function ChequeReplaceForm({
+  cheque,
+  currency = "QAR",
+}: {
+  cheque: ChequeItem;
+  currency?: string;
+}) {
   const t = useTranslations("cheques");
   const tCommon = useTranslations("common");
   const errors = t.raw("errors") as Record<string, string>;
@@ -488,7 +496,7 @@ export function ChequeReplaceForm({ cheque }: { cheque: ChequeItem }) {
       chequeNo: "",
       bankName: cheque.bank_name ?? "",
       amount: (cheque.amount_minor / 100).toFixed(2),
-      currency: "QAR",
+      currency,
       chequeDate: new Date().toISOString().slice(0, 10),
       notes: "",
     },
