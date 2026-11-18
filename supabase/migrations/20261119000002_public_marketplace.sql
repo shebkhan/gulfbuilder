@@ -101,7 +101,6 @@ select
   coalesce(oi.config ->> 'phone', oi.config ->> 'number') as whatsapp
 from units u
 left join org_integrations oi on oi.org_id = u.org_id and oi.provider = 'whatsapp'
-
 join buildings b on b.id = u.building_id
 where u.is_listed_publicly
   and b.is_listed_publicly
@@ -119,7 +118,11 @@ create policy listing_images_read on listing_images for select
   using (org_id = auth_org() or is_publicly_listed(unit_id));
 create policy listing_images_write on listing_images for all
   using (org_id = auth_org() and auth_role() in ('org_admin', 'manager'))
-  with check (org_id = auth_org() and auth_role() in ('org_admin', 'manager'));
+  with check (
+    org_id = auth_org()
+    and auth_role() in ('org_admin', 'manager')
+    and public_listing_org(unit_id) = org_id
+  );
 
 create policy listing_enquiries_read on listing_enquiries for select
   using (org_id = auth_org());

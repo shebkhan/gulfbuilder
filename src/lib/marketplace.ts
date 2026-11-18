@@ -73,6 +73,8 @@ export function filterListings<T extends ListingPreview>(listings: T[], filters:
     if (row.rent_minor === null) {
       if (filters.minRentMinor !== null || filters.maxRentMinor !== null) return false;
     } else {
+      // shortcut: rent filters compare minor units assuming one currency (QAR); add a
+      // per-row currency conversion when listings span multiple currencies.
       const rent = BigInt(row.rent_minor);
       if (filters.minRentMinor !== null && rent < filters.minRentMinor) return false;
       if (filters.maxRentMinor !== null && rent > filters.maxRentMinor) return false;
