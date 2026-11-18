@@ -1,3 +1,4 @@
+import type { DashboardKpis } from "@/schemas/dashboard";
 import { getOrgContext } from "@/server/org-context";
 import {
   chequePipeline,
@@ -14,17 +15,7 @@ import {
   type ValueKpi,
 } from "@/lib/kpi";
 
-export type PortfolioKpis = {
-  total_units: number;
-  occupied_units: number;
-  vacant_units: number;
-  occupancy_pct: number;
-  monthly_rent_roll: number;
-  ytd_collections: number;
-  ytd_expenses: number;
-  net_operating_income: number;
-  overdue_receivables: number;
-};
+export type PortfolioKpis = DashboardKpis;
 
 export async function fetchPortfolioKpis(): Promise<PortfolioKpis | null> {
   const ctx = await getOrgContext();

@@ -18,8 +18,8 @@ import CountUp from "@/components/ui/count-up";
 import { Link } from "@/i18n/navigation";
 import { exponentOf, formatMoney, toDecimal } from "@/lib/money";
 import { can } from "@/lib/rbac";
-import { fetchPortfolioKpis } from "@/server/actions/reports";
 import { getOrgContext } from "@/server/org-context";
+import { getDashboard } from "@/server/services/dashboard";
 
 export default async function DashboardPage({
   params,
@@ -37,56 +37,8 @@ export default async function DashboardPage({
   const tPayments = await getTranslations("payments");
   const tMaintenance = await getTranslations("maintenance");
 
-  const next30Days = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-
-  // Parallel data fetching for entire dashboard
-  const [
-    kpis,
-    { data: rawExpiring },
-    { count: openMaintCount },
-    { data: rawCheques },
-    { data: rawPayments },
-    { data: rawMaintRequests },
-    { data: rawBuildings },
-  ] = await Promise.all([
-    fetchPortfolioKpis(),
-    ctx.supabase.rpc("leases_expiring", { p_days: 30 }),
-    ctx.supabase
-      .from("maintenance_requests")
-      .select("*", { count: "exact", head: true })
-      .in("status", ["open", "in_progress"]),
-    ctx.supabase
-      .from("cheques")
-      .select("id, cheque_no, bank_name, amount_minor, currency, cheque_date, status, tenants(full_name)")
-      .in("status", ["received", "deposited"])
-      .lte("cheque_date", next30Days)
-      .order("cheque_date", { ascending: true })
-      .limit(4),
-    ctx.supabase
-      .from("payments")
-      .select("id, receipt_no, receipt_year, amount_minor, currency, method, received_at, tenants(full_name)")
-      .order("received_at", { ascending: false })
-      .limit(4),
-    ctx.supabase
-      .from("maintenance_requests")
-      .select("id, title, priority, status, opened_at, buildings(code), units(unit_no)")
-      .in("status", ["open", "in_progress"])
-      .order("opened_at", { ascending: false })
-      .limit(4),
-    ctx.supabase
-      .from("buildings")
-      .select("id, code, name, units(id, status)")
-      .is("deleted_at", null)
-      .order("code"),
-  ]);
-
-  const expiringLeases = (rawExpiring ?? []) as {
-    lease_id: string;
-    lease_no: string;
-    tenant_name: string;
-    end_date: string;
-    days_left: number;
-  }[];
+  const data = await getDashboard(ctx);
+  const { kpis, expiringLeases } = data;
 
   const canLease = can(ctx.role, "leases.write");
   const canFinance = can(ctx.role, "finance.write") || ctx.role === "manager";
@@ -221,7 +173,7 @@ export default async function DashboardPage({
             <div className="flex flex-col">
               <KpiLabel>{t("activeWorkOrders")}</KpiLabel>
               <CountUp
-                to={openMaintCount ?? 0}
+                to={data.openMaintenance}
                 replayOnHover
                 className="font-headline-md text-headline-md font-bold text-on-surface"
               />
@@ -303,14 +255,13 @@ export default async function DashboardPage({
               </Link>
             </CardHeader>
             <CardBody className="pt-0">
-              {(!rawCheques || rawCheques.length === 0) ? (
+              {data.upcomingCheques.length === 0 ? (
                 <p className="py-4 font-body-sm text-body-sm text-on-surface-variant">
                   {t("noUpcomingCheques")}
                 </p>
               ) : (
                 <div className="flex flex-col divide-y divide-hairline">
-                  {rawCheques.map((c) => {
-                    const tenant = c.tenants as unknown as { full_name: string } | null;
+                  {data.upcomingCheques.map((c) => {
                     return (
                       <div
                         key={c.id}
@@ -321,7 +272,7 @@ export default async function DashboardPage({
                             {t("cheque")} #{c.cheque_no} ({c.bank_name})
                           </span>
                           <span className="text-xs text-on-surface-variant">
-                            {tenant?.full_name} · {t("due")} {c.cheque_date}
+                            {c.tenant_name} · {t("due")} {c.cheque_date}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -356,15 +307,17 @@ export default async function DashboardPage({
               </Link>
             </CardHeader>
             <CardBody className="pt-0">
-              {(!rawPayments || rawPayments.length === 0) ? (
+              {data.recentPayments.length === 0 ? (
                 <p className="py-4 font-body-sm text-body-sm text-on-surface-variant">
                   {t("noRecentPayments")}
                 </p>
               ) : (
                 <div className="flex flex-col divide-y divide-hairline">
-                  {rawPayments.map((p) => {
-                    const tenant = p.tenants as unknown as { full_name: string } | null;
-                    const receiptFormatted = `#${p.receipt_year}-${String(p.receipt_no).padStart(4, "0")}`;
+                  {data.recentPayments.map((p) => {
+                    const receiptFormatted =
+                      p.receipt_no !== null && p.receipt_year !== null
+                        ? `#${p.receipt_year}-${String(p.receipt_no).padStart(4, "0")}`
+                        : "—";
                     return (
                       <div
                         key={p.id}
@@ -375,7 +328,7 @@ export default async function DashboardPage({
                             {receiptFormatted}
                           </span>
                           <span className="text-xs text-on-surface-variant">
-                            {tenant?.full_name} · {tPayments(`methods.${p.method}`)}
+                            {p.tenant_name} · {tPayments(`methods.${p.method}`)}
                           </span>
                         </div>
                         <span className="font-semibold text-on-surface">
@@ -408,14 +361,14 @@ export default async function DashboardPage({
               </Link>
             </CardHeader>
             <CardBody className="pt-0">
-              {(!rawBuildings || rawBuildings.length === 0) ? (
+              {data.buildings.length === 0 ? (
                 <p className="py-4 font-body-sm text-body-sm text-on-surface-variant">
                   {t("noBuildings")}
                 </p>
               ) : (
                 <div className="flex flex-col divide-y divide-hairline">
-                  {rawBuildings.map((b) => {
-                    const unitsList = (b.units || []) as { id: string; status: string }[];
+                  {data.buildings.map((b) => {
+                    const unitsList = b.units;
                     const totalU = unitsList.length;
                     const occupiedU = unitsList.filter((u) => u.status === "occupied").length;
                     const pct = totalU > 0 ? Math.round((occupiedU / totalU) * 100) : 0;
@@ -463,16 +416,17 @@ export default async function DashboardPage({
               </Link>
             </CardHeader>
             <CardBody className="pt-0">
-              {(!rawMaintRequests || rawMaintRequests.length === 0) ? (
+              {data.recentMaintenance.length === 0 ? (
                 <p className="py-4 font-body-sm text-body-sm text-on-surface-variant">
                   {t("noRecentMaintenance")}
                 </p>
               ) : (
                 <div className="flex flex-col divide-y divide-hairline">
-                  {rawMaintRequests.map((req) => {
-                    const building = req.buildings as unknown as { code: string } | null;
-                    const unit = req.units as unknown as { unit_no: string } | null;
-                    const location = [building?.code, unit?.unit_no ? t("unitLabel", { no: unit.unit_no }) : t("commonArea")]
+                  {data.recentMaintenance.map((req) => {
+                    const location = [
+                      req.building_code,
+                      req.unit_no ? t("unitLabel", { no: req.unit_no }) : t("commonArea"),
+                    ]
                       .filter(Boolean)
                       .join(" · ");
 
