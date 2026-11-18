@@ -3,6 +3,20 @@
 Deviations from `docs/SPEC.md` and `docs/CLAUDE.md`, newest first. Each entry names the spec
 section it departs from and why.
 
+## 2026-11-18
+
+**D-020 · An API layer sits in front of Supabase; supersedes D-010.**
+Supabase remains the database, auth provider and object store, and RLS remains the gate on every
+query. The web app calls `src/server/services/*` in-process (no HTTP hop between server components
+and the API), while mobile and future consumers call the versioned `/api/v1` route handlers that
+wrap the same services. Mobile authenticates through `/api/v1/auth/*`, so it never talks to
+PostgREST directly; the web keeps its `@supabase/ssr` cookie session. Responses are explicit Zod
+schemas rather than raw table rows, so a column rename cannot silently break a client. An ESLint
+override forbids importing `@supabase/*` from pages, components and server actions, which is what
+keeps the boundary from eroding. D-010's three rules (location, secrets, shape) still apply; only
+"no API layer" is reversed. Reason: the mobile client needs a stable, versioned contract and a
+single place for business logic.
+
 ## 2026-11-17
 
 **D-019 · `web-push` and Resend, Twilio and Telegram services are introduced for delivery.**
