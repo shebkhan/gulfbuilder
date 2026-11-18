@@ -276,5 +276,65 @@ select is(
   3::bigint, 'one late fee per overdue charge (three fixtures) after two sweeps'
 );
 
+-- FIX-ROUND-1: pin the manual RPC wrapper. auth_org() = coalesce(jwt org_id,
+-- profiles.active_org_id) is nullable, and sweep_overdue(null) sweeps EVERY org, so the
+-- wrapper must short-circuit to 0 when there is no org. These run last so the JWT claims
+-- set below cannot disturb any earlier assertion.
+
+-- Case A: JWT org_role authorizes the call, but there is no org_id claim and no active org.
+insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000f9');
+insert into public.profiles (id, active_org_id) values ('00000000-0000-0000-0000-0000000000f9', null);
+create temp table wrapper_charges_before as select id, status from public.charges;
+select set_config('request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-0000000000f9","org_role":"org_admin"}', true);
+select ok(auth_org() is null, 'fixture: auth_org() is null without an org_id claim or active org');
+select is(auth_role(), 'org_admin', 'fixture: JWT org_role alone authorizes the call');
+select is(public.mark_overdue_and_late_fees(), 0,
+  'manual RPC returns 0 when auth_org() is null instead of sweeping every org');
+select is(
+  (select count(*) from public.charges c
+   join wrapper_charges_before b on b.id = c.id
+   where c.status is distinct from b.status),
+  0::bigint, 'null-org wrapper call changes no charge status'
+);
+select is(
+  (select count(*) from public.charges),
+  (select count(*) from wrapper_charges_before),
+  'null-org wrapper call inserts no late fees'
+);
+
+-- Case A2: no role resolves at all; NULL not in (...) must not raise, and NULL org returns 0.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f9"}', true);
+select ok(auth_role() is null, 'fixture: no org_role claim and no membership resolves to NULL role');
+select is(public.mark_overdue_and_late_fees(), 0,
+  'NULL role does not raise and NULL org still returns 0');
+
+-- Case B: a valid org via profile fallback and an authorized role via membership fallback.
+insert into public.profiles (id, active_org_id) values
+  ('00000000-0000-0000-0000-0000000000f1', '33333333-3333-3333-3333-333333333333');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f1"}', true);
+select is(auth_org(), '33333333-3333-3333-3333-333333333333'::uuid,
+  'fixture: profile active_org_id resolves the org without an org_id claim');
+select is(auth_role(), 'org_admin', 'fixture: membership resolves the role without an org_role claim');
+select is(public.mark_overdue_and_late_fees(), 0,
+  'manual RPC delegates to the org-scoped sweep and returns an integer');
+
+-- Case C: the role guard is unchanged and still rejects a non org_admin/accountant role.
+select set_config('request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-0000000000f1","org_id":"33333333-3333-3333-3333-333333333333","org_role":"tenant"}', true);
+select throws_ok(
+  $$select public.mark_overdue_and_late_fees()$$,
+  '42501', 'Insufficient role to run the overdue sweep.',
+  'manual RPC still raises 42501 for a tenant role'
+);
+
+-- Case D: the authenticated grant is unchanged -- the RPC is executable as that role.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f1"}', true);
+set local role authenticated;
+select is(public.mark_overdue_and_late_fees(), 0,
+  'authenticated role can execute the manual RPC (grant preserved)');
+reset role;
+reset request.jwt.claims;
+
 select * from finish();
 rollback;

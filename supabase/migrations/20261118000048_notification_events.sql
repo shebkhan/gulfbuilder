@@ -319,11 +319,17 @@ $$;
 -- Keep the manual RPC's exact signature, role guard and grant: only the body changes.
 create or replace function public.mark_overdue_and_late_fees() returns integer
 language plpgsql security definer set search_path = public as $$
+declare
+  v_org uuid := auth_org();
 begin
   if auth_role() not in ('org_admin', 'accountant') then
     raise exception 'Insufficient role to run the overdue sweep.' using errcode = '42501';
   end if;
-  return public.sweep_overdue(auth_org());
+  -- sweep_overdue(null) means every org; the manual RPC has always been org-scoped.
+  -- auth_org() is nullable (jwt org_id -> profiles.active_org_id), so keep the original
+  -- "NULL org matches nothing, returns 0" behaviour before delegating.
+  if v_org is null then return 0; end if;
+  return public.sweep_overdue(v_org);
 end;
 $$;
 
