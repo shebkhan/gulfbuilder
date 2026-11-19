@@ -273,7 +273,9 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           id: string
+          is_listed_publicly: boolean
           latitude: number | null
+          listing_description: string | null
           longitude: number | null
           name: string
           national_address: Json | null
@@ -295,7 +297,9 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          is_listed_publicly?: boolean
           latitude?: number | null
+          listing_description?: string | null
           longitude?: number | null
           name: string
           national_address?: Json | null
@@ -317,7 +321,9 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          is_listed_publicly?: boolean
           latitude?: number | null
+          listing_description?: string | null
           longitude?: number | null
           name?: string
           national_address?: Json | null
@@ -1434,6 +1440,114 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_enquiries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          org_id: string
+          phone: string | null
+          status: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          org_id: string
+          phone?: string | null
+          status?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          org_id?: string
+          phone?: string | null
+          status?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_enquiries_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_enquiries_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_images: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          org_id: string
+          path: string
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id: string
+          path: string
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id?: string
+          path?: string
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_images_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_images_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -3105,6 +3219,10 @@ export type Database = {
           floor_id: string
           furnished: boolean
           id: string
+          is_listed_publicly: boolean
+          listing_description: string | null
+          listing_slug: string | null
+          listed_at: string | null
           occupancy_type: string
           org_id: string
           rentable_as: string
@@ -3128,6 +3246,10 @@ export type Database = {
           floor_id: string
           furnished?: boolean
           id?: string
+          is_listed_publicly?: boolean
+          listing_description?: string | null
+          listing_slug?: string | null
+          listed_at?: string | null
           occupancy_type?: string
           org_id: string
           rentable_as?: string
@@ -3151,6 +3273,10 @@ export type Database = {
           floor_id?: string
           furnished?: boolean
           id?: string
+          is_listed_publicly?: boolean
+          listing_description?: string | null
+          listing_slug?: string | null
+          listed_at?: string | null
           occupancy_type?: string
           org_id?: string
           rentable_as?: string
@@ -3316,6 +3442,30 @@ export type Database = {
       }
     }
     Views: {
+      public_listings: {
+        Row: {
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          building_name: string
+          city: string | null
+          currency: string | null
+          description: string | null
+          furnished: boolean
+          latitude: number | null
+          longitude: number | null
+          occupancy_type: string
+          org_id: string
+          rent_minor: number | null
+          slug: string | null
+          title: string
+          unit_id: string
+          unit_type: string | null
+          whatsapp: string | null
+          zone: string | null
+        }
+        Relationships: []
+      }
       pg_all_foreign_keys: {
         Row: {
           fk_columns: unknown[] | null
@@ -3636,6 +3786,8 @@ export type Database = {
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
+      is_publicly_listed: { Args: { p_unit: string }; Returns: boolean }
+      public_listing_org: { Args: { p_unit: string }; Returns: string }
       is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
       issue_owner_statement: {

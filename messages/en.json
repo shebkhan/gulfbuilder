@@ -29,7 +29,8 @@
     "cashFlowForecast": "Cash Flow Forecast",
     "platform": "Platform",
     "marketPacks": "Market packs",
-    "themes": "Themes"
+    "themes": "Themes",
+    "enquiries": "Enquiries"
   },
   "errors": {
     "title": "Something went wrong",
@@ -1663,6 +1664,19 @@
         "failed": "Could not save. Try again.",
         "not_authorised": "You are not allowed to use the platform console."
       }
+    },
+    "whatsapp": {
+      "title": "WhatsApp integration",
+      "hint": "The number used for the one-tap enquiry link on public listings, in international format.",
+      "phone": "WhatsApp number",
+      "enabled": "Enabled",
+      "save": "Save",
+      "saved": "Integration saved.",
+      "errors": {
+        "invalid_input": "Check the details and try again.",
+        "failed": "Could not save. Try again.",
+        "not_authorised": "You are not allowed to use the platform console."
+      }
     }
   },
   "print": {
@@ -1721,5 +1735,76 @@
   },
   "invalid_slug": "Use 3–40 lowercase letters, numbers or dashes.",
   "invalid_color": "Enter a 6-digit hex colour, e.g. #795919.",
-  "invalid_url": "Leave empty or enter an http(s) URL."
+  "invalid_url": "Leave empty or enter an http(s) URL.",
+  "marketplace": {
+    "brand": "Gulf Properties",
+    "dashboard": "Dashboard",
+    "kicker": "FIND YOUR NEXT HOME",
+    "hero": "Discover places to live and work",
+    "subtitle": "Browse verified vacant units across the city, compare prices and contact the owner directly.",
+    "featured": "Featured listings",
+    "viewAll": "View all",
+    "viewDetails": "View details",
+    "noListings": "No public listings yet.",
+    "browseByCity": "Browse by city",
+    "home": "Home",
+    "resultsTitle": "Properties for rent",
+    "resultsCount": "{count} results",
+    "noResults": "No listings match your search.",
+    "backToResults": "Back to results",
+    "filters": {
+      "keywords": "Keywords",
+      "city": "City",
+      "type": "Type",
+      "bedrooms": "Bedrooms",
+      "min": "Min rent",
+      "max": "Max rent",
+      "all": "All",
+      "search": "Search"
+    },
+    "detail": {
+      "about": "About this property",
+      "noDescription": "No description provided.",
+      "specs": "Property details",
+      "type": "Type",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "area": "Area",
+      "furnished": "Furnished",
+      "occupancy": "Occupancy",
+      "yes": "Yes",
+      "mapLink": "View on map",
+      "perMonth": "per month",
+      "related": "Similar listings",
+      "enquiryMessage": "Hello, I am interested in {title}. Is it still available?"
+    },
+    "enquiry": {
+      "title": "Enquire about this property",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "message": "Message",
+      "send": "Send enquiry",
+      "whatsapp": "Or chat on WhatsApp",
+      "success": "Thank you — your enquiry has been sent.",
+      "invalid_input": "Please check the form and try again.",
+      "submit_failed": "Could not send your enquiry. Please try again."
+    },
+    "share": {
+      "label": "Share",
+      "whatsapp": "WhatsApp",
+      "x": "X",
+      "facebook": "Facebook",
+      "copy": "Copy link",
+      "copied": "Copied"
+    },
+    "inbox": {
+      "title": "Listing enquiries",
+      "subtitle": "Messages from prospective tenants.",
+      "empty": "No enquiries yet.",
+      "status": {
+        "new": "New"
+      }
+    }
+  }
 }

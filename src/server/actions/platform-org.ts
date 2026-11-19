@@ -155,6 +155,7 @@ export async function saveOrgIntegrationAction(
     botToken: formData.get("botToken") || "",
     botName: formData.get("botName") || "",
     chatId: formData.get("chatId") || "",
+    phone: formData.get("phone") || "",
     enabled: formData.get("enabled") === "on",
   });
   if (!ids.success || !parsed.success) return fail("invalid_input");
@@ -169,12 +170,16 @@ export async function saveOrgIntegrationAction(
     typeof existing?.config === "object" && existing.config
       ? (existing.config as Record<string, unknown>)
       : {};
-  const config = {
-    bot_token: parsed.data.botToken || previous.bot_token || "",
-    bot_name: parsed.data.botName,
-    chat_id: parsed.data.chatId,
-    enabled: parsed.data.enabled,
-  };
+  // The public_listings view reads whatsapp.config ->> 'phone' for the deep link.
+  const config: Record<string, unknown> =
+    parsed.data.provider === "whatsapp"
+      ? { phone: parsed.data.phone || previous.phone || "", enabled: parsed.data.enabled }
+      : {
+          bot_token: parsed.data.botToken || previous.bot_token || "",
+          bot_name: parsed.data.botName,
+          chat_id: parsed.data.chatId,
+          enabled: parsed.data.enabled,
+        };
 
   const { error } = await ctx.admin.from("org_integrations").upsert(
     {
@@ -189,8 +194,9 @@ export async function saveOrgIntegrationAction(
 
   await audit(ctx.admin, ctx.userId, "org_integrations", "upsert", ids.data.orgId, null, {
     provider: parsed.data.provider,
-    bot_name: config.bot_name,
-    chat_id: config.chat_id,
+    bot_name: config.bot_name ?? null,
+    chat_id: config.chat_id ?? null,
+    phone: config.phone ?? null,
     enabled: config.enabled,
     token_changed: Boolean(parsed.data.botToken),
   });

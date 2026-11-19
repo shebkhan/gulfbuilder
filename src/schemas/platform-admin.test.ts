@@ -59,6 +59,12 @@ describe("integrationSchema", () => {
       }).success,
     ).toBe(true);
   });
+
+  it("accepts a WhatsApp phone for the public listing deep link", () => {
+    expect(integrationSchema.safeParse({ provider: "whatsapp", phone: "+97455551234" }).success).toBe(
+      true,
+    );
+  });
 });
 
 describe("organizationUpdate", () => {

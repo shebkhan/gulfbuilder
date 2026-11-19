@@ -9,6 +9,7 @@ import type { OrganizationSettings } from "@/components/domain/organization-sett
 import { PlatformLookupsManager, type LookupRow } from "@/components/domain/platform-lookups-manager";
 import { PlatformOrgSettingsForm } from "@/components/domain/platform-org-settings-form";
 import { PlatformTelegramForm } from "@/components/domain/platform-telegram-form";
+import { PlatformWhatsappForm } from "@/components/domain/platform-whatsapp-form";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { hasStoredToken } from "@/lib/telegram-config";
 import { LOOKUP_CATEGORIES } from "@/schemas/platform-admin";
@@ -23,7 +24,8 @@ export default async function PlatformOrganization({
   const t = await getTranslations("platform");
 
   const admin = createSupabaseAdminClient();
-  const [org, subscription, plans, members, snapshots, lookups, integrations] = await Promise.all([
+  const [org, subscription, plans, members, snapshots, lookups, integrations, whatsapp] =
+    await Promise.all([
     admin.from("organizations").select("*").eq("id", id).maybeSingle(),
     admin.from("subscriptions").select("*").eq("org_id", id).maybeSingle(),
     admin.from("plans").select("*").order("code"),
@@ -41,6 +43,7 @@ export default async function PlatformOrganization({
       .order("category")
       .order("sort_order"),
     admin.from("org_integrations").select("config").eq("org_id", id).eq("provider", "telegram").maybeSingle(),
+    admin.from("org_integrations").select("config").eq("org_id", id).eq("provider", "whatsapp").maybeSingle(),
   ]);
 
   if (!org.data) notFound();
@@ -74,6 +77,10 @@ export default async function PlatformOrganization({
   const telegramConfig =
     typeof integrations.data?.config === "object" && integrations.data.config
       ? (integrations.data.config as Record<string, unknown>)
+      : {};
+  const whatsappConfig =
+    typeof whatsapp.data?.config === "object" && whatsapp.data.config
+      ? (whatsapp.data.config as Record<string, unknown>)
       : {};
 
   const memberIds = (members.data ?? []).map((member) => member.user_id);
@@ -203,6 +210,19 @@ export default async function PlatformOrganization({
             botName: typeof telegramConfig.bot_name === "string" ? telegramConfig.bot_name : "",
             chatId: typeof telegramConfig.chat_id === "string" ? telegramConfig.chat_id : "",
             enabled: telegramConfig.enabled === true,
+          }}
+        />
+      </section>
+
+      <section className="rounded-2xl bg-surface-container-lowest p-5 shadow-sm">
+        <h2 className="mb-4 font-headline-sm text-headline-sm text-on-surface">
+          {t("whatsapp.title")}
+        </h2>
+        <PlatformWhatsappForm
+          orgId={id}
+          config={{
+            phone: typeof whatsappConfig.phone === "string" ? whatsappConfig.phone : "",
+            enabled: whatsappConfig.enabled === true,
           }}
         />
       </section>

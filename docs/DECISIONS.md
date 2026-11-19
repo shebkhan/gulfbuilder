@@ -3,6 +3,27 @@
 Deviations from `docs/SPEC.md` and `docs/CLAUDE.md`, newest first. Each entry names the spec
 section it departs from and why.
 
+## 2026-11-19
+
+**D-027 · The public marketplace is outside SPEC v1 scope.**
+SPEC §1 and the v1 surface list describe a tenant-facing property-management app; unauthenticated
+property listings, search and enquiries are not in it. This branch adds `/{locale}`,
+`/{locale}/properties`, `/{locale}/properties/[slug]` and the org enquiry inbox anyway, following
+`/Users/shahbaz/.opencode/plan/public-marketplace.md`. The public read path is a single
+security-definer `public_listings` view with an explicit allow-list of columns — no tenant, lease,
+contact or internal financial fields — and anon gets INSERT-only on `listing_enquiries`. Reason:
+the marketplace was requested as a standalone plan; cost is a new public attack surface that needs
+SEO/ops work outside this repo to be useful. Anon enquiries have DB length checks and a column-level
+grant (status cannot be set by the public), but no per-IP throttling yet; add rate limiting at the
+edge if the inbox starts receiving spam.
+
+**D-026 · The `listing-images` Storage bucket is public instead of private with signed URLs.**
+SPEC §3, §6 and §11 (and `docs/CLAUDE.md`) call for private buckets with `{org_id}/` prefixes and
+signed URLs. `listing-images` is marked public with a public `select` policy; paths are still
+`{org_id}/...` and `insert`/`update`/`delete` require `authenticated`, the prefix matching
+`auth_org()`. Reason: OG/Twitter cards and search-engine image crawlers need stable URLs, and
+signed URLs expire; cost is that listing images are world-readable by design.
+
 ## 2026-11-18
 
 **D-025 · `src/app/manifest.ts` is dynamic so the installed PWA reads branding.**

@@ -16,6 +16,7 @@ export type Fixture = {
   managerId: string;
   buildingId: string;
   unitIds: string[];
+  listingSlug: string;
 };
 
 export function env(): { url: string; anon: string; service: string } {
@@ -187,12 +188,35 @@ export async function ensureFixture(): Promise<Fixture> {
     .eq("building_id", buildingId)
     .is("deleted_at", null)
     .order("unit_no");
+  const unitIds = (units.data ?? []).map((unit) => unit.id as string);
+  const firstUnitId = unitIds[0];
+  if (!firstUnitId) throw new Error("the E2E building has no units to list");
+
+  // One deterministic public listing so the marketplace e2e suite has data.
+  const listingSlug = `${ORG_SLUG}-tower-001`;
+  const buildingUpdate = await admin
+    .from("buildings")
+    .update({ is_listed_publicly: true, listing_description: "A bright flat in Doha." })
+    .eq("id", buildingId);
+  if (buildingUpdate.error) throw new Error(buildingUpdate.error.message);
+  const unitUpdate = await admin
+    .from("units")
+    .update({
+      is_listed_publicly: true,
+      listing_title: `${BUILDING_NAME} 001`,
+      listing_description: "Bright flat near the metro.",
+      listing_slug: listingSlug,
+      listed_at: new Date().toISOString(),
+    })
+    .eq("id", firstUnitId);
+  if (unitUpdate.error) throw new Error(unitUpdate.error.message);
 
   return {
     orgId,
     ownerId: owner.id,
     managerId: manager.id,
     buildingId,
-    unitIds: (units.data ?? []).map((unit) => unit.id as string),
+    unitIds,
+    listingSlug,
   };
 }
