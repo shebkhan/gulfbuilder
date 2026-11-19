@@ -27,7 +27,7 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const [listing, origin] = await Promise.all([getPublicListing(slug), siteUrl()]);
   if (!listing) return {};
-  const images = await getListingImages(listing.unit_id);
+  const images = await getListingImages(listing.unit_id!);
   const seo = listingOg(listing, `${origin}/${locale}/properties/${slug}`, images[0], locale);
   return {
     metadataBase: new URL(origin),
@@ -52,7 +52,7 @@ export default async function ListingDetailPage({
   if (!listing) notFound();
 
   const [images, allListings, origin] = await Promise.all([
-    getListingImages(listing.unit_id),
+    getListingImages(listing.unit_id!),
     getPublicListings(),
     siteUrl(),
   ]);
@@ -90,7 +90,7 @@ export default async function ListingDetailPage({
   const mapUrl =
     listing.latitude !== null && listing.longitude !== null
       ? `https://www.google.com/maps/search/?api=1&query=${listing.latitude},${listing.longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(listing.city ?? listing.building_name)}`;
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(listing.city ?? listing.building_name ?? "")}`;
 
   return (
     <main className="min-h-screen bg-surface px-4 py-8">
@@ -114,7 +114,7 @@ export default async function ListingDetailPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={hero}
-                alt={listing.title}
+                alt={listing.title ?? ""}
                 className="mt-4 aspect-[16/10] w-full rounded-frame object-cover"
               />
             ) : (
@@ -167,7 +167,7 @@ export default async function ListingDetailPage({
             <div className="mt-6">
               <ShareButtons
                 url={`${origin}/${locale}/properties/${listing.slug}`}
-                title={listing.title}
+                title={listing.title ?? ""}
               />
             </div>
           </div>
@@ -182,10 +182,10 @@ export default async function ListingDetailPage({
               </p>
             </div>
             <EnquiryForm
-              orgId={listing.org_id}
-              unitId={listing.unit_id}
-              whatsapp={listing.whatsapp}
-              message={t("detail.enquiryMessage", { title: listing.title })}
+              orgId={listing.org_id!}
+              unitId={listing.unit_id!}
+              whatsapp={listing.whatsapp ?? undefined}
+              message={t("detail.enquiryMessage", { title: listing.title ?? "" })}
             />
           </aside>
         </div>

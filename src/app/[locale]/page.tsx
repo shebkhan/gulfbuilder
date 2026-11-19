@@ -37,7 +37,7 @@ export default async function MarketplaceLanding({
   const cities = citiesFrom(listings);
   const featured = listings.slice(0, 6);
   const images = await Promise.all(
-    featured.map(async (listing) => (await getListingImages(listing.unit_id))[0]),
+    featured.map(async (listing) => (await getListingImages(listing.unit_id!))[0]),
   );
 
   return (

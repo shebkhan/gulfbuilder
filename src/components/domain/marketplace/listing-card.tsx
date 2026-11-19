@@ -18,10 +18,10 @@ export function ListingCard({
 }) {
   return (
     <article className="overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm">
-      <Link href={`/properties/${listing.slug}`} className="block">
+      <Link href={`/properties/${listing.slug!}`} className="block">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt={listing.title} className="aspect-[4/3] w-full object-cover" />
+          <img src={imageUrl} alt={listing.title ?? ""} className="aspect-[4/3] w-full object-cover" />
         ) : (
           <div className="aspect-[4/3] w-full bg-surface-container" aria-hidden />
         )}

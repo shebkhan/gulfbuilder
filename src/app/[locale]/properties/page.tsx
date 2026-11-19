@@ -43,7 +43,7 @@ export default async function PropertiesPage({
   const filters = parseListingFilters(query);
   const listings = filterListings(allListings, filters);
   const images = await Promise.all(
-    listings.map(async (listing) => (await getListingImages(listing.unit_id))[0]),
+    listings.map(async (listing) => (await getListingImages(listing.unit_id!))[0]),
   );
 
   const first = (value: QueryValue) => (Array.isArray(value) ? value[0] : value) ?? "";
