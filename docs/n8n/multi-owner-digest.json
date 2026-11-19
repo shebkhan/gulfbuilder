@@ -1,0 +1,17 @@
+{
+  "name": "Gulf - Multi-Owner Daily Digest",
+  "nodes": [
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 7 * * *"}]}}, "id": "sched", "name": "Daily 07:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [250, 300]},
+    {"parameters": {"jsCode": "const owners = [\n  { chatId: 'CHAT_ID_1', apiKey: 'gulf_OWNER_KEY_1' },\n  // Add more owners here\n];\nreturn owners.map(o => ({json: {chatId: o.chatId, apiKey: o.apiKey}}));"}, "id": "owners", "name": "Owner List", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [470, 300]},
+    {"parameters": {"method": "GET", "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest", "authentication": "none", "sendHeaders": true, "headerParameters": {"parameters": [{"name":"X-API-Key","value":"={{ $json.apiKey }}"}]}, "options": {}}, "id": "http", "name": "Fetch Digest", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [690, 300], "retryOnFail": true, "maxTries": 3, "waitBetweenTries": 1000},
+    {"parameters": {"jsCode": "const d=$input.first().json; const dg=d.data||d; const dash=dg.dashboard||{}; const cheques=dg.cheques_due_7d||[]; const leases=dg.leases_expiring_30d||[]; const maint=dg.open_maintenance||[]; const appr=dg.pending_approvals||[]; let msg='Gulf daily digest\\n'; msg+='Units: '+(dash.totalUnits??0)+' total, '+(dash.occupiedUnits??0)+' occupied\\n'; msg+='Expected this month: '+(dash.expectedThisMonth??0)+'\\n'; msg+='Collected this month: '+(dash.collectedThisMonth??0)+'\\n'; msg+='Arrears: '+(dash.arrears??0)+'\\n'; msg+='Cheques due (7d): '+cheques.length+'\\n'; for(const c of cheques) msg+='  - '+c.cheque_no+' '+c.amount_minor+' '+c.currency+' on '+c.cheque_date+'\\n'; msg+='Leases expiring (30d): '+leases.length+'\\n'; msg+='Open maintenance: '+maint.length+'\\n'; msg+='Pending approvals: '+appr.length+'\\n'; return [{json:{message:msg, chatId:$('Owner List').first().json.chatId}}];"}, "id": "fmt", "name": "Format Message", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [910, 300]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{ $json.chatId }}", "text": "={{ $json.message }}", "additionalFields": {"appendAttribution": false}}, "id": "tg", "name": "Send Telegram", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [1130, 300], "credentials": {"telegramApi": {"id": "m0TcrFMdHYuAkrSa", "name": "Gulf Telegram Bot"}}, "retryOnFail": true, "maxTries": 3, "waitBetweenTries": 1000}
+  ],
+  "connections": {
+    "Daily 07:00": {"main": [[{"node": "Owner List", "type": "main", "index": 0}]]},
+    "Owner List": {"main": [[{"node": "Fetch Digest", "type": "main", "index": 0}]]},
+    "Fetch Digest": {"main": [[{"node": "Format Message", "type": "main", "index": 0}]]},
+    "Format Message": {"main": [[{"node": "Send Telegram", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}
