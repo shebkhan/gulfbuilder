@@ -791,13 +791,23 @@
       "deposit_failed": "The cheque could not be deposited.",
       "clear_failed": "The cheque could not be cleared.",
       "bounce_failed": "The cheque could not be marked as bounced.",
-      "replacement_failed": "The replacement cheque could not be created."
+      "replacement_failed": "The replacement cheque could not be created.",
+      "file_too_large": "File is too large (max 10 MB).",
+      "unsupported_file_type": "Unsupported file type.",
+      "upload_failed": "Image upload failed.",
+      "parse_failed": "Could not read cheque details; please enter manually.",
+      "ocr_not_configured": "Cheque scanning is not configured.",
+      "signing_failed": "Could not load cheque image.",
+      "not_found": "Cheque image not found."
     },
     "kpis": {
       "pendingClearance": "Pending Clearance",
       "clearedTotal": "Cleared Total",
       "bouncedCheques": "Bounced Cheques"
-    }
+    },
+    "scanCheque": "Scan cheque",
+    "scanning": "Scanning…",
+    "scanFilled": "Fields filled from cheque image — please review."
   },
   "deposits": {
     "title": "Security Deposits",

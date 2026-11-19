@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { BuildingTenantPicker } from "@/components/domain/building-tenant-picker";
 import { LocalizedFormMessage } from "@/components/domain/localized-form-message";
+import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -30,8 +31,10 @@ import {
   bounceChequeAction,
   clearChequeAction,
   depositChequeAction,
+  parseChequeImageAction,
   registerChequeAction,
   replaceChequeAction,
+  type ChequeParseState,
   type ChequeState,
 } from "@/server/actions/cheques";
 
@@ -59,6 +62,8 @@ type RegisterValues = {
   currency: string;
   chequeDate: string;
   notes?: string;
+  imagePath?: string;
+  payeeRaw?: string;
 };
 
 type ReplaceValues = {
@@ -278,6 +283,8 @@ export function ChequeRegisterForm({
       currency,
       chequeDate: new Date().toISOString().slice(0, 10),
       notes: "",
+      imagePath: "",
+      payeeRaw: "",
     },
   });
 
@@ -295,6 +302,30 @@ export function ChequeRegisterForm({
     ? leases.filter((l) => l.tenant_id === selectedTenant)
     : leases;
 
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [scanState, setScanState] = useState<ChequeParseState>({});
+  const [isScanning, startScanTransition] = useTransition();
+
+  const handleScan = () => {
+    if (!pendingFile) return;
+    setScanState({});
+    const formData = new FormData();
+    formData.set("file", pendingFile);
+    startScanTransition(async () => {
+      const res = await parseChequeImageAction({}, formData);
+      setScanState(res);
+      if (res.imagePath) registerForm.setValue("imagePath", res.imagePath);
+      if (res.parsed) {
+        if (res.parsed.chequeNo) registerForm.setValue("chequeNo", res.parsed.chequeNo);
+        if (res.parsed.bankName) registerForm.setValue("bankName", res.parsed.bankName);
+        if (res.parsed.amount) registerForm.setValue("amount", res.parsed.amount);
+        if (res.parsed.chequeDate) registerForm.setValue("chequeDate", res.parsed.chequeDate);
+        if (res.parsed.payee) registerForm.setValue("payeeRaw", res.parsed.payee);
+        if (res.suggestedTenantId) registerForm.setValue("tenantId", res.suggestedTenantId);
+      }
+    });
+  };
+
   return (
     <Form {...registerForm}>
       <form
@@ -302,6 +333,40 @@ export function ChequeRegisterForm({
         noValidate
         className="flex flex-col gap-6"
       >
+        <div className="flex flex-col gap-3 rounded-xl border border-hairline bg-surface-container-lowest p-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-label-md text-label-md text-on-surface">
+              {t("scanCheque")}
+            </span>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleScan}
+              disabled={!pendingFile || isScanning}
+            >
+              {isScanning ? t("scanning") : t("scanCheque")}
+            </Button>
+          </div>
+          <FileDropzone
+            accept="image/png,image/jpeg,image/webp"
+            maxSize={10 * 1024 * 1024}
+            onFiles={(files) => setPendingFile(files[0] ?? null)}
+          />
+          {scanState.error ? (
+            <p role="alert" className="rounded-xl bg-error-container px-3 py-2 font-body-sm text-body-sm text-on-error-container">
+              {errors[scanState.error] ?? scanState.error}
+            </p>
+          ) : null}
+          {scanState.parsed ? (
+            <p className="rounded-xl bg-secondary-container/50 px-3 py-2 font-body-sm text-body-sm text-on-secondary-container">
+              {t("scanFilled")}
+            </p>
+          ) : null}
+          <input type="hidden" {...registerForm.register("imagePath")} />
+          <input type="hidden" {...registerForm.register("payeeRaw")} />
+        </div>
+
         <FormField
           control={registerForm.control}
           name="tenantId"

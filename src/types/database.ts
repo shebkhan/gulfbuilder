@@ -3968,8 +3968,10 @@ export type Database = {
               p_cheque_date: string
               p_cheque_no: string
               p_currency?: string
+              p_image_path?: string
               p_lease_id: string
               p_notes?: string
+              p_payee_raw?: string
               p_tenant_id: string
             }
             Returns: string
@@ -3982,8 +3984,10 @@ export type Database = {
               p_cheque_date: string
               p_cheque_no: string
               p_currency?: string
+              p_image_path?: string
               p_lease_id: string
               p_notes?: string
+              p_payee_raw?: string
               p_tenant_id: string
             }
             Returns: string
@@ -4000,8 +4004,10 @@ export type Database = {
           p_cheque_date: string
           p_cheque_no: string
           p_currency?: string
+          p_image_path?: string
           p_notes?: string
           p_old_cheque_id: string
+          p_payee_raw?: string
         }
         Returns: string
       }

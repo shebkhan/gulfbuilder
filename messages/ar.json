@@ -791,13 +791,23 @@
       "deposit_failed": "تعذّر إيداع الشيك.",
       "clear_failed": "تعذّر تحصيل الشيك.",
       "bounce_failed": "تعذّر تحديد الشيك كمرتد.",
-      "replacement_failed": "تعذّر إنشاء الشيك البديل."
+      "replacement_failed": "تعذّر إنشاء الشيك البديل.",
+      "file_too_large": "الملف كبير جداً (الحد الأقصى 10 ميغابايت).",
+      "unsupported_file_type": "نوع ملف غير مدعوم.",
+      "upload_failed": "فشل رفع الصورة.",
+      "parse_failed": "تعذر قراءة تفاصيل الشيك؛ يرجى الإدخال يدوياً.",
+      "ocr_not_configured": "مسح الشيكات غير مُعد.",
+      "signing_failed": "تعذر تحميل صورة الشيك.",
+      "not_found": "صورة الشيك غير موجودة."
     },
     "kpis": {
       "pendingClearance": "بانتظار الصرف",
       "clearedTotal": "إجمالي المصروف",
       "bouncedCheques": "شيكات مرتدة"
-    }
+    },
+    "scanCheque": "مسح الشيك",
+    "scanning": "جارٍ المسح…",
+    "scanFilled": "تم تعبئة الحقول من صورة الشيك — يرجى المراجعة."
   },
   "deposits": {
     "title": "مبالغ التأمين",
