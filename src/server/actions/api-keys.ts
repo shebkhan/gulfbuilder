@@ -10,7 +10,7 @@ export type ApiKeyState = { error?: string; ok?: string; key?: string };
 
 const createSchema = z.object({
   name: z.string().trim().min(1).max(80),
-  role: z.enum(["owner", "org_admin", "manager", "accountant"]).default("owner"),
+  role: z.enum(["owner", "org_admin", "manager", "accountant", "caretaker", "tenant"]).default("owner"),
   ownerId: z.string().uuid().optional().or(z.literal("")),
 });
 

@@ -1,0 +1,29 @@
+{
+  "name": "Gulf - Weekly Recap",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 8 * * 1" } ] } },
+      "id": "sched", "name": "Monday 08:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [250, 300]
+    },
+    {
+      "parameters": { "method": "GET", "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest", "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "options": {} },
+      "id": "http", "name": "Fetch Digest", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [470, 300],
+      "credentials": { "httpHeaderAuth": { "id": "l9ZE1SyEtK8FLTfg", "name": "Gulf API Key" } }
+    },
+    {
+      "parameters": { "jsCode": "const d=$input.first().json; const dg=d.data||d; const dash=dg.dashboard||{}; const cheques=dg.cheques_due_7d||[]; const leases=dg.leases_expiring_30d||[]; const maint=dg.open_maintenance||[]; const recv=dg.receivables_total_minor||0; let m='Gulf weekly recap\\n'; m+='Units: '+(dash.totalUnits??0)+' total, '+(dash.occupiedUnits??0)+' occupied\\n'; m+='Expected this month: '+ (dash.expectedThisMonth??0) +'\\n'; m+='Collected this month: '+(dash.collectedThisMonth??0)+'\\n'; m+='Arrears: '+(dash.arrears??0)+'\\n'; m+='Cheques due (7d): '+cheques.length+'\\n'; m+='Leases expiring (30d): '+leases.length+'\\n'; m+='Open maintenance: '+maint.length+'\\n'; m+='Receivables total: '+recv+'\\n'; return [{json:{message:m}}];" },
+      "id": "fmt", "name": "Format", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [690, 300]
+    },
+    {
+      "parameters": { "operation": "sendMessage", "chatId": "6986993618", "text": "={{ $json.message }}", "additionalFields": { "appendAttribution": false } },
+      "id": "tg", "name": "Send Telegram", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [910, 300],
+      "credentials": { "telegramApi": { "id": "m0TcrFMdHYuAkrSa", "name": "Gulf Telegram Bot" } }
+    }
+  ],
+  "connections": {
+    "Monday 08:00": { "main": [[{ "node": "Fetch Digest", "type": "main", "index": 0 }]] },
+    "Fetch Digest": { "main": [[{ "node": "Format", "type": "main", "index": 0 }]] },
+    "Format": { "main": [[{ "node": "Send Telegram", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

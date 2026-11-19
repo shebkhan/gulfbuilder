@@ -1,0 +1,29 @@
+{
+  "name": "Gulf - Threshold Alerts",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 */2 * * *" } ] } },
+      "id": "sched", "name": "Every 2h", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [250, 300]
+    },
+    {
+      "parameters": { "method": "GET", "url": "https://gulfbuilder.vercel.app/api/v1/owner/digest", "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "options": {} },
+      "id": "http", "name": "Fetch Digest", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [470, 300],
+      "credentials": { "httpHeaderAuth": { "id": "l9ZE1SyEtK8FLTfg", "name": "Gulf API Key" } }
+    },
+    {
+      "parameters": { "jsCode": "const d=$input.first().json; const dg=d.data||d; const dash=dg.dashboard||{}; const ARREARS_THRESHOLD=500000; const alerts=[]; if((dash.arrears||0)>ARREARS_THRESHOLD) alerts.push('Arrears '+dash.arrears+' exceeds threshold '+ARREARS_THRESHOLD); const maint=dg.open_maintenance||[]; const urgent=maint.filter(m=>m.priority==='urgent'); if(urgent.length) alerts.push('Urgent maintenance: '+urgent.length); const bounced=(dg.cheques_due_7d||[]).filter(c=>c.status==='bounced'); if(bounced.length) alerts.push('Bounced cheques: '+bounced.length); if(!alerts.length) return []; return [{json:{message:'Gulf alert:\\n'+alerts.join('\\n')}}];" },
+      "id": "check", "name": "Check Thresholds", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [690, 300]
+    },
+    {
+      "parameters": { "operation": "sendMessage", "chatId": "6986993618", "text": "={{ $json.message }}", "additionalFields": { "appendAttribution": false } },
+      "id": "tg", "name": "Send Alert", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [910, 300],
+      "credentials": { "telegramApi": { "id": "m0TcrFMdHYuAkrSa", "name": "Gulf Telegram Bot" } }
+    }
+  ],
+  "connections": {
+    "Every 2h": { "main": [[{ "node": "Fetch Digest", "type": "main", "index": 0 }]] },
+    "Fetch Digest": { "main": [[{ "node": "Check Thresholds", "type": "main", "index": 0 }]] },
+    "Check Thresholds": { "main": [[{ "node": "Send Alert", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

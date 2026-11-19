@@ -867,6 +867,13 @@ export type Database = {
             foreignKeyName: "expenses_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "expenses_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -1076,6 +1083,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
           },
           {
             foreignKeyName: "journal_lines_unit_id_fkey"
@@ -1391,55 +1405,14 @@ export type Database = {
             foreignKeyName: "leases_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "leases_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      maintenance_events: {
-        Row: {
-          author_id: string | null
-          body: string
-          created_at: string
-          id: string
-          kind: string
-          org_id: string
-          photo_paths: string[]
-          request_id: string
-        }
-        Insert: {
-          author_id?: string | null
-          body: string
-          created_at?: string
-          id?: string
-          kind: string
-          org_id: string
-          photo_paths?: string[]
-          request_id: string
-        }
-        Update: {
-          author_id?: string | null
-          body?: string
-          created_at?: string
-          id?: string
-          kind?: string
-          org_id?: string
-          photo_paths?: string[]
-          request_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "maintenance_events_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenance_events_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "maintenance_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1496,6 +1469,13 @@ export type Database = {
             foreignKeyName: "listing_enquiries_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "listing_enquiries_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -1547,7 +1527,62 @@ export type Database = {
             foreignKeyName: "listing_images_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "listing_images_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_events: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          org_id: string
+          photo_paths: string[]
+          request_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          kind: string
+          org_id: string
+          photo_paths?: string[]
+          request_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          org_id?: string
+          photo_paths?: string[]
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1671,6 +1706,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
           },
           {
             foreignKeyName: "maintenance_requests_unit_id_fkey"
@@ -1840,6 +1882,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meters_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
           },
           {
             foreignKeyName: "meters_unit_id_fkey"
@@ -2964,6 +3013,13 @@ export type Database = {
             foreignKeyName: "rooms_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "rooms_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -3220,9 +3276,10 @@ export type Database = {
           furnished: boolean
           id: string
           is_listed_publicly: boolean
+          listed_at: string | null
           listing_description: string | null
           listing_slug: string | null
-          listed_at: string | null
+          listing_title: string | null
           occupancy_type: string
           org_id: string
           rentable_as: string
@@ -3247,9 +3304,10 @@ export type Database = {
           furnished?: boolean
           id?: string
           is_listed_publicly?: boolean
+          listed_at?: string | null
           listing_description?: string | null
           listing_slug?: string | null
-          listed_at?: string | null
+          listing_title?: string | null
           occupancy_type?: string
           org_id: string
           rentable_as?: string
@@ -3274,9 +3332,10 @@ export type Database = {
           furnished?: boolean
           id?: string
           is_listed_publicly?: boolean
+          listed_at?: string | null
           listing_description?: string | null
           listing_slug?: string | null
-          listed_at?: string | null
+          listing_title?: string | null
           occupancy_type?: string
           org_id?: string
           rentable_as?: string
@@ -3442,30 +3501,6 @@ export type Database = {
       }
     }
     Views: {
-      public_listings: {
-        Row: {
-          area_sqm: number | null
-          bathrooms: number | null
-          bedrooms: number | null
-          building_name: string
-          city: string | null
-          currency: string | null
-          description: string | null
-          furnished: boolean
-          latitude: number | null
-          longitude: number | null
-          occupancy_type: string
-          org_id: string
-          rent_minor: number | null
-          slug: string | null
-          title: string
-          unit_id: string
-          unit_type: string | null
-          whatsapp: string | null
-          zone: string | null
-        }
-        Relationships: []
-      }
       pg_all_foreign_keys: {
         Row: {
           fk_columns: unknown[] | null
@@ -3486,6 +3521,45 @@ export type Database = {
           pk_table_oid: unknown
         }
         Relationships: []
+      }
+      public_listings: {
+        Row: {
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          building_name: string | null
+          city: string | null
+          currency: string | null
+          description: string | null
+          furnished: boolean | null
+          latitude: number | null
+          longitude: number | null
+          occupancy_type: string | null
+          org_id: string | null
+          rent_minor: number | null
+          slug: string | null
+          title: string | null
+          unit_id: string | null
+          unit_type: string | null
+          whatsapp: string | null
+          zone: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "units_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "units_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tap_funky: {
         Row: {
@@ -3786,8 +3860,6 @@ export type Database = {
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
-      is_publicly_listed: { Args: { p_unit: string }; Returns: boolean }
-      public_listing_org: { Args: { p_unit: string }; Returns: string }
       is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
       issue_owner_statement: {
