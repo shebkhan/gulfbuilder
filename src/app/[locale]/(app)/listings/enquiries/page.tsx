@@ -41,7 +41,9 @@ export default async function EnquiriesPage({
                   {enquiry.name}
                 </p>
                 <span className="rounded-full bg-surface-container px-2 py-1 font-label-sm text-label-sm text-on-surface-variant">
-                  {enquiry.status}
+                  {t.has(`status.${enquiry.status}` as never)
+                    ? t(`status.${enquiry.status}` as never)
+                    : enquiry.status}
                 </span>
               </div>
               <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant" dir="ltr">

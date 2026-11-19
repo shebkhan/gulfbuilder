@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/domain/marketplace/listing-card";
 import { ListingSearch } from "@/components/domain/marketplace/listing-search";
 import { Link } from "@/i18n/navigation";
-import { getCities, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
+import { citiesFrom, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
 
 export const revalidate = 60;
 
@@ -33,7 +33,8 @@ export default async function MarketplaceLanding({
   setRequestLocale(locale);
   const t = await getTranslations("marketplace");
 
-  const [listings, cities] = await Promise.all([getPublicListings(), getCities()]);
+  const listings = await getPublicListings();
+  const cities = citiesFrom(listings);
   const featured = listings.slice(0, 6);
   const images = await Promise.all(
     featured.map(async (listing) => (await getListingImages(listing.unit_id))[0]),

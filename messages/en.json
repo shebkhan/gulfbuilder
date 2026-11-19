@@ -1664,6 +1664,19 @@
         "failed": "Could not save. Try again.",
         "not_authorised": "You are not allowed to use the platform console."
       }
+    },
+    "whatsapp": {
+      "title": "WhatsApp integration",
+      "hint": "The number used for the one-tap enquiry link on public listings, in international format.",
+      "phone": "WhatsApp number",
+      "enabled": "Enabled",
+      "save": "Save",
+      "saved": "Integration saved.",
+      "errors": {
+        "invalid_input": "Check the details and try again.",
+        "failed": "Could not save. Try again.",
+        "not_authorised": "You are not allowed to use the platform console."
+      }
     }
   },
   "print": {
@@ -1779,13 +1792,19 @@
     },
     "share": {
       "label": "Share",
+      "whatsapp": "WhatsApp",
+      "x": "X",
+      "facebook": "Facebook",
       "copy": "Copy link",
       "copied": "Copied"
     },
     "inbox": {
       "title": "Listing enquiries",
       "subtitle": "Messages from prospective tenants.",
-      "empty": "No enquiries yet."
+      "empty": "No enquiries yet.",
+      "status": {
+        "new": "New"
+      }
     }
   }
 }

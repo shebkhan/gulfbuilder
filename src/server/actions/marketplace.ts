@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { listingEnquirySchema } from "@/schemas/marketplace";
 
@@ -34,6 +33,5 @@ export async function submitListingEnquiryAction(
   });
   if (error) return { error: "submit_failed" };
 
-  revalidatePath("/listings/enquiries");
   return { ok: true };
 }

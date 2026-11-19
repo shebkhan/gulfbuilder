@@ -20,13 +20,13 @@ export function ShareButtons({ url, title }: { url: string; title: string }) {
     <div className="flex flex-wrap items-center gap-2">
       <span className="font-label-md text-label-md text-on-surface-variant">{t("label")}</span>
       <Button asChild variant="secondary" size="sm">
-        <a href={links.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href={links.whatsapp} target="_blank" rel="noopener noreferrer">{t("whatsapp")}</a>
       </Button>
       <Button asChild variant="secondary" size="sm">
-        <a href={links.x} target="_blank" rel="noopener noreferrer">X</a>
+        <a href={links.x} target="_blank" rel="noopener noreferrer">{t("x")}</a>
       </Button>
       <Button asChild variant="secondary" size="sm">
-        <a href={links.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href={links.facebook} target="_blank" rel="noopener noreferrer">{t("facebook")}</a>
       </Button>
       <Button variant="secondary" size="sm" onClick={copy} type="button">
         {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}

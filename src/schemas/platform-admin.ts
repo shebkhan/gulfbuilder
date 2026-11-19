@@ -34,9 +34,10 @@ export const lookupSchema = z
   });
 
 export const integrationSchema = z.object({
-  provider: z.literal("telegram"),
+  provider: z.enum(["telegram", "whatsapp"]),
   botToken: z.string().trim().max(300).default(""),
   botName: z.string().trim().max(80).default(""),
   chatId: z.string().trim().max(80).default(""),
+  phone: z.string().trim().max(40).default(""),
   enabled: z.boolean().default(false),
 });

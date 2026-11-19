@@ -4,7 +4,7 @@ import { ListingCard } from "@/components/domain/marketplace/listing-card";
 import { ListingSearch } from "@/components/domain/marketplace/listing-search";
 import { Link } from "@/i18n/navigation";
 import { filterListings, parseListingFilters } from "@/lib/marketplace";
-import { getCities, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
+import { citiesFrom, getListingImages, getPublicListings, siteUrl } from "@/lib/marketplace-data";
 
 export const revalidate = 60;
 
@@ -38,7 +38,8 @@ export default async function PropertiesPage({
   const t = await getTranslations("marketplace");
   const query = await searchParams;
 
-  const [allListings, cities] = await Promise.all([getPublicListings(), getCities()]);
+  const allListings = await getPublicListings();
+  const cities = citiesFrom(allListings);
   const filters = parseListingFilters(query);
   const listings = filterListings(allListings, filters);
   const images = await Promise.all(

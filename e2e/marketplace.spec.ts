@@ -49,8 +49,8 @@ test("a listing detail renders specs, JSON-LD and share links", async ({ page })
   await healthy(page);
   await expect(page.locator("h1")).toContainText(listingTitle);
   await expect(page.locator('script[type="application/ld+json"]')).toContainText("Residence");
-  await expect(page.getByRole("link", { name: "WhatsApp" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Facebook" })).toBeVisible();
+  await expect(page.locator('a[href^="https://wa.me/"]').first()).toBeVisible();
+  await expect(page.locator('a[href*="facebook.com/"]').first()).toBeVisible();
   await expect(page.locator("#enquiry-name")).toBeVisible();
 });
 

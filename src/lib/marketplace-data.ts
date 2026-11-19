@@ -13,19 +13,21 @@ function publicClient() {
 }
 
 export async function getPublicListings(): Promise<Listing[]> {
-  const { data } = await publicClient()
+  const { data, error } = await publicClient()
     .from("public_listings")
     .select("*")
     .order("title");
+  if (error) throw new Error(`public_listings: ${error.message}`);
   return data ?? [];
 }
 
 export async function getPublicListing(slug: string): Promise<Listing | null> {
-  const { data } = await publicClient()
+  const { data, error } = await publicClient()
     .from("public_listings")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
+  if (error) throw new Error(`public_listings: ${error.message}`);
   return data ?? null;
 }
 
@@ -34,16 +36,16 @@ export function listingImageUrl(path: string): string {
 }
 
 export async function getListingImages(unitId: string): Promise<string[]> {
-  const { data } = await publicClient()
+  const { data, error } = await publicClient()
     .from("listing_images")
     .select("path")
     .eq("unit_id", unitId)
     .order("sort_order");
+  if (error) throw new Error(`listing_images: ${error.message}`);
   return (data ?? []).map((row) => listingImageUrl(row.path));
 }
 
-export async function getCities(): Promise<string[]> {
-  const listings = await getPublicListings();
+export function citiesFrom(listings: Listing[]): string[] {
   return [...new Set(listings.map((l) => l.city).filter((c): c is string => Boolean(c)))].sort();
 }
 

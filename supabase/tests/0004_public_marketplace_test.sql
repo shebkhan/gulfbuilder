@@ -60,14 +60,16 @@ select throws_ok($$ insert into listing_enquiries (org_id, unit_id, name, email,
 select throws_ok($$ select * from listing_enquiries $$,
   '42501', null, 'anon cannot read the enquiry inbox');
 
+-- A second, publicly listed lead is created as anon so this insert does not
+-- violate the authenticated policy's org check and abort the whole test.
+insert into listing_enquiries (org_id, unit_id, name, email, message)
+values ('a2222222-2222-2222-2222-222222222222', 'e2222222-2222-2222-2222-222222222222',
+        'Other org lead', 'other@test.dev', 'hidden');
+
 -- Org A staff: sees only its own leads.
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-0000-0000-0000000000a1","org_id":"a1111111-1111-1111-1111-111111111111","org_role":"org_admin"}', true);
-
-insert into listing_enquiries (org_id, unit_id, name, email, message, status)
-values ('a2222222-2222-2222-2222-222222222222', 'e2222222-2222-2222-2222-222222222222',
-        'Other org lead', 'other@test.dev', 'hidden', 'new');
 
 select is((select count(*) from listing_enquiries), 1::bigint,
   'org A staff sees only org A enquiries');
