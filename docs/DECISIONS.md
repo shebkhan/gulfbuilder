@@ -15,7 +15,9 @@ contact or internal financial fields — and anon gets INSERT-only on `listing_e
 the marketplace was requested as a standalone plan; cost is a new public attack surface that needs
 SEO/ops work outside this repo to be useful. Anon enquiries have DB length checks and a column-level
 grant (status cannot be set by the public), but no per-IP throttling yet; add rate limiting at the
-edge if the inbox starts receiving spam.
+edge if the inbox starts receiving spam. Listing flags, copy, slugs and images are database fields
+only — no admin edit screen ships with this branch; the WhatsApp number is configured from the
+platform organization console.
 
 **D-026 · The `listing-images` Storage bucket is public instead of private with signed URLs.**
 SPEC §3, §6 and §11 (and `docs/CLAUDE.md`) call for private buckets with `{org_id}/` prefixes and

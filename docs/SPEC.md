@@ -1,6 +1,6 @@
 # Gulf Property Management Platform: Build Specification
 
-Version 0.2 · 16 November 2026 · Target stack: Next.js 15 + Supabase · Audience: Claude Code and human reviewers
+Version 0.3 · 19 November 2026 · Target stack: Next.js 15 + Supabase · Audience: Claude Code and human reviewers
 
 ## 0. How to use this spec
 
@@ -22,6 +22,7 @@ A multi-tenant, white-label SaaS for property companies in the Gulf. It manages 
 - **First market:** Qatar (QAR). Architecture supports UAE, Saudi Arabia, Kuwait, Bahrain and Oman through per-organization market packs.
 - **Customers:** (a) companies that own their buildings, (b) companies that manage buildings for third-party owners, (c) both at once. All three are supported through a per-owner `ownership_model`.
 - **v1 surfaces:** responsive web app (Arabic RTL and English), tenant portal, owner portal, installable PWA, white-label branding, super-admin console.
+- **Additive surface:** a public, unauthenticated property marketplace across organizations — landing, search, listing detail, enquiries and an org enquiry inbox (section 8 MP, section 12 M8). It is not part of the original v1 tenant scope; see D-027.
 - **Out of scope for v1:** native apps (Expo, phase 2), government registry integrations (tracked manually), online card payments (phase 2), non-Gulf markets.
 
 ## 2. Locked decisions
@@ -42,6 +43,7 @@ A multi-tenant, white-label SaaS for property companies in the Gulf. It manages 
 | D12 | Mutations via Server Actions; multi-step financial operations via Postgres RPC functions |
 | D13 | ID numbers encrypted at rest (Vault/pgsodium or app-level envelope encryption behind `src/lib/crypto.ts`) |
 | D14 | Soft delete on master data; effective-dated rent changes (`lease_terms`) |
+| D15 | Public listings are exposed only through the `public_listings` security-definer view with an explicit column allow-list; anonymous users may only INSERT `listing_enquiries` for publicly listed units and cannot SELECT any lead |
 
 ## 3. Stack and conventions
 
@@ -54,7 +56,7 @@ A multi-tenant, white-label SaaS for property companies in the Gulf. It manages 
 | Data | supabase-js server client (RLS via user JWT), TanStack Query for client interactivity |
 | Database | Supabase Postgres with RLS, pg_cron, btree_gist |
 | Auth | Supabase Auth: email and password, magic link, phone OTP; TOTP MFA for admin roles |
-| Storage | Supabase Storage, private buckets, path prefix `{org_id}/` |
+| Storage | Supabase Storage, private buckets with path prefix `{org_id}/`; `listing-images` is a deliberate public bucket for crawlable listing images (D-026) |
 | Jobs | pg_cron plus Edge Functions |
 | Charts | Recharts |
 | PDF | @react-pdf/renderer, bilingual with RTL support |
@@ -68,6 +70,7 @@ Repository layout:
 src/
   app/
     [locale]/
+      /, properties, properties/[slug]                          # public marketplace
       (auth)/login, accept-invite, reset-password
       (app)/dashboard
       (app)/buildings/[id]/(overview | floors | units | stacking | expenses)
@@ -75,15 +78,19 @@ src/
       (app)/owners, tenants, leases, payments, cheques, deposits
       (app)/expenses, maintenance, reports, documents
       (app)/settings/(organization | users | branding | templates | notifications | accounting)
+      (app)/listings/enquiries                                  # org lead inbox
       (owner)/home, buildings, statements, payouts, approvals, documents
       (portal)/home, statement, payments, requests, documents
       (platform)/organizations, plans, market-packs, usage      # platform_admin only
     api/webhooks/(whatsapp | payments)/route.ts
+    sitemap.ts, robots.ts                                       # public marketplace SEO
   middleware.ts            # locale, host -> organization, auth redirect
   components/ui/           # shadcn primitives
   components/domain/       # StackingGrid, ChequeBoard, LedgerTable, LeaseForm, StatementView ...
+  components/domain/marketplace/  # ListingCard, ListingSearch, EnquiryForm, ShareButtons
   lib/supabase/(server | client | admin).ts
   lib/(money | dates | hijri | rbac | i18n | kpi).ts
+  lib/(marketplace | marketplace-data | marketplace-seo).ts
   schemas/*.ts             # Zod schemas shared by client and server
   server/actions/*.ts      # Server Actions per module
   server/queries/*.ts      # read models
@@ -94,7 +101,7 @@ supabase/
 docs/DECISIONS.md
 ```
 
-Request flow: browser, then Server Component or Server Action, then Supabase with the user's JWT. Middleware resolves the request host to an organization (white-label domains) and injects branding CSS variables in the root layout. A Supabase Auth custom access token hook adds `org_id` and `org_role` claims for the active organization.
+Request flow: browser, then Server Component or Server Action, then Supabase with the user's JWT. Middleware resolves the request host to an organization (white-label domains) and injects branding CSS variables in the root layout. A Supabase Auth custom access token hook adds `org_id` and `org_role` claims for the active organization. The marketplace routes (`/{locale}`, `/{locale}/properties`, `/{locale}/properties/[slug]`) are anonymous: they use the anon Supabase client against `public_listings` and are not matched by the auth-protected route list; only `/{locale}/listings/enquiries` requires a session.
 
 ## 4. Roles and permissions
 
@@ -116,8 +123,10 @@ Capability matrix (C create, R read, U update, D delete, A approve):
 | Reports and analytics | R | R (assigned) | R | | R (own) | |
 | Owner statements and payouts | CRUDA | R | CRUDA | | R (own) | |
 | Users, branding, settings | CRUD | | | | | |
+| Public listing metadata and images (RLS permission; no management UI yet) | CRUD | CRU (assigned buildings) | | | | |
+| Listing enquiries (org inbox) | R (assigned buildings), U (org) | R (assigned buildings), U (org) | R (assigned buildings), U (org) | | | |
 
-Managers and caretakers are limited to buildings in `member_building_access`. Owners are limited to buildings where `buildings.owner_id` matches their owner record (`owners.user_id = auth.uid()`). Tenants see only rows linked to their own leases (`tenants.user_id = auth.uid()`).
+Anonymous visitors have no row-level access to business tables: they may read only the allow-listed columns of the `public_listings` view and insert enquiries for publicly listed vacant units. Managers and caretakers are limited to buildings in `member_building_access`. Owners are limited to buildings where `buildings.owner_id` matches their owner record (`owners.user_id = auth.uid()`). Tenants see only rows linked to their own leases (`tenants.user_id = auth.uid()`).
 
 ## 5. Database schema
 
@@ -613,6 +622,52 @@ create table usage_snapshots (org_id uuid, taken_on date, units int, users int, 
 
 Attach `audit_trigger` (writes old and new row to `audit_log`) to all business tables.
 
+### 5.9 `20261119000002_public_marketplace.sql`: public listings and enquiries
+
+Additive and opt-in: a unit appears only when its slug is set, both building and unit flags allow listing, status is `vacant` and neither row is soft-deleted. No tenant, lease, cheque or internal financial column is ever exposed publicly. The flag defaults are permissive, so setting a slug is the effective publish action; an admin UI for these fields is still to come.
+
+```sql
+-- opt-in flags/listings metadata on existing tables
+buildings: is_listed_publicly boolean not null default true, listing_description text
+units:     is_listed_publicly boolean not null default true, listing_title text,
+           listing_description text, listing_slug text unique, listed_at timestamptz
+
+create table listing_images (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references organizations(id),
+  unit_id uuid not null references units(id),
+  path text not null, alt_text text, sort_order int not null default 0,
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+  created_by uuid
+);
+create index listing_images_org_unit_idx on listing_images (org_id, unit_id, sort_order);
+
+create table listing_enquiries (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references organizations(id),
+  unit_id uuid not null references units(id),
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null check (char_length(email) between 3 and 255),
+  phone text check (char_length(phone) <= 40),
+  message text not null check (char_length(message) between 1 and 2000),
+  status text not null default 'new',  -- app uses new/read/replied/closed
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+  created_by uuid
+);
+create index listing_enquiries_org_idx on listing_enquiries (org_id, created_at desc);
+create index listing_enquiries_unit_idx on listing_enquiries (unit_id);
+```
+
+`public_listings` is a `security_definer` view with an explicit column allow-list: `unit_id`, `org_id`, `slug`, `title`, `description`, `rent_minor`, `currency`, `unit_type`, `bedrooms`, `bathrooms`, `area_sqm`, `furnished`, `occupancy_type`, `city`, `zone`, `building_name`, `latitude`, `longitude` and an org-configured `whatsapp` number. It includes only units that are opted in, not soft-deleted and `status = 'vacant'`.
+
+Helper functions `is_publicly_listed`, `public_listing_org` and `public_listing_building` are `security definer` so anonymous visitors can check eligibility and resolve the owning organization without reading `units` or `buildings`. Policies:
+
+- `public_listings`: anon and authenticated `SELECT` on the allow-listed columns only.
+- `listing_images`: org members with `org_admin`/`manager` role and `can_access_building(public_listing_building(unit_id))` may write; anon may read images of publicly listed units.
+- `listing_enquiries`: anon may `INSERT` only where `is_publicly_listed(unit_id)` and `org_id = public_listing_org(unit_id)`, via a column grant restricted to `org_id, unit_id, name, email, phone, message` (no anon `SELECT`). Org members read leads only for buildings they can access, scoped to `org_admin`, `manager` and `accountant`; the update policy is org-scoped (`org_id = auth_org()`).
+
+A public-read `listing-images` Storage bucket holds crawlable image URLs; writes are restricted to the `{org_id}/` folder prefix (D-026). The WhatsApp number comes from the platform organization's `whatsapp` integration config, not a hard-coded constant.
+
 ## 6. Auth, RLS and storage
 
 **Access token hook.** A Supabase Auth custom access token hook reads `org_members` for the user's active organization and adds claims `org_id` and `org_role`. Switching organization updates the active org (stored in `profiles` or user metadata) and refreshes the session.
@@ -794,6 +849,16 @@ Workflow: draft (first day after period close) then review by accountant then is
 **Administration (A)**
 - A1 Invite users, assign roles and building access. A2 Organization settings (currency, late fee policy, grace days, reminder schedule, tax rate, revenue recognition, templates, terminology). A3 Branding. A4 Audit log viewer. A5 Full data export (CSV).
 
+**Public marketplace (MP)** — additive to v1; see D-027
+- MP1 Public landing at `/{locale}` with hero search, featured listings and browse-by-city; replaces the old dashboard redirect while a dashboard link remains in the header.
+- MP2 `/{locale}/properties` search results with filters (city, unit type, bedrooms, furnished, price, occupancy); anonymous users see only `public_listings`.
+- MP3 `/{locale}/properties/[slug]` listing detail: gallery, specifications, map, share buttons, WhatsApp deep link and enquiry form.
+- MP4 Enquiry form submits to `listing_enquiries` anonymously for publicly listed units only; a confirmation is shown and no lead data is readable by the public.
+- MP5 Org enquiry inbox at `/{locale}/listings/enquiries` with status tracking, scoped to the member's accessible buildings.
+- MP6 Opt-in fields: building/unit `is_listed_publicly` flags, listing title/description, unit slug, `listing_images` rows and the WhatsApp number from the org's integration config. These are database/API fields only — there is no admin UI yet for editing listing copy, flags or images; the WhatsApp number is set in the platform organization console. `e2e/setup.ts` seeds a representative public listing for tests.
+- MP7 SEO: server-rendered pages, `generateMetadata`, Open Graph/Twitter cards, JSON-LD `Residence` with an `Offer`, `sitemap.ts`, `robots.ts` and stable slugs.
+- MP8 Sharing: WhatsApp, X, Facebook and copy-link buttons; rich previews for every listing. Saved listings, social login, auto-posting and embeddable widgets are deferred.
+
 ## 9. Reports and analytics
 
 Audience: A org admin, M manager, F accountant, O owner (own buildings only through RLS). All reports take parameters: date range, basis (accrual or cash), building, owner, unit type, currency, comparison (previous period, same period last year, budget). Every figure drills down to journal lines and then the source document.
@@ -862,7 +927,9 @@ Audience: A org admin, M manager, F accountant, O owner (own buildings only thro
 - Super-admin console (`(platform)` route group, platform_admin only): create organizations, set plan and limits, impersonate with audit trail, usage and health, manage market packs.
 - Phase 2: branded Expo builds from a per-organization config file through EAS in CI.
 
-**Notifications.** Events enqueue rows in `notification_outbox`; an Edge Function on a short schedule sends with retries. Channels: in-app, email, web push, WhatsApp, SMS behind a `Notifier` interface. Templates per organization, event, channel and locale. Respect tenant language and quiet hours.
+**Public marketplace sharing.** Listing detail pages render WhatsApp, X, Facebook and copy-link share actions and emit Open Graph/Twitter metadata for link previews. The WhatsApp deep link and the card's contact number use the `whatsapp` phone configured in the organization's integration config; there is no hard-coded global number. Saved listings, social login, auto-posting and embeddable widgets are out of scope for this surface.
+
+**Notifications.** Events enqueue rows in `notification_outbox`; an Edge Function on a short schedule sends with retries. Channels: in-app, email, web push, WhatsApp, SMS behind a `Notifier` interface. Templates per organization, event, channel and locale. Respect tenant language and quiet hours. Listing enquiries create org-scoped lead rows for the inbox; they do not enqueue notification events.
 
 | Event | Recipient | Default timing |
 |---|---|---|
@@ -887,15 +954,15 @@ Audience: A org admin, M manager, F accountant, O owner (own buildings only thro
 **Non-functional**
 - Performance: lists and dashboards under 1 second at p95 for 5,000 units per organization; server-side pagination and filtering; indexes on `(org_id, ...)`.
 - Availability: 99.5% target at launch; point-in-time recovery enabled; quarterly restore test.
-- Security: RLS on every table, encrypted ID numbers, private storage with signed URLs, MFA for admin roles, rate limiting on auth and public endpoints, audit log, dependency scanning, secrets only in environment management.
+- Security: RLS on every table, encrypted ID numbers, private storage with signed URLs, MFA for admin roles, rate limiting on auth and public endpoints, audit log, dependency scanning, secrets only in environment management. The `listing-images` bucket is the documented public-read exception (D-026). Rate limiting on marketplace enquiries is deferred (D-027).
 - Privacy: data minimization for ID copies, retention settings per organization, export and deletion workflows, data processing agreement template.
 - Accessibility: WCAG 2.1 AA targets, keyboard navigation, mobile-first layouts for caretaker, tenant and owner screens.
 - Observability: error tracking (Sentry or equivalent), structured logs, job failure alerts, uptime check.
 
 **Testing**
-- pgTAP: every RLS policy, exclusion constraints, triggers, journal balance, period locks, RPC functions, ownership model rules R1 to R6.
-- Vitest: money, schedule generation (including rounding remainder), allocation, KPI functions, Zod schemas.
-- Playwright (run in `en` and `ar`): onboarding, bulk property setup, lease with 4 cheques, clear and bounce flow, partial payment and receipt, deposit deduction and refund, sub-letting (both modes), tenant portal, owner portal and statement issue, period close, white-label domain and branding.
+- pgTAP: every RLS policy, exclusion constraints, triggers, journal balance, period locks, RPC functions, ownership model rules R1 to R6, plus `20261119000002_public_marketplace.sql` (`supabase/tests/0004_public_marketplace_test.sql`): anon reads only `public_listings`, anon inserts only for opted-in units, no anon lead reads, org isolation for lead reads and the public `listing-images` bucket flag.
+- Vitest: money, schedule generation (including rounding remainder), allocation, KPI functions, Zod schemas, plus `src/lib/marketplace.ts` (slug generation, filter parsing, money formatting, share/WhatsApp links) and `src/lib/marketplace-seo.ts` (JSON-LD and OG metadata).
+- Playwright (run in `en` and `ar`): onboarding, bulk property setup, lease with 4 cheques, clear and bounce flow, partial payment and receipt, deposit deduction and refund, sub-letting (both modes), tenant portal, owner portal and statement issue, period close, white-label domain and branding, plus `e2e/marketplace.spec.ts` (browse, filter, detail, enquiry).
 - CI (GitHub Actions): lint, typecheck, unit, `supabase db reset` plus `supabase test db`, e2e. Cross-tenant access tests are mandatory for every new table.
 
 **Seed data** (`supabase/seed.sql`): one demo organization (Qatar, QAR) with a `self` owner and two `managed` owners; 3 buildings with 10 floors and about 200 units, some with rooms; tenants (Arabic and English names), active and expired leases, cheques in every status, partial payments, deposits with deductions, expenses (one pending owner approval), maintenance requests, a closed period and an issued statement. Users for every role with documented demo credentials (local only).
@@ -952,6 +1019,16 @@ Each milestone ends with its Definition of Done (DoD). Do not proceed until it p
 - [ ] Documentation (admin guide, runbook), onboarding import templates, pilot with one customer.
 - **DoD:** all acceptance criteria pass; load and restore tests documented in `docs/`.
 
+### M8 Public marketplace (additive)
+- [x] Migration `20261119000002_public_marketplace.sql`: opt-in flags, listing metadata, `listing_images`, `listing_enquiries`, `public_listings` view, definer helpers, RLS and the public `listing-images` bucket; generated types updated.
+- [x] Public routes: `/{locale}` landing, `/{locale}/properties` search, `/{locale}/properties/[slug]` detail, `/{locale}/listings/enquiries` org inbox.
+- [x] SEO: `generateMetadata`, JSON-LD, Open Graph/Twitter cards, `sitemap.ts`, `robots.ts`.
+- [x] Sharing: WhatsApp/X/Facebook/copy-link and org-configured WhatsApp enquiry deep link.
+- [x] Tests: pgTAP RLS, Vitest helpers and metadata, Playwright browse/filter/detail/enquiry.
+- [x] Deviations recorded in `docs/DECISIONS.md` (D-026, D-027).
+- **DoD:** an anonymous visitor can browse and enquire only on opted-in vacant units; an org member sees only their own leads; public SEO URLs are crawlable.
+- **Deferred:** admin UI for listing flags/copy/images, saved listings, social login, auto-posting, embeddable widgets and rate limiting on the enquiry endpoint.
+
 ## 13. Acceptance criteria for v1
 
 1. A new organization can be created, branded and populated with 3 buildings, 10 floors and 200 units through import in under 30 minutes.
@@ -969,6 +1046,12 @@ Each milestone ends with its Definition of Done (DoD). Do not proceed until it p
 13. KPI values are identical on dashboards, reports and statements.
 14. An owner user cannot access any report row outside their own buildings, proven by automated tests.
 15. Arabic RTL renders correctly on every screen and in every PDF; the tenant portal shows only the tenant's own data.
+
+**Public marketplace (additive)**
+
+16. An anonymous visitor can browse and filter listings in both `en` and `ar`, open a detail page with crawlable metadata and submit an enquiry only for an opted-in vacant unit; no tenant or internal financial data is exposed.
+17. An anonymous visitor cannot read any lead row and cannot enquire on a private or occupied unit; an org member sees only leads for buildings they can access, proven by pgTAP cross-tenant tests.
+18. Listing detail URLs are unique, server-rendered, present in the sitemap and shared with working WhatsApp/X/Facebook/copy-link actions using the organization's configured WhatsApp number.
 
 ## 14. Open items (ask the owner; do not guess)
 

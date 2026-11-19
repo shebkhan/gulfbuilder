@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Project: Gulf Property Management Platform, a multi-tenant, white-label SaaS (buildings, floors, units, rooms, leases, deposits, rent, cheques, owners, financial reports).
+Project: Gulf Property Management Platform, a multi-tenant, white-label SaaS (buildings, floors, units, rooms, leases, deposits, rent, cheques, owners, financial reports) plus an additive public marketplace for opted-in vacant units (SPEC §5.9, §8 MP, M8).
 
 **Read SPEC.md fully before starting any task.** SPEC.md defines what to build and in which order; this file defines how to work in the repo.
 
@@ -61,7 +61,7 @@ Before declaring any task done, run: `pnpm lint && pnpm typecheck && pnpm test &
 ## Security rules
 
 - Never log or expose ID numbers, tokens or the service-role key. ID numbers are encrypted at rest via Postgres `encrypt_id`/`decrypt_id` (Vault + pgcrypto); see D-011.
-- Storage paths start with `{org_id}/`; bucket policies check that prefix. Use signed URLs.
+- Storage paths start with `{org_id}/`; bucket policies check that prefix. Use signed URLs. `listing-images` is a documented public-read exception for crawlable listing photos (D-026).
 - Add a cross-tenant test (user in org A cannot read or write org B) for every new table.
 - Do not add third-party services or dependencies without noting them in `docs/DECISIONS.md`.
 

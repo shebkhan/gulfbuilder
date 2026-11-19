@@ -1,6 +1,6 @@
 # Gulf Property Management Platform
 
-Multi-tenant, white-label SaaS for property companies in the Gulf: buildings, floors, units, rooms, leases, deposits, rent collection (post-dated cheques), maintenance, expenses, owner statements and financial analytics. First market Qatar (QAR); UAE, Saudi Arabia, Kuwait, Bahrain and Oman follow via market packs.
+Multi-tenant, white-label SaaS for property companies in the Gulf: buildings, floors, units, rooms, leases, deposits, rent collection (post-dated cheques), maintenance, expenses, owner statements and financial analytics. Also includes an additive public marketplace for opted-in vacant units (browse, filter, listing detail, enquiries and an org lead inbox). First market Qatar (QAR); UAE, Saudi Arabia, Kuwait, Bahrain and Oman follow via market packs.
 
 ## Stack
 
@@ -34,9 +34,9 @@ Before declaring a task done: `pnpm lint && pnpm typecheck && pnpm test && supab
 
 ## Tests
 
-- Vitest: `src/**/*.test.ts` — pure logic (money, schedule, allocation, KPIs, Zod schemas, notifications helpers, white-label).
-- pgTAP: `supabase/tests/` — RLS, constraints, triggers, RPCs, ownership rules.
-- Playwright: `e2e/` — key flows in `en` and `ar`.
+- Vitest: `src/**/*.test.ts` — pure logic (money, schedule, allocation, KPIs, Zod schemas, notifications helpers, white-label, marketplace helpers and SEO metadata).
+- pgTAP: `supabase/tests/` — RLS, constraints, triggers, RPCs, ownership rules, marketplace anon access.
+- Playwright: `e2e/` — key flows in `en` and `ar`, including marketplace browse → filter → detail → enquiry.
 
 ## Layout
 

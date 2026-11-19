@@ -73,6 +73,29 @@ app origin; `{locale}` is `en` or `ar`. Roles come from `docs/SPEC.md` §4.
 - **Platform console:** `/{locale}/platform` — organizations, plan and feature flags,
   usage snapshots, market packs and audited active-org switching.
 
+## Public marketplace
+
+- **Visitor surfaces (no sign-in):** `/{locale}` is the landing page with hero search,
+  featured listings and browse-by-city. `/{locale}/properties` filters by city, unit
+  type, bedrooms, furnishing, price and occupancy; `/{locale}/properties/{slug}` shows
+  the gallery, specs, map, share buttons, a WhatsApp deep link and an enquiry form.
+  The header links back to `/{locale}/dashboard` for staff. These routes replace the
+  old redirect from `/{locale}` to the dashboard.
+- **Lead inbox:** `/{locale}/listings/enquiries` lists enquiries with their status.
+  Members see only leads for buildings they can access; anonymous visitors can never
+  read leads.
+- **Publishing a unit:** there is no admin UI yet. A unit is publicly visible only when
+  it is `vacant`, not soft-deleted, its building and unit have `is_listed_publicly = true`
+  and the unit has a unique `listing_slug`. Set an optional `listing_title`,
+  `listing_description` and rows in `listing_images` (paths in the public
+  `listing-images` bucket under `{org_id}/`) to improve the listing. `e2e/setup.ts`
+  contains a complete seed example. See D-026/D-027 in `docs/DECISIONS.md`.
+- **WhatsApp link:** set `config.phone` on the organization's `whatsapp` row in
+  `org_integrations` from `/{locale}/platform/organizations/{id}` (platform_admin only).
+  The listing detail deep link and social cards use this number.
+- **Metadata:** `/sitemap.xml` and `/robots.txt` are generated for the public routes;
+  check them after publishing a new slug.
+
 ## Demo credentials (local only)
 
 Created by `node scripts/seed-demo-data.cjs`; **never use these in a deployed

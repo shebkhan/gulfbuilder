@@ -7,7 +7,8 @@
 2. Link the Supabase project once: `supabase link --project-ref <ref>` (the project is
    configured as `gulfproperty` in `.env.example`).
 3. Apply schema changes: `pnpm db:push` (`supabase db push --linked`). Migrations are
-   numbered `202611160000NN_*.sql` and are never edited after they have been applied.
+   timestamped (`202611160000NN_*.sql` and later) and are never edited after they have
+   been applied.
    Regenerate the typed client with `pnpm gen:types` after every migration.
 4. Verify the release: `pnpm lint && pnpm typecheck && pnpm build`. The owner excluded
    automated test suites from v1, so these plus read-only SQL probes are the gates.
@@ -40,7 +41,26 @@
   into a fresh project first and replay migrations forward; never restore over a live
   project without owner approval.
 - **Storage:** the private `documents` bucket holds `{org_id}/{entity}/{id}/{file}`.
-  A backup must include both the database and this bucket.
+  The `listing-images` bucket is public-read so search engines can crawl listing
+  photos; writes stay under `{org_id}/` (D-026). A backup must include both buckets
+  and the database.
+
+## Public marketplace
+
+- Routes `/{locale}`, `/{locale}/properties` and `/{locale}/properties/{slug}` are
+  anonymous and read the `public_listings` view; `/{locale}/listings/enquiries` is
+  session-gated. `sitemap.xml` and `robots.txt` are generated from the app.
+- `20261119000002_public_marketplace.sql` has only been hand-verified in the build
+  environment: local Postgres/Docker was unavailable, so `supabase test db` and
+  Playwright did not run. Before deploying, apply it to a local stack and run
+  `supabase db reset`, `supabase test db` (including
+  `supabase/tests/0004_public_marketplace_test.sql`) and `pnpm test:e2e`, then
+  regenerate `src/types/database.ts` from the applied schema.
+- Add a rate limit in front of the enquiry action before exposing the marketplace
+  to the open internet (D-027). Listing copy, flags and images have no admin UI yet;
+  they are set in the database. The WhatsApp share/deep-link number comes from
+  `org_integrations.config.phone` for provider `whatsapp` (platform organization
+  console).
 
 ## Notification dispatch
 
