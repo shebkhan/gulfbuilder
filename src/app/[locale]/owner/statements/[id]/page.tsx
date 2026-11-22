@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOwnerScope } from "@/server/queries/owner-portal";
+import { OwnerStatementPdfButton } from "@/components/domain/owner-statement-pdf-button";
 
 export default async function OwnerStatementPage({
   params,
@@ -54,6 +55,7 @@ export default async function OwnerStatementPage({
             {statement.status}
           </Badge>
         </p>
+        <OwnerStatementPdfButton statementId={id} />
       </div>
 
       <Card>
