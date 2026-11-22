@@ -45,4 +45,25 @@
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+
+  /* Accessibility: visible focus ring and skip-to-content target. */
+  :focus-visible {
+    outline: 2px solid var(--brand-primary, #795919);
+    outline-offset: 2px;
+  }
+
+  .skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    background: var(--brand-primary, #795919);
+    color: #fff;
+    border-radius: 0 0 0.5rem 0;
+  }
+
+  .skip-to-content:focus {
+    left: 0;
+  }
 }
