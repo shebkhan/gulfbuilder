@@ -6,6 +6,7 @@ import { can } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrgContext } from "@/server/org-context";
 import { ReceiptPdf, type ReceiptPdfData } from "@/lib/pdf/receipt";
+import { storePdf } from "@/lib/pdf/storage";
 
 
 export type ReceiptPdfState = { error?: string; url?: string };
@@ -61,23 +62,7 @@ export async function generateReceiptPdfAction(paymentId: string): Promise<Recei
   };
 
   const buffer = await renderToBuffer(<ReceiptPdf data={data} />);
-  const path = `${ctx.orgId}/receipts/${paymentId}.pdf`;
-  const { error: uploadError } = await ctx.supabase.storage
-    .from("documents")
-    .upload(path, buffer, { contentType: "application/pdf", upsert: true });
-  if (uploadError) return { error: "upload_failed" };
-
-  // Record in documents table.
-  await ctx.supabase.from("documents").insert({
-    org_id: ctx.orgId,
-    entity_type: "payment",
-    entity_id: paymentId,
-    kind: "receipt",
-    path,
-    uploaded_by: ctx.userId,
-  });
-
   revalidatePath("/payments");
-  const { data: signed } = await ctx.supabase.storage.from("documents").createSignedUrl(path, 3600);
-  return { url: signed?.signedUrl };
+  const result = await storePdf(ctx.supabase, ctx.orgId, ctx.userId, "receipts", "payment", paymentId, "receipt", buffer);
+  return result.url ? { url: result.url } : { error: result.error ?? "upload_failed" };
 }

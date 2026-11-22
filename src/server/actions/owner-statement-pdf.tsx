@@ -6,6 +6,7 @@ import { can } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrgContext } from "@/server/org-context";
 import { OwnerStatementPdf, type OwnerStatementPdfData } from "@/lib/pdf/owner-statement";
+import { storePdf } from "@/lib/pdf/storage";
 
 export type OwnerStatementPdfState = { error?: string; url?: string };
 
@@ -52,21 +53,6 @@ export async function generateOwnerStatementPdfAction(
   };
 
   const buffer = await renderToBuffer(<OwnerStatementPdf data={data} />);
-  const path = `${ctx.orgId}/owner-statements/${statementId}.pdf`;
-  const { error: uploadError } = await ctx.supabase.storage
-    .from("documents")
-    .upload(path, buffer, { contentType: "application/pdf", upsert: true });
-  if (uploadError) return { error: "upload_failed" };
-
-  await ctx.supabase.from("documents").insert({
-    org_id: ctx.orgId,
-    entity_type: "owner_statement",
-    entity_id: statementId,
-    kind: "statement",
-    path,
-    uploaded_by: ctx.userId,
-  });
-
-  const { data: signed } = await ctx.supabase.storage.from("documents").createSignedUrl(path, 3600);
-  return { url: signed?.signedUrl };
+  const result = await storePdf(ctx.supabase, ctx.orgId, ctx.userId, "owner-statements", "owner_statement", statementId, "statement", buffer);
+  return result.url ? { url: result.url } : { error: result.error ?? "upload_failed" };
 }

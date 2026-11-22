@@ -1,3 +1,4 @@
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
@@ -53,7 +54,7 @@ export default async function middleware(request: NextRequest) {
     bucketName = "public";
   }
   if (bucket) {
-    const { ok, retryAfter } = rateLimit(`${bucketName}:${clientIp(request)}`, bucket!.limit, bucket!.windowMs);
+    const { ok, retryAfter } = checkRateLimit(`${bucketName}:${clientIp(request)}`, bucket!.limit, bucket!.windowMs);
     if (!ok) {
       return new NextResponse("Too many requests", {
         status: 429,
@@ -93,43 +94,11 @@ export default async function middleware(request: NextRequest) {
   return response;
 }
 
-// --- Lightweight, per-instance rate limiting (Edge runtime, in-memory).
-// shortcut: per-instance only, resets on redeploy; upgrade to a shared store
-// (Upstash/Redis) before scaling beyond a single instance.
+
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   auth: { limit: 10, windowMs: 60_000 },
   public: { limit: 60, windowMs: 60_000 },
-  dispatch: { limit: 12, windowMs: 60_000 },
 };
-const buckets = new Map<string, number[]>();
-
-function clientIp(request: NextRequest): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
-
-function rateLimit(key: string, limit: number, windowMs: number): { ok: boolean; retryAfter: number } {
-  const now = Date.now();
-  const cutoff = now - windowMs;
-  const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);
-  if (hits.length >= limit) {
-    const retryAfter = Math.ceil(((hits[0] as number) + windowMs - now) / 1000);
-    buckets.set(key, hits);
-    return { ok: false, retryAfter: Math.max(1, retryAfter) };
-  }
-  hits.push(now);
-  buckets.set(key, hits);
-  // Opportunistic cleanup to avoid unbounded growth.
-  if (buckets.size > 5000) {
-    for (const [k, v] of buckets) {
-      if (v.every((t) => t <= cutoff)) buckets.delete(k);
-    }
-  }
-  return { ok: true, retryAfter: 0 };
-}
 
 export const config = {
   matcher: ["/((?!api|auth|_next|_vercel|.*\\..*).*)"],

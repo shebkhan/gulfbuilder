@@ -5,6 +5,7 @@ import { can } from "@/lib/rbac";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrgContext } from "@/server/org-context";
 import { ContractPdf, type ContractPdfData } from "@/lib/pdf/contract";
+import { storePdf } from "@/lib/pdf/storage";
 
 export type ContractPdfState = { error?: string; url?: string };
 
@@ -50,21 +51,6 @@ export async function generateContractPdfAction(leaseId: string): Promise<Contra
   };
 
   const buffer = await renderToBuffer(<ContractPdf data={data} />);
-  const path = `${ctx.orgId}/contracts/${leaseId}.pdf`;
-  const { error: uploadError } = await ctx.supabase.storage
-    .from("documents")
-    .upload(path, buffer, { contentType: "application/pdf", upsert: true });
-  if (uploadError) return { error: "upload_failed" };
-
-  await ctx.supabase.from("documents").insert({
-    org_id: ctx.orgId,
-    entity_type: "lease",
-    entity_id: leaseId,
-    kind: "contract",
-    path,
-    uploaded_by: ctx.userId,
-  });
-
-  const { data: signed } = await ctx.supabase.storage.from("documents").createSignedUrl(path, 3600);
-  return { url: signed?.signedUrl };
+  const result = await storePdf(ctx.supabase, ctx.orgId, ctx.userId, "contracts", "lease", leaseId, "contract", buffer);
+  return result.url ? { url: result.url } : { error: result.error ?? "upload_failed" };
 }
