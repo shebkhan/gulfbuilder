@@ -110,7 +110,7 @@ export async function AppShell({
             </div>
           </header>
 
-          <main className="flex-1 px-6 pb-8 lg:px-8">{children}</main>
+          <main id="main-content" className="flex-1 px-6 pb-8 lg:px-8">{children}</main>
         </div>
       </div>
     </div>

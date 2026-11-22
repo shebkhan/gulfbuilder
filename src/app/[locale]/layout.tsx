@@ -70,6 +70,9 @@ export default async function LocaleLayout({
     >
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
+          <a href="#main-content" className="skip-to-content">
+            Skip to content
+          </a>
           <ServiceWorkerRegistrar />
           {children}
         </NextIntlClientProvider>
