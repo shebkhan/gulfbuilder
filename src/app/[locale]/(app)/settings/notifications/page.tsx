@@ -7,8 +7,8 @@ import { TelegramLinkCard } from "@/components/domain/telegram-link-card";
 import { WebPushCard } from "@/components/domain/web-push-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import { can, isRole } from "@/lib/rbac";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { can } from "@/lib/rbac";
+import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
 
 export default async function NotificationSettingsPage({
@@ -19,22 +19,13 @@ export default async function NotificationSettingsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/login`);
+  const ctx = await getOrgContext();
+  if (!ctx) redirect(`/${locale}/login`);
+  if (!can(ctx.role, "settings.write")) redirect(`/${locale}/dashboard`);
 
-  const { data: membership } = await supabase
-    .from("org_members")
-    .select("org_id, role")
-    .eq("user_id", user.id)
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
-
-  const role = membership && isRole(membership.role) ? membership.role : "tenant";
-  if (!can(role, "settings.write")) redirect(`/${locale}/dashboard`);
+  const role = ctx.role;
+  const supabase = ctx.supabase;
+  const user = { id: ctx.userId };
 
   const t = await getTranslations("settings.notifications");
 

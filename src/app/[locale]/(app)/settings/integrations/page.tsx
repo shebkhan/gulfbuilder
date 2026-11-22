@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { can, isRole } from "@/lib/rbac";
+import { getOrgContext } from "@/server/org-context";
+import { can } from "@/lib/rbac";
 
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,24 +12,16 @@ export default async function IntegrationsSettingsPage({ params }: { params: Pro
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/login`);
+  const ctx = await getOrgContext();
+  if (!ctx) redirect(`/${locale}/login`);
+  if (!can(ctx.role, "settings.write")) redirect(`/${locale}/dashboard`);
 
-  const { data: membership } = await supabase
-    .from("org_members")
-    .select("org_id, role")
-    .eq("user_id", user.id)
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
-  const role = membership && isRole(membership.role) ? membership.role : "tenant";
-  if (!can(role, "settings.write")) redirect(`/${locale}/dashboard`);
+  const supabase = ctx.supabase;
 
   const { data: keys } = await supabase
     .from("api_keys")
     .select("id, name, role, owner_id, scopes, expires_at, revoked_at, last_used_at, created_at")
-    .eq("org_id", membership!.org_id)
+    .eq("org_id", ctx.orgId)
     .order("created_at", { ascending: false });
 
   return (

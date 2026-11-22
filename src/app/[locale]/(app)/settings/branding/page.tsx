@@ -3,8 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BrandingForm } from "@/components/domain/branding-form";
 import { PageHeader } from "@/components/domain/page-header";
 import { SettingsNav } from "@/components/domain/settings-nav";
-import { can, isRole } from "@/lib/rbac";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { can } from "@/lib/rbac";
+import { getOrgContext } from "@/server/org-context";
 
 export default async function BrandingSettingsPage({
   params,
@@ -14,29 +14,19 @@ export default async function BrandingSettingsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/login`);
+  const ctx = await getOrgContext();
+  if (!ctx) redirect(`/${locale}/login`);
+  if (!can(ctx.role, "settings.write")) redirect(`/${locale}/dashboard`);
 
-  const { data: membership } = await supabase
-    .from("org_members")
-    .select("org_id, role")
-    .eq("user_id", user.id)
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
-
-  const role = membership && isRole(membership.role) ? membership.role : "tenant";
-  if (!can(role, "settings.write")) redirect(`/${locale}/dashboard`);
+  const role = ctx.role;
+  const supabase = ctx.supabase;
 
   const { data: branding } = await supabase
     .from("org_branding")
     .select(
       "app_name, logo_url, favicon_url, primary_color, secondary_color, font_family, terminology, custom_domain, custom_domain_status",
     )
-    .eq("org_id", membership!.org_id)
+    .eq("org_id", ctx.orgId)
     .maybeSingle();
 
   const { data: presets } = await supabase
