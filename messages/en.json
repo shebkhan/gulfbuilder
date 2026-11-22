@@ -1183,7 +1183,8 @@
       }
     },
     "cashFlowForecast": "Cash Flow Forecast",
-    "cashFlowForecastDesc": "Projected net cash flows, scenario modeling, renewal rate, and PDC clearance assumptions."
+    "cashFlowForecastDesc": "Projected net cash flows, scenario modeling, renewal rate, and PDC clearance assumptions.",
+    "budgets": "Budgets vs actual"
   },
   "portal": {
     "nav": {

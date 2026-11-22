@@ -443,9 +443,11 @@ export type Database = {
           currency: string
           deposited_at: string | null
           id: string
+          image_path: string | null
           lease_id: string | null
           notes: string | null
           org_id: string
+          payee_raw: string | null
           payment_id: string | null
           replaced_by: string | null
           status: Database["public"]["Enums"]["cheque_status"]
@@ -466,9 +468,11 @@ export type Database = {
           currency?: string
           deposited_at?: string | null
           id?: string
+          image_path?: string | null
           lease_id?: string | null
           notes?: string | null
           org_id: string
+          payee_raw?: string | null
           payment_id?: string | null
           replaced_by?: string | null
           status?: Database["public"]["Enums"]["cheque_status"]
@@ -489,9 +493,11 @@ export type Database = {
           currency?: string
           deposited_at?: string | null
           id?: string
+          image_path?: string | null
           lease_id?: string | null
           notes?: string | null
           org_id?: string
+          payee_raw?: string | null
           payment_id?: string | null
           replaced_by?: string | null
           status?: Database["public"]["Enums"]["cheque_status"]
@@ -3860,6 +3866,7 @@ export type Database = {
       in_todo: { Args: never; Returns: boolean }
       is_empty: { Args: { "": string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
+      is_publicly_listed: { Args: { p_unit: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       isnt_empty: { Args: { "": string }; Returns: string }
       issue_owner_statement: {
@@ -3915,6 +3922,8 @@ export type Database = {
         }
         Returns: string
       }
+      public_listing_building: { Args: { p_unit: string }; Returns: string }
+      public_listing_org: { Args: { p_unit: string }; Returns: string }
       record_expense: {
         Args: {
           p_amount: number
@@ -3968,10 +3977,22 @@ export type Database = {
               p_cheque_date: string
               p_cheque_no: string
               p_currency?: string
-              p_image_path?: string
               p_lease_id: string
               p_notes?: string
-              p_payee_raw?: string
+              p_tenant_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_charge_id?: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_lease_id: string
+              p_notes?: string
               p_tenant_id: string
             }
             Returns: string
@@ -3992,25 +4013,53 @@ export type Database = {
             }
             Returns: string
           }
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_image_path?: string
+              p_lease_id: string
+              p_notes?: string
+              p_payee_raw?: string
+              p_tenant_id: string
+            }
+            Returns: string
+          }
       renew_lease: { Args: { p_lease: string; p_terms: Json }; Returns: string }
       reopen_period: {
         Args: { p_month: string; p_reason?: string }
         Returns: undefined
       }
-      replace_cheque: {
-        Args: {
-          p_amount: number
-          p_bank_name: string
-          p_cheque_date: string
-          p_cheque_no: string
-          p_currency?: string
-          p_image_path?: string
-          p_notes?: string
-          p_old_cheque_id: string
-          p_payee_raw?: string
-        }
-        Returns: string
-      }
+      replace_cheque:
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_notes?: string
+              p_old_cheque_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_amount: number
+              p_bank_name: string
+              p_cheque_date: string
+              p_cheque_no: string
+              p_currency?: string
+              p_image_path?: string
+              p_notes?: string
+              p_old_cheque_id: string
+              p_payee_raw?: string
+            }
+            Returns: string
+          }
       resolve_org_by_host: {
         Args: { p_app_host?: string; p_host: string }
         Returns: Json
