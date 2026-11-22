@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ContractPdfButton } from "@/components/domain/contract-pdf-button";
 import { notFound } from "next/navigation";
 import {
   PrintDocument,
@@ -73,7 +74,8 @@ export default async function PrintContract({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="print-no-print flex justify-end">
+      <div className="print-no-print flex justify-end gap-2">
+        <ContractPdfButton leaseId={id} />
         <PrintLocaleLink href={`/print/contract/${id}`} locale={otherLocale} />
       </div>
       <PrintDocument
