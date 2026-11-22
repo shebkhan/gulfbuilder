@@ -6,14 +6,13 @@
  * than be served offline.
  */
 const CACHE = "gulf-shell-v1";
-const SHELL = ["/en/dashboard", "/ar/dashboard"];
+const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(SHELL))
-      .catch(() => undefined)
+      .then((cache) => cache.addAll([OFFLINE_URL, "/icons/icon.svg"]).catch(() => undefined))
       .then(() => self.skipWaiting()),
   );
 });
@@ -37,41 +36,32 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request).catch(() =>
-        caches.match(request).then((cached) => cached || caches.match("/en/dashboard")),
-      ),
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => undefined);
+          return res;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
+          return cached || (await caches.match(OFFLINE_URL)) || Response.error();
+        }),
     );
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then(
-      (cached) =>
-        cached ||
-        fetch(request).then((response) => {
-          if (response.ok && url.pathname.startsWith("/_next/static")) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        }),
-    ),
-  );
-});
-
-self.addEventListener("push", (event) => {
-  let payload = {};
-  try {
-    payload = event.data ? event.data.json() : {};
-  } catch {
-    payload = {};
+  // Cache-first for static assets.
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((res) => {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => undefined);
+            return res;
+          }),
+      ),
+    );
   }
-  const title = payload.title || "";
-  const body = payload.body || "";
-  event.waitUntil(self.registration.showNotification(title, { body }));
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  event.waitUntil(self.clients.openWindow("/dashboard"));
 });
