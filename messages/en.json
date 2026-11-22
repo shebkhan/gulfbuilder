@@ -506,7 +506,11 @@
     },
     "occupied": "Occupied",
     "vacant": "Vacant",
-    "viewTenants": "View Tenants"
+    "viewTenants": "View Tenants",
+    "listingSettings": "Listing settings",
+    "buildingListed": "List building publicly",
+    "buildingListedHint": "When off, none of its units appear in the public marketplace.",
+    "save": "Save"
   },
   "tenants": {
     "title": "Tenants",
@@ -1820,6 +1824,37 @@
       "status": {
         "new": "New"
       }
+    },
+    "admin": {
+      "title": "Listing settings",
+      "subtitle": "Control how this unit appears on the public marketplace.",
+      "listed": "Listed publicly",
+      "titleField": "Listing title",
+      "descriptionField": "Listing description",
+      "slugField": "URL slug",
+      "slugHint": "Lowercase letters, numbers and hyphens. Leave blank to auto-generate.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "images": "Listing images",
+      "imagesHint": "Upload photos shown in the gallery. First image is the cover.",
+      "addImage": "Add image",
+      "uploading": "Uploading…",
+      "uploaded": "Uploaded",
+      "remove": "Remove",
+      "altText": "Alt text",
+      "noImages": "No images yet.",
+      "errors": {
+        "not_authorised": "You are not allowed to edit listings.",
+        "invalid_input": "Please check the form.",
+        "duplicate_slug": "That slug is already in use.",
+        "file_required": "Choose an image file.",
+        "file_too_large": "Image is too large (max 5 MB).",
+        "unsupported_file_type": "Only PNG, JPEG or WebP images are allowed.",
+        "upload_failed": "Upload failed. Please try again.",
+        "failed": "Could not save. Please try again."
+      },
+      "buildingNotListed": "The building is not listed publicly, so this unit will not appear in search results."
     }
   }
 }

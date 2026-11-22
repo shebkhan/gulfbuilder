@@ -63,6 +63,12 @@ export default async function UnitPage({
             >
               ← {building?.name ?? t("title")}
             </Link>
+            <Link
+              href={`/units/${id}/listing`}
+              className="w-fit font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface"
+            >
+              {t("listingSettings")}
+            </Link>
             <Badge variant={unit.status === "occupied" ? "success" : "neutral"}>
               {t(`statuses.${unit.status}`)}
             </Badge>

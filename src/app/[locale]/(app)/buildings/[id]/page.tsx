@@ -4,12 +4,14 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BuildingAccess } from "@/components/domain/building-access";
 import { FloorsForm, UnitsForm } from "@/components/domain/bulk-forms";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { toggleBuildingListingAction } from "@/server/actions/listings";
 
 const STATUS_VARIANT: Record<string, "warning" | "success" | "info" | "danger"> = {
   vacant: "warning",
@@ -41,7 +43,7 @@ export default async function BuildingPage({
 
   const { data: building } = await ctx.supabase
     .from("buildings")
-    .select("id, code, name, city, street, zone, country_code")
+    .select("id, code, name, city, street, zone, country_code, is_listed_publicly")
     .eq("id", id)
     .maybeSingle();
   if (!building) notFound();
@@ -148,6 +150,34 @@ export default async function BuildingPage({
           </>
         }
       />
+
+      {writable ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("buildingListed")}</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <p className="mb-3 font-body-sm text-body-sm text-on-surface-variant">
+              {t("buildingListedHint")}
+            </p>
+            <form action={toggleBuildingListingAction} className="flex items-center gap-3">
+              <input type="hidden" name="buildingId" value={building.id} />
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isListed"
+                  value="true"
+                  defaultChecked={building.is_listed_publicly}
+                />
+                <span className="font-body-md text-body-md text-on-surface">{t("buildingListed")}</span>
+              </label>
+              <Button type="submit" size="sm">
+                {t("save")}
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
