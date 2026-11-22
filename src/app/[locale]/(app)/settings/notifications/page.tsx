@@ -161,7 +161,7 @@ export default async function NotificationSettingsPage({
           {!outbox || outbox.length === 0 ? (
             <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
           ) : (
-            <ul className="flex flex-col divide-y divide-hairline">
+            <ul className="flex flex-col divide-y divide-hairline" aria-live="polite">
               {outbox.map((row) => (
                 <li key={row.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                   <div className="flex flex-col">

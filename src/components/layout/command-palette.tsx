@@ -73,7 +73,7 @@ export function CommandPalette() {
             onChange={(e) => run(e.target.value)}
             placeholder={t("search" as never) || "Search tenants, units, leases…"}
           />
-          <div className="mt-3 max-h-80 overflow-y-auto">
+          <div className="mt-3 max-h-80 overflow-y-auto" aria-live="polite" aria-atomic="true">
             {pending ? (
               <p className="py-4 text-center font-body-sm text-body-sm text-on-surface-variant">
                 {t("loading")}
