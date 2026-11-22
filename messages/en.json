@@ -58,7 +58,8 @@
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "all": "All",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "search": "Search"
   },
   "today": {
     "title": "Today",

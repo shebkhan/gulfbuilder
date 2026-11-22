@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AppShell } from "@/components/domain/app-shell";
+import { CommandPalette } from "@/components/layout/command-palette";
 import { requiresMfa } from "@/lib/mfa";
 import { getBrand } from "@/lib/white-label";
 import { isRole } from "@/lib/rbac";
@@ -66,6 +67,7 @@ export default async function AppLayout({
       logoUrl={(await getBrand())?.logoUrl}
     >
       {children}
+      <CommandPalette />
     </AppShell>
   );
 }
