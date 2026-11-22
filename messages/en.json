@@ -382,7 +382,12 @@
       "languages": {
         "en": "English",
         "ar": "العربية"
-      }
+      },
+      "health": "Delivery health",
+      "queued": "Queued",
+      "sent": "Sent",
+      "failed": "Failed",
+      "healthHint": "Rows currently in the outbox by status. The dispatch worker drains queued rows automatically."
     },
     "audit": {
       "title": "Audit log",

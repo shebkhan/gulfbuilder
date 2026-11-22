@@ -33,3 +33,9 @@ Schedule trigger 07:00 Asia/Qatar → GET /owner/digest → format → send per 
 ## 6. Admin endpoints
 
 Admin/manager/accountant keys use `/api/v1/admin/*`: dashboard, units/summary, cheques/due, leases, receivables, maintenance, approvals, digest. An admin daily digest template is shipped as `docs/n8n/daily-admin-digest.json`.
+
+## 7. Notification dispatch (automated delivery)
+
+Import `docs/n8n/notification-dispatch.json`. It POSTs to `/api/notifications/dispatch` every 5 minutes.
+
+Credential: HTTP Header Auth with header `Authorization` and value `Bearer <NOTIFICATION_CRON_SECRET>` (the env var on the Gulf app). The route returns `{ claimed, sent, failed, skipped }`; inspect the execution log or the Settings → Notifications health panel for failures. Set the workflow to active once the credential is saved. Retry/backoff is handled server-side in `src/server/notifications/backoff.ts`.

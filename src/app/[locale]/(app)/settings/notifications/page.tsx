@@ -38,23 +38,36 @@ export default async function NotificationSettingsPage({
 
   const t = await getTranslations("settings.notifications");
 
-  const [{ data: templates }, { data: outbox }, { data: profile }] = await Promise.all([
-    supabase
-      .from("notification_templates")
-      .select("id, event, channel, locale, subject, body")
-      .order("event")
-      .limit(100),
-    supabase
-      .from("notification_outbox")
-      .select("id, event, channel, recipient, locale, status, attempts, created_at, sent_at")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    supabase
-      .from("profiles")
-      .select("telegram_chat_id, telegram_link_code, telegram_link_expires_at")
-      .eq("id", user.id)
-      .maybeSingle(),
-  ]);
+  const [{ data: templates }, { data: outbox }, { data: profile }, { count: queuedCount }, { count: sentCount }, { count: failedCount }] =
+    await Promise.all([
+      supabase
+        .from("notification_templates")
+        .select("id, event, channel, locale, subject, body")
+        .order("event")
+        .limit(100),
+      supabase
+        .from("notification_outbox")
+        .select("id, event, channel, recipient, locale, status, attempts, created_at, sent_at")
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabase
+        .from("profiles")
+        .select("telegram_chat_id, telegram_link_code, telegram_link_expires_at")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("notification_outbox")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "queued"),
+      supabase
+        .from("notification_outbox")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "sent"),
+      supabase
+        .from("notification_outbox")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "failed"),
+    ]);
 
   const telegramCode =
     profile?.telegram_link_code &&
@@ -107,6 +120,35 @@ export default async function NotificationSettingsPage({
               ))}
             </ul>
           )}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>{t("health")}</CardTitle>
+        </CardHeader>
+        <CardBody className="pt-0">
+          <p className="py-2 font-body-sm text-body-sm text-on-surface-variant">{t("healthHint")}</p>
+          <dl className="grid grid-cols-3 gap-3">
+            <div className="flex flex-col rounded-xl bg-surface-container-lowest p-3">
+              <dt className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
+                {t("queued")}
+              </dt>
+              <dd className="font-headline-md text-headline-md text-on-surface tabular">{queuedCount ?? 0}</dd>
+            </div>
+            <div className="flex flex-col rounded-xl bg-surface-container-lowest p-3">
+              <dt className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
+                {t("sent")}
+              </dt>
+              <dd className="font-headline-md text-headline-md text-on-surface tabular">{sentCount ?? 0}</dd>
+            </div>
+            <div className="flex flex-col rounded-xl bg-surface-container-lowest p-3">
+              <dt className="font-section-kicker text-section-kicker uppercase tracking-wider text-on-surface-variant">
+                {t("failed")}
+              </dt>
+              <dd className="font-headline-md text-headline-md text-on-surface tabular">{failedCount ?? 0}</dd>
+            </div>
+          </dl>
         </CardBody>
       </Card>
 
