@@ -8,6 +8,7 @@ import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { RealtimeRefresh } from "@/components/domain/realtime-refresh";
 
 type SearchParams = Promise<{
   status?: string;
@@ -115,6 +116,8 @@ export default async function MaintenancePage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
+      <RealtimeRefresh table="maintenance_requests" />
+
       <PageHeader
         section="maintenance"
         role={ctx.role}

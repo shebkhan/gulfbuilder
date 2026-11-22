@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/domain/page-header";
+import { RealtimeRefresh } from "@/components/domain/realtime-refresh";
 import { getOrgContext } from "@/server/org-context";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,8 @@ export default async function EnquiriesPage({
 
   return (
     <div className="flex flex-col gap-space-lg pt-2">
+      <RealtimeRefresh table="listing_enquiries" />
+
       <PageHeader
         section="buildings"
         role={ctx.role}
