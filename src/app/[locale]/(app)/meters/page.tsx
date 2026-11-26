@@ -1,4 +1,4 @@
-import { Gauge, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DateCell } from "@/components/domain/date-cell";
 import { ListPagination } from "@/components/domain/list-pagination";
@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -80,8 +81,7 @@ export default async function MetersPage({
         <CardBody className="pt-0">
           {paged.total === 0 ? (
             <div className="flex flex-col items-center gap-3 py-10 text-center">
-              <Gauge className="size-12 text-on-surface-variant/40" />
-              <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+              <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
             </div>
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">

@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/domain/page-header";
 import { RealtimeRefresh } from "@/components/domain/realtime-refresh";
 import { getOrgContext } from "@/server/org-context";
+import { EmptyState } from "@/components/domain/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +64,7 @@ export default async function EnquiriesPage({
           ))}
         </div>
       ) : (
-        <p className="font-body-lg text-body-lg text-on-surface-variant">{t("empty")}</p>
+        <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
       )}
     </div>
   );

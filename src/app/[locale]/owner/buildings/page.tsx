@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Card, CardBody } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { paginate } from "@/lib/pagination";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOwnerScope } from "@/server/queries/owner-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -45,8 +46,7 @@ export default async function OwnerBuildingsPage({
       {(buildings ?? []).length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center gap-3 p-12 text-center">
-            <Building2 className="size-12 text-on-surface-variant/40" />
-            <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           </CardBody>
         </Card>
       ) : (

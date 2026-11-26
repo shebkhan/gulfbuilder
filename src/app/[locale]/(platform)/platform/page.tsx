@@ -3,6 +3,7 @@ import { CreateOrganizationForm } from "@/components/domain/organization-admin-f
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { EmptyState } from "@/components/domain/empty-state";
 
 export default async function PlatformDashboard({
   params,
@@ -96,7 +97,7 @@ export default async function PlatformDashboard({
       <section className="rounded-2xl bg-surface-container-lowest p-5 shadow-sm">
         <h2 className="mb-4 font-headline-sm text-headline-sm text-on-surface">{t("organizations")}</h2>
         {(orgs.data ?? []).length === 0 ? (
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+          <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-start font-body-sm text-body-sm">

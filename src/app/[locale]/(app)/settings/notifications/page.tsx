@@ -10,6 +10,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { EmptyState } from "@/components/domain/empty-state";
 
 export default async function NotificationSettingsPage({
   params,
@@ -90,7 +91,7 @@ export default async function NotificationSettingsPage({
         </CardHeader>
         <CardBody className="pt-0">
           {!templates || templates.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
               {templates.map((template) => (
@@ -150,7 +151,7 @@ export default async function NotificationSettingsPage({
         <CardBody className="flex flex-col gap-4 pt-0">
           <SendNowButton />
           {!outbox || outbox.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <ul className="flex flex-col divide-y divide-hairline" aria-live="polite">
               {outbox.map((row) => (

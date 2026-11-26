@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/dates";
 import { paginate } from "@/lib/pagination";
 import { getTenantPortalData } from "@/server/queries/tenant-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -41,7 +42,7 @@ export default async function PortalDocumentsPage({
         </CardHeader>
         <CardBody className="pt-0">
           {data.documents.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
               {paged.rows.map((d) => (

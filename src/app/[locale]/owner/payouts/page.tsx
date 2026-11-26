@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { getOwnerPayouts, getOwnerScope } from "@/server/queries/owner-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -39,7 +40,7 @@ export default async function OwnerPayoutsPage({
         </CardHeader>
         <CardBody className="pt-0">
           {payouts.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">

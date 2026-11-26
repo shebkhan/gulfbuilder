@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader, CardTitle, KpiLabel } from "@/components/ui
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { getOwnerReceivables, getOwnerScope } from "@/server/queries/owner-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 const BUCKETS = [
   { key: "0-30", min: 0, max: 30 },
@@ -67,7 +68,7 @@ export default async function OwnerReceivablesPage({
         </CardHeader>
         <CardBody className="pt-0">
           {rows.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">

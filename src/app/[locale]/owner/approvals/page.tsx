@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
 import { paginate } from "@/lib/pagination";
 import { getOwnerApprovals, getOwnerScope } from "@/server/queries/owner-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -41,7 +42,7 @@ export default async function OwnerApprovalsPage({
         </CardHeader>
         <CardBody className="pt-0">
           {approvals.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <ul className="flex flex-col divide-y divide-hairline">
               {paged.rows.map((a) => {

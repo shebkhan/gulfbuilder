@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { EmptyState } from "@/components/domain/empty-state";
 
 export default async function AuditSettingsPage({
   params,
@@ -47,7 +48,7 @@ export default async function AuditSettingsPage({
         </CardHeader>
         <CardBody className="pt-0">
           {!rows || rows.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">

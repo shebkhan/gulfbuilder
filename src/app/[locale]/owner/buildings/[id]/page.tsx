@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOwnerScope } from "@/server/queries/owner-portal";
+import { EmptyState } from "@/components/domain/empty-state";
 
 export default async function OwnerBuildingPage({
   params,
@@ -53,7 +54,7 @@ export default async function OwnerBuildingPage({
         </CardHeader>
         <CardBody className="pt-0">
           {units.length === 0 ? (
-            <p className="py-3 font-body-sm text-body-sm text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-start font-body-sm text-body-sm">
