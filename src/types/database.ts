@@ -1912,6 +1912,7 @@ export type Database = {
           channel: string
           claimed_at: string | null
           created_at: string
+          dedupe_key: string | null
           error: string | null
           event: string
           id: string
@@ -1930,6 +1931,7 @@ export type Database = {
           channel: string
           claimed_at?: string | null
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           event: string
           id?: string
@@ -1948,6 +1950,7 @@ export type Database = {
           channel?: string
           claimed_at?: string | null
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           event?: string
           id?: string
