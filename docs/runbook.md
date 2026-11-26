@@ -91,7 +91,7 @@ row but **not** one whose `scheduled_for` is in the future; (c) a stale claim
 `src/types/database.ts` from the applied migration to confirm the hand-edited
 types before any remote push.
 
-**Before deploying `20261118000048_notification_events.sql` (1B):** run the pgTAP
+**Before deploying `20261123000001_notification_events.sql` (1B):** run the pgTAP
 suite — `supabase test db` on a local stack, or `pnpm db:test --linked` against a
 staging branch — and confirm `supabase/tests/notification_events_test.sql` passes.
 `pnpm db:test --linked` must be run by the owner/superuser, because the pgTAP suite

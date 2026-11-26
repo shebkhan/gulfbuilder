@@ -262,6 +262,132 @@ export type Database = {
           },
         ]
       }
+      bank_transactions: {
+        Row: {
+          amount_minor: number
+          bank_account_id: string
+          description: string | null
+          id: string
+          imported_at: string
+          matched_id: string | null
+          matched_type: string | null
+          org_id: string
+          txn_date: string
+        }
+        Insert: {
+          amount_minor: number
+          bank_account_id: string
+          description?: string | null
+          id?: string
+          imported_at?: string
+          matched_id?: string | null
+          matched_type?: string | null
+          org_id: string
+          txn_date: string
+        }
+        Update: {
+          amount_minor?: number
+          bank_account_id?: string
+          description?: string | null
+          id?: string
+          imported_at?: string
+          matched_id?: string | null
+          matched_type?: string | null
+          org_id?: string
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budgets: {
+        Row: {
+          account_id: string
+          amount_minor: number
+          building_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          month: string
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          amount_minor: number
+          building_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          id?: string
+          month: string
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          amount_minor?: number
+          building_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          month?: string
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
+          },
+          {
+            foreignKeyName: "budgets_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "budgets_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buildings: {
         Row: {
           amenities: string[]
@@ -856,6 +982,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "expenses_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
+          },
+          {
             foreignKeyName: "expenses_journal_id_fk"
             columns: ["journal_id"]
             isOneToOne: false
@@ -930,6 +1063,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "buildings"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "floors_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
           },
           {
             foreignKeyName: "floors_org_id_fkey"
@@ -1054,6 +1194,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "buildings"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
           },
           {
             foreignKeyName: "journal_lines_journal_id_fkey"
@@ -1679,6 +1826,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "maintenance_requests_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
+          },
+          {
             foreignKeyName: "maintenance_requests_expense_id_fkey"
             columns: ["expense_id"]
             isOneToOne: false
@@ -1784,6 +1938,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "member_building_access_building_fk"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
+          },
+          {
             foreignKeyName: "member_building_access_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -1881,6 +2042,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "buildings"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meters_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
           },
           {
             foreignKeyName: "meters_org_id_fkey"
@@ -2360,6 +2528,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "buildings"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_ledger_entries_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
           },
           {
             foreignKeyName: "owner_ledger_entries_journal_id_fkey"
@@ -3363,6 +3538,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "units_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "mv_building_occupancy"
+            referencedColumns: ["building_id"]
+          },
+          {
             foreignKeyName: "units_currency_fkey"
             columns: ["currency"]
             isOneToOne: false
@@ -3510,6 +3692,26 @@ export type Database = {
       }
     }
     Views: {
+      mv_building_occupancy: {
+        Row: {
+          building_code: string | null
+          building_id: string | null
+          building_name: string | null
+          occupied_units: number | null
+          org_id: string | null
+          total_units: number | null
+          vacant_units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buildings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pg_all_foreign_keys: {
         Row: {
           fk_columns: unknown[] | null
@@ -3700,6 +3902,7 @@ export type Database = {
           channel: string
           claimed_at: string | null
           created_at: string
+          dedupe_key: string | null
           error: string | null
           event: string
           id: string
@@ -3819,6 +4022,19 @@ export type Database = {
         Returns: boolean
       }
       encrypt_id: { Args: { p_plaintext: string }; Returns: string }
+      enqueue_notification: {
+        Args: {
+          p_channel: string
+          p_dedupe_key: string
+          p_event: string
+          p_locale: string
+          p_org: string
+          p_payload: Json
+          p_recipient: string
+        }
+        Returns: undefined
+      }
+      enqueue_notification_reminders: { Args: never; Returns: undefined }
       fail:
         | { Args: never; Returns: string }
         | { Args: { "": string }; Returns: string }
@@ -3831,6 +4047,10 @@ export type Database = {
           p_scenario?: string
         }
         Returns: Json
+      }
+      format_money: {
+        Args: { p_currency: string; p_minor: number }
+        Returns: string
       }
       format_type_string: { Args: { "": string }; Returns: string }
       generate_floors: {
@@ -3968,6 +4188,7 @@ export type Database = {
         }
         Returns: string
       }
+      refresh_building_occupancy_mv: { Args: never; Returns: undefined }
       refund_deposit: {
         Args: { p_amount: number; p_deposit_id: string; p_reason?: string }
         Returns: undefined
@@ -4031,6 +4252,19 @@ export type Database = {
             }
             Returns: string
           }
+      render_notification: {
+        Args: {
+          p_channel: string
+          p_event: string
+          p_locale: string
+          p_org: string
+          p_payload: Json
+        }
+        Returns: {
+          body: string
+          subject: string
+        }[]
+      }
       renew_lease: { Args: { p_lease: string; p_terms: Json }; Returns: string }
       reopen_period: {
         Args: { p_month: string; p_reason?: string }
@@ -4079,6 +4313,7 @@ export type Database = {
       skip:
         | { Args: { "": string }; Returns: string }
         | { Args: { how_many: number; why: string }; Returns: string }
+      sweep_overdue: { Args: { p_org?: string }; Returns: number }
       tenant_id_number: { Args: { p_tenant: string }; Returns: string }
       tenant_ids: { Args: never; Returns: string[] }
       tenant_lease_ids: { Args: never; Returns: string[] }
