@@ -1,4 +1,4 @@
-import { Building2, Eye, FileSignature, Mail, Phone, Plus, Users } from "lucide-react";
+import { Building2, Eye, FileSignature, Mail, Phone, Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { TenantSearch } from "@/components/domain/tenant-search";
@@ -9,6 +9,7 @@ import { paginate } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{
   q?: string;
@@ -308,8 +309,7 @@ export default async function TenantsPage({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-hairline bg-surface-container-low p-12 text-center">
-            <Users className="mb-3 h-10 w-10 text-on-surface-variant/60" />
-            <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           </div>
         )}
       </div>

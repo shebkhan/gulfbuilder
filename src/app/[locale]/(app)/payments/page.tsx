@@ -11,6 +11,7 @@ import { PAGE_SIZE, getPaginationRange, toPaginated } from "@/lib/pagination";
 import { can } from "@/lib/rbac";
 import { getOrgContext } from "@/server/org-context";
 import { PageHeader } from "@/components/domain/page-header";
+import { EmptyState } from "@/components/domain/empty-state";
 
 type SearchParams = Promise<{ page?: string }>;
 
@@ -139,8 +140,7 @@ export default async function PaymentsPage({
       <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
         {(!payments || payments.length === 0) ? (
           <div className="flex flex-col items-center justify-center gap-3 p-12 text-center">
-            <Receipt className="size-12 text-on-surface-variant/40" />
-            <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
+            <EmptyState animation="/animations/empty-box.lottie" description={t("empty")} />
           </div>
         ) : (
           <div className="overflow-x-auto">

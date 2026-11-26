@@ -203,6 +203,7 @@ export async function ensureFixture(): Promise<Fixture> {
     .from("units")
     .update({
       is_listed_publicly: true,
+      status: "vacant",
       listing_title: `${BUILDING_NAME} 001`,
       listing_description: "Bright flat near the metro.",
       listing_slug: listingSlug,

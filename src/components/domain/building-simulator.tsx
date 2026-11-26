@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { LottieAnimation } from "@/components/domain/lottie-animation";
 import { groupUnitsByFloor } from "@/lib/stacking";
 import { bulkSetUnitStatusAction, saveBuildingLayoutAction } from "@/server/actions/property";
 import { Button } from "@/components/ui/button";
@@ -369,12 +370,24 @@ export function BuildingSimulator({
 
           {writable && dirty && !previewMode && (
             <Button size="sm" onClick={saveLayout} disabled={saving || isPending}>
-              {saving ? ts("saving") : ts("saveLayout")}
+              {saving ? (
+                <span className="flex items-center gap-1.5">
+                  <LottieAnimation src="/animations/loading.lottie" className="h-4 w-4" />
+                  {ts("saving")}
+                </span>
+              ) : (
+                ts("saveLayout")
+              )}
             </Button>
           )}
 
           {message && (
-            <span className="font-body-sm text-body-sm text-on-surface-variant">{message}</span>
+            <span className="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+              {(message === "saved" || message === "updated") && (
+                <LottieAnimation src="/animations/success.lottie" className="h-5 w-5" loop={false} />
+              )}
+              {message}
+            </span>
           )}
         </div>
 

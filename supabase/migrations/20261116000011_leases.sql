@@ -241,7 +241,7 @@ declare
 begin
   if tg_op = 'DELETE' then
     v_unit := coalesce(
-      (select unit_id from leases where id = old.id),
+      old.unit_id,
       (select r.unit_id from rooms r where r.id = old.room_id)
     );
   else

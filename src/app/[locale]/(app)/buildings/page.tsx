@@ -1,7 +1,7 @@
 import { Building2, Plus, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/domain/page-header";
-import { LottieAnimation } from "@/components/domain/lottie-animation";
+import { EmptyState } from "@/components/domain/empty-state";
 import { Button } from "@/components/ui/button";
 import { ListPagination } from "@/components/domain/list-pagination";
 import { Link } from "@/i18n/navigation";
@@ -181,10 +181,7 @@ export default async function BuildingsPage({
           />
         </>
       ) : (
-        <div className="flex flex-col items-center gap-3 py-8">
-          <LottieAnimation src="/animations/building.lottie" className="h-32 w-32" />
-          <p className="font-body-md text-body-md text-on-surface-variant">{t("empty")}</p>
-        </div>
+        <EmptyState animation="/animations/building.lottie" description={t("empty")} />
       )}
     </div>
   );
