@@ -8,6 +8,9 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.9.1
     version: 3.10.0(react-hook-form@7.92.0)
+  '@lottiefiles/dotlottie-react':
+    specifier: ^0.22.3
+    version: 0.22.3(react@19.3.1)
   '@radix-ui/react-checkbox':
     specifier: ^1.4.1
     version: 1.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
@@ -1097,6 +1100,21 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.3
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  /@lottiefiles/dotlottie-react@0.22.3(react@19.3.1):
+    resolution: {integrity: sha512-TBcQsb7FqprGEKsn8D1w+HGINz9t8LAz1wgcYVej4I964SbwzDPxnuCoGV/c8WIdIxn/XAmDRzSXQljSRpOtsA==}
+    engines: {node: '>=18.17.0', npm: '>=9.5.0'}
+    peerDependencies:
+      react: ^17 || ^18 || ^19
+    dependencies:
+      '@lottiefiles/dotlottie-web': 0.83.2
+      react: 19.3.1
+    dev: false
+
+  /@lottiefiles/dotlottie-web@0.83.2:
+    resolution: {integrity: sha512-MMI4RVcFtB5Vjv9mwbP8oWsSqy4N7GO2P+jwHVLo4GjbYAdR4Z7seK3rR7YefpcfayWrsQogaORMBzv6YFWntQ==}
+    engines: {node: '>=18.17.0', npm: '>=9.5.0'}
+    dev: false
 
   /@modelcontextprotocol/core@2.4.0:
     resolution: {integrity: sha512-z8QBKqdfXLPzkLQuG4xp8hrVEMm1PZ1IgxMN2sMbJiFiAKOWXnAzogXn2W4aqIBlP1ea6U5yiqVquvUNM1Cj6Q==}

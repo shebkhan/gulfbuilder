@@ -201,3 +201,11 @@ Levels with SPEC D11. Consequence: there is no `supabase db reset` and `supabase
 replayed automatically. pgTAP runs with `supabase test db --linked`, generated types with
 `supabase gen types typescript --linked`, and migrations are applied with `supabase db push --linked`.
 A local Docker stack is reintroduced for the M7 load and restore tests.
+
+## 2026-11-26
+
+**D-028 · Lottie animations via `@lottiefiles/dotlottie-react`.**
+Added the dependency to render illustrated Lottie/dotLottie animations. First use: the buildings
+list empty state (`/public/animations/building.lottie`, Alexander Gromov "Building", Lottie Simple
+License). Rationale: small bundle (dotLottie ~2 KB) and a reusable `LottieAnimation` client
+component. Reuse the component for other empty/loading states rather than adding more libs.
