@@ -209,7 +209,15 @@ export default async function BuildingPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>{t("stacking")}</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>{t("stacking")}</CardTitle>
+              <Link
+                href={`/buildings/${id}/stacking`}
+                className="font-label-sm text-label-sm text-primary hover:underline"
+              >
+                {t("simulator.openSimulator")} →
+              </Link>
+            </div>
           </CardHeader>
           <CardBody>
             <div className="flex flex-col gap-2">

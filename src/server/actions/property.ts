@@ -210,3 +210,59 @@ export async function revokeBuildingAccessAction(formData: FormData): Promise<vo
 
   revalidatePath(`/buildings/${buildingId.data}`);
 }
+
+export type StackingLayoutItem = { unitId: string; floorId: string; order: number };
+
+export async function saveBuildingLayoutAction(
+  buildingId: string,
+  layout: StackingLayoutItem[],
+): Promise<PropertyState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "properties.write")) return fail("not_authorised");
+
+  const parsedBuilding = z.string().uuid().safeParse(buildingId);
+  if (!parsedBuilding.success) return fail("invalid_input");
+  if (!Array.isArray(layout) || layout.length === 0) return fail("invalid_input");
+
+  for (const item of layout) {
+    const v = z
+      .object({ unitId: z.string().uuid(), floorId: z.string().uuid(), order: z.number().int().min(1) })
+      .safeParse(item);
+    if (!v.success) return fail("invalid_input");
+  }
+
+  // Update each unit's floor + layout_order. RLS scopes writes to the org.
+  for (const item of layout) {
+    const { error } = await ctx.supabase
+      .from("units")
+      .update({ floor_id: item.floorId, layout_order: item.order, updated_at: new Date().toISOString() })
+      .eq("id", item.unitId)
+      .eq("building_id", parsedBuilding.data);
+    if (error) return fail("failed");
+  }
+
+  revalidatePath(`/buildings/${parsedBuilding.data}`, "layout");
+  revalidatePath(`/buildings/${parsedBuilding.data}/stacking`);
+  return { ok: "saved" };
+}
+
+export async function bulkSetUnitStatusAction(
+  unitIds: string[],
+  status: string,
+): Promise<PropertyState> {
+  const ctx = await getOrgContext();
+  if (!ctx || !can(ctx.role, "properties.write")) return fail("not_authorised");
+
+  const parsedIds = z.array(z.string().uuid()).min(1).safeParse(unitIds);
+  const parsedStatus = z.enum(["vacant", "occupied", "reserved", "maintenance"]).safeParse(status);
+  if (!parsedIds.success || !parsedStatus.success) return fail("invalid_input");
+
+  const { error } = await ctx.supabase
+    .from("units")
+    .update({ status: parsedStatus.data, updated_at: new Date().toISOString() })
+    .in("id", parsedIds.data);
+  if (error) return fail("failed");
+
+  revalidatePath("/buildings", "layout");
+  return { ok: "updated" };
+}

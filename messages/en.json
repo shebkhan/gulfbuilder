@@ -511,7 +511,27 @@
     "listingSettings": "Listing settings",
     "buildingListed": "List building publicly",
     "buildingListedHint": "When off, none of its units appear in the public marketplace.",
-    "save": "Save"
+    "save": "Save",
+    "simulator": {
+      "grid": "Grid",
+      "facade": "3D",
+      "saveLayout": "Save layout",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "preview": "Preview scenario",
+      "exitPreview": "Exit preview",
+      "apply": "Apply",
+      "discard": "Discard",
+      "previewHint": "Click a unit to cycle status.",
+      "changed": "changed",
+      "selected": "selected",
+      "markMaintenance": "Mark maintenance",
+      "markVacant": "Mark vacant",
+      "clear": "Clear",
+      "openSimulator": "Open simulator",
+      "floors": "floors",
+      "units": "units"
+    }
   },
   "tenants": {
     "title": "Tenants",

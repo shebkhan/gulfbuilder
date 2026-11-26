@@ -511,7 +511,27 @@
     "listingSettings": "إعدادات الإدراج",
     "buildingListed": "إدراج المبنى للعامة",
     "buildingListedHint": "عند إيقافه، لن تظهر أي من وحداته في السوق العام.",
-    "save": "حفظ"
+    "save": "حفظ",
+    "simulator": {
+      "grid": "شبكة",
+      "facade": "ثلاثي الأبعاد",
+      "saveLayout": "حفظ التخطيط",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ",
+      "preview": "معاينة سيناريو",
+      "exitPreview": "إنهاء المعاينة",
+      "apply": "تطبيق",
+      "discard": "تجاهل",
+      "previewHint": "انقر على وحدة لتبديل الحالة.",
+      "changed": "تم تغييرها",
+      "selected": "محددة",
+      "markMaintenance": "تحديد كصيانة",
+      "markVacant": "تحديد كشاغرة",
+      "clear": "مسح",
+      "openSimulator": "فتح المحاكي",
+      "floors": "طوابق",
+      "units": "وحدات"
+    }
   },
   "tenants": {
     "title": "المستأجرون",

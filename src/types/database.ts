@@ -3460,6 +3460,7 @@ export type Database = {
           furnished: boolean
           id: string
           is_listed_publicly: boolean
+          layout_order: number | null
           listed_at: string | null
           listing_description: string | null
           listing_slug: string | null
@@ -3488,6 +3489,7 @@ export type Database = {
           furnished?: boolean
           id?: string
           is_listed_publicly?: boolean
+          layout_order?: number | null
           listed_at?: string | null
           listing_description?: string | null
           listing_slug?: string | null
@@ -3516,6 +3518,7 @@ export type Database = {
           furnished?: boolean
           id?: string
           is_listed_publicly?: boolean
+          layout_order?: number | null
           listed_at?: string | null
           listing_description?: string | null
           listing_slug?: string | null
